@@ -9,6 +9,7 @@ import {
     IonButton,
     IonIcon,
     IonLabel,
+    IonTitle,
     useIonViewWillEnter
 } from '@ionic/react';
 import {
@@ -174,90 +175,65 @@ const CalendarPage: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader className="ion-no-border">
-                <IonToolbar>
+            <IonHeader className="calendar-header-wrapper">
+                <IonToolbar className="calendar-toolbar">
                     <IonButtons slot="start">
                         <IonButton
                             size="small"
-                            fill="clear"
                             className={`mode-toggle-button ${viewMode === 'month' ? 'mode-toggle-button--active' : ''}`}
-                            onClick={() => {
-                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                setViewMode('month');
-                            }}
-                            aria-pressed={viewMode === 'month'}
-                            aria-label="Switch to month view"
+                            onClick={() => setViewMode('month')}
                         >
                             <IonLabel>Month</IonLabel>
                         </IonButton>
                         <IonButton
                             size="small"
-                            fill="clear"
                             className={`mode-toggle-button ${viewMode === 'year' ? 'mode-toggle-button--active' : ''}`}
-                            onClick={() => {
-                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                setViewMode('year');
-                            }}
-                            aria-pressed={viewMode === 'year'}
-                            aria-label="Switch to year view"
+                            onClick={() => setViewMode('year')}
                         >
                             <IonLabel>Year</IonLabel>
                         </IonButton>
                     </IonButtons>
+
+                    <IonTitle>
+                        <div className="header-date">
+                            {viewMode === 'month'
+                                ? currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })
+                                : currentDate.getFullYear()}
+                        </div>
+                    </IonTitle>
+
                     <IonButtons slot="end">
                         {viewMode === 'month' ? (
-                            <IonButton
-                                onClick={goToToday}
-                                fill="clear"
-                                className="header-today-button"
-                                aria-label="Go to today"
-                            >
-                                <IonLabel>Today</IonLabel>
-                            </IonButton>
-                        ) : (
-                            <>
-                                <IonButton
-                                    fill="clear"
-                                    size="small"
-                                    onClick={() => {
-                                        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                        changeYear(-1);
-                                    }}
-                                    aria-label="Previous year"
-                                >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <IonButton fill="clear" onClick={() => changeMonth(-1)}>
                                     <IonIcon icon={chevronBack} />
                                 </IonButton>
-                                <span
-                                    style={{
-                                        fontSize: '0.8rem',
-                                        fontWeight: 600,
-                                        opacity: 0.8,
-                                        margin: '0 4px',
-                                        minWidth: '3.5rem',
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    {currentDate.getFullYear()}
-                                </span>
                                 <IonButton
-                                    fill="clear"
-                                    size="small"
-                                    onClick={() => {
-                                        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                        changeYear(1);
-                                    }}
-                                    aria-label="Next year"
+                                    onClick={goToToday}
+                                    className="header-today-button"
                                 >
+                                    <IonLabel>Today</IonLabel>
+                                </IonButton>
+                                <IonButton fill="clear" onClick={() => changeMonth(1)}>
                                     <IonIcon icon={chevronForward} />
                                 </IonButton>
-                            </>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <IonButton fill="clear" onClick={() => changeYear(-1)}>
+                                    <IonIcon icon={chevronBack} />
+                                </IonButton>
+                                <IonButton fill="clear" onClick={() => changeYear(1)}>
+                                    <IonIcon icon={chevronForward} />
+                                </IonButton>
+                            </div>
                         )}
                     </IonButtons>
                 </IonToolbar>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 16px 8px', background: 'var(--ion-toolbar-background)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <IonIcon icon={locationOutline} color="primary" style={{ fontSize: '0.8rem' }} />
-                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)' }}>{locationName}</span>
+                <div className="header-location-bar">
+                    <div className="location-info">
+                        <IonIcon icon={locationOutline} color="primary" />
+                        <span>{locationName}</span>
                     </div>
                 </div>
             </IonHeader>
@@ -310,24 +286,6 @@ const CalendarPage: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="ion-padding-horizontal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <IonButton fill="clear" size="small" onClick={() => {
-                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                changeMonth(-1);
-                            }}>
-                                <IonIcon icon={chevronBack} />
-                            </IonButton>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', opacity: 0.6 }}>
-                                {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                            </span>
-                            <IonButton fill="clear" size="small" onClick={() => {
-                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-                                changeMonth(1);
-                            }}>
-                                <IonIcon icon={chevronForward} />
-                            </IonButton>
-                        </div>
-
                         {renderMonthGrid()}
                     </>
                 ) : (
@@ -335,38 +293,43 @@ const CalendarPage: React.FC = () => {
                 )}
 
                 <div className="calendar-legend">
-                    <div className="legend-title">Moon & Tradition Legend</div>
-                    <div className="legend-grid">
-                        <div className="legend-item"><span>🌕</span> Purnima Uposatha</div>
-                        <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
-                        <div className="legend-item"><span>🌗</span> Ashtami / Chaturdashi</div>
-                        <div className="legend-item"><span>○</span> Kshaya / Vridhi (Optional)</div>
+                    <div className="legend-section">
+                        <div className="legend-title">Moon Phases</div>
+                        <div className="legend-grid">
+                            <div className="legend-item"><span>🌕</span> Purnima Uposatha</div>
+                            <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
+                            <div className="legend-item"><span>🌗</span> Ashtami / Chaturdashi</div>
+                            <div className="legend-item"><span>○</span> Muted (Optional)</div>
+                        </div>
                     </div>
 
-                    <div className="traditions-row">
-                        <div className="legend-item">
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF9933' }} />
-                            Theravada
-                        </div>
-                        <div className="legend-item">
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E34234' }} />
-                            Mahayana
-                        </div>
-                        <div className="legend-item">
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1E3A5F' }} />
-                            Vajrayana
+                    <div className="legend-section">
+                        <div className="legend-title">Traditions</div>
+                        <div className="traditions-row">
+                            <div className="legend-item">
+                                <span className="tradition-dot dot-theravada"></span>
+                                Theravada
+                            </div>
+                            <div className="legend-item">
+                                <span className="tradition-dot dot-mahayana"></span>
+                                Mahayana
+                            </div>
+                            <div className="legend-item">
+                                <span className="tradition-dot dot-vajrayana"></span>
+                                Vajrayana
+                            </div>
                         </div>
                     </div>
 
                     <div className="liturgical-meanings">
-                        <div style={{ marginBottom: '4px' }}><strong>Liturgical Meanings:</strong></div>
-                        <div style={{ marginBottom: '4px', display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
-                            <span>•</span>
-                            <span><strong>Kshaya (Skipped):</strong> Occurs when a Tithi starts after one sunrise and ends before the next. It never exists at the moment of sunrise, causing it to be "skipped" in the primary udaya-based count. These are marked as optional observances.</span>
+                        <div className="legend-title">Liturgical Meanings</div>
+                        <div className="liturgical-item">
+                            <span className="bullet">•</span>
+                            <span><strong>Kshaya (Skipped):</strong> Occurs when a Tithi starts after one sunrise and ends before the next. "Skipped" in the count.</span>
                         </div>
-                        <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
-                            <span>•</span>
-                            <span><strong>Vridhi (Extended):</strong> Occurs when a Tithi is long enough to span across two consecutive sunrises. The same Tithi is counted twice; the first is the primary day, and the second is marked as an optional/extended day.</span>
+                        <div className="liturgical-item">
+                            <span className="bullet">•</span>
+                            <span><strong>Vridhi (Extended):</strong> Tithi spans two sunrises. Counted twice (primary + extended).</span>
                         </div>
                     </div>
                 </div>

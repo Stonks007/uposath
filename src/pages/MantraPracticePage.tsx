@@ -3,7 +3,7 @@ import {
     IonPage, IonHeader, IonToolbar, IonButtons, IonButton,
     IonTitle, IonContent, IonIcon, useIonAlert,
     useIonViewWillEnter, IonProgressBar,
-    IonSegment, IonSegmentButton
+    IonSegment, IonSegmentButton, IonLabel
 } from '@ionic/react';
 import { close, volumeHigh, volumeMute, pause, play, add, remove } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';

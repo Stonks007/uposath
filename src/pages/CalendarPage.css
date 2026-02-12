@@ -125,119 +125,262 @@
 }
 
 /* Legend Styling */
+/* Legend Styling */
 .calendar-legend {
     margin: var(--space-xs);
-    padding: var(--space-sm);
-    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-xl);
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.legend-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .legend-title {
-    font-size: 0.65rem;
-    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-display);
+    font-size: 0.6rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0.7;
-    margin-bottom: 6px;
-    color: var(--color-text-secondary);
+    letter-spacing: 0.1em;
+    color: var(--color-text-tertiary);
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .legend-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2px 8px;
-    margin-bottom: 6px;
+    gap: 8px 12px;
 }
 
 .traditions-row {
     display: flex;
-    justify-content: flex-start;
-    gap: 8px;
-    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 0.6rem;
-    opacity: 0.8;
-    line-height: 1.2;
+    gap: 6px;
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
 }
 
+.legend-item span:first-child:not(.tradition-dot) {
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+/* Tradition Dots */
+.tradition-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-theravada {
+    background: #FF9933;
+    box-shadow: 0 0 4px rgba(255, 153, 51, 0.4);
+}
+
+.dot-mahayana {
+    background: #E34234;
+    box-shadow: 0 0 4px rgba(227, 66, 52, 0.4);
+}
+
+.dot-vajrayana {
+    background: #1E3A5F;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Liturgical Meanings Section */
+/* Liturgical Meanings Section */
 .liturgical-meanings {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    margin-top: 2px;
+}
+
+.liturgical-meanings .legend-title {
+    border-bottom: none;
+    margin-bottom: 4px;
+    color: var(--color-accent-primary);
     opacity: 0.9;
+}
+
+.liturgical-item {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    font-size: 0.6rem;
     line-height: 1.4;
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
 }
 
-.liturgical-meanings strong {
+.liturgical-item:last-child {
+    margin-bottom: 0;
+}
+
+.liturgical-item strong {
     color: var(--color-text-primary);
-    opacity: 1;
+    font-weight: 700;
 }
 
-/* Header controls */
+.bullet {
+    color: var(--color-accent-primary);
+    font-size: 0.8em;
+    line-height: 1.4;
+    margin-top: 0;
+}
+
+/* Header styling overhaul */
+.calendar-header-wrapper {
+    background: var(--color-bg-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.calendar-toolbar {
+    --background: transparent;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+}
+
+.header-date {
+    font-family: var(--font-family-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--color-accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.header-location-bar {
+    padding: 0 16px 8px;
+    background: transparent;
+}
+
+.location-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+    opacity: 0.8;
+}
+
+.location-info ion-icon {
+    font-size: 0.8rem;
+}
+
+/* Header controls refine */
 .mode-toggle-button {
-    --background: rgba(255, 255, 255, 0.02);
+    --background: rgba(255, 255, 255, 0.03);
     --color: var(--color-text-secondary);
-    --border-radius: 999px;
-    --padding-start: 0.75rem;
-    --padding-end: 0.75rem;
-    --border-color: var(--color-border);
-    font-weight: var(--font-weight-medium);
-    text-transform: none;
-    letter-spacing: 0.02em;
-    transition:
-        background-color var(--transition-base),
-        box-shadow var(--transition-base),
-        transform var(--transition-fast),
-        opacity var(--transition-base);
-    box-shadow: 0 0 0 1px var(--color-border);
+    --border-radius: 12px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-style: solid;
+    --border-width: 1px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    margin: 0 4px;
+    height: 32px;
 }
 
 .mode-toggle-button--active {
-    --background: var(--gradient-twilight);
-    --color: var(--color-text-primary);
-    box-shadow: var(--shadow-glow-intense);
-    transform: translateY(-1px);
+    --background: rgba(255, 198, 112, 0.1);
+    --color: var(--color-accent-primary);
+    --border-color: var(--color-accent-primary);
+    box-shadow: 0 0 10px rgba(255, 198, 112, 0.1);
+}
+
+.mode-toggle-button--active ion-label {
+    color: var(--color-accent-primary) !important;
+    font-weight: 800;
 }
 
 .mode-toggle-button:active {
-    transform: scale(0.96);
+    transform: scale(0.92);
+    --background: var(--color-accent-primary);
+    --color: var(--color-bg-primary);
+    box-shadow: 0 0 20px var(--color-accent-primary);
+}
+
+.mode-toggle-button:hover:not(.mode-toggle-button--active) {
+    --background: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.2);
 }
 
 .header-today-button {
-    --background: var(--gradient-sunrise);
-    --color: var(--color-text-primary);
-    --border-radius: 999px;
-    --padding-start: 0.75rem;
-    --padding-end: 0.75rem;
-    font-weight: var(--font-weight-medium);
-    text-transform: none;
-    letter-spacing: 0.02em;
-    box-shadow: var(--shadow-glow);
-    transition:
-        background-color var(--transition-base),
-        transform var(--transition-fast),
-        box-shadow var(--transition-base);
+    --background: rgba(255, 198, 112, 0.1);
+    --color: var(--color-accent-primary);
+    --border-radius: 12px;
+    --padding-start: 0.8rem;
+    --padding-end: 0.8rem;
+    --border-color: var(--color-accent-primary);
+    --border-style: solid;
+    --border-width: 1px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    height: 32px;
+    transition: all 0.2s ease;
 }
 
-.header-today-button ion-label,
+.header-today-button ion-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
 .mode-toggle-button ion-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    pointer-events: none;
 }
 
-.mode-toggle-button:hover,
 .header-today-button:hover {
-    opacity: 0.9;
+    --background: rgba(255, 198, 112, 0.2);
+    box-shadow: 0 0 10px rgba(255, 198, 112, 0.2);
 }
 
 .header-today-button:active {
-    transform: scale(0.96);
+    transform: scale(0.92);
+    --background: var(--color-accent-primary);
+    --color: var(--color-bg-primary);
+    box-shadow: 0 0 20px var(--color-accent-primary);
+}
+
+ion-toolbar ion-button {
+    --padding-start: 8px;
+    --padding-end: 8px;
+}
+
+ion-toolbar ion-button ion-icon {
+    font-size: 1.2rem;
+    color: var(--color-accent-primary);
+}
+
+.calendar-header-wrapper ion-toolbar ion-buttons[slot="end"] {
+    margin-right: 8px;
 }
 
 @keyframes fadeIn {
