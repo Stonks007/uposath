@@ -6,7 +6,8 @@
  * 
  * IMPORTANT: No Hindu festivals are included.
  */
-import { getPanchangam, type Panchangam, Observer } from '@ishubhamx/panchangam-js';
+import { type Panchangam, Observer } from '@ishubhamx/panchangam-js';
+import { getPanchangam } from './panchangamService';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

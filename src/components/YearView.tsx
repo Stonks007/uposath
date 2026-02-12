@@ -11,28 +11,33 @@ interface YearViewProps {
     observer: Observer;
 }
 
+import { formatSanskritDate } from '../services/timeUtils';
+
 const YearView: React.FC<YearViewProps> = ({ year, observer }) => {
     const uposathaDays = useMemo(() => {
         const days = getYearUposathaDays(year, observer);
         // Group by month
         const grouped: Record<string, UposathaDay[]> = {};
         days.forEach(day => {
-            const monthKey = day.date.toLocaleString('default', { month: 'long' });
-            if (!grouped[monthKey]) grouped[monthKey] = [];
-            grouped[monthKey].push(day);
+            const gregorianMonth = day.date.toLocaleString('default', { month: 'long' });
+            const masaName = day.status.panchangam.masa.name;
+            const key = `${gregorianMonth} (${masaName} Masa)`;
+
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(day);
         });
         return grouped;
     }, [year, observer]);
 
     return (
         <IonList>
-            {Object.entries(uposathaDays).map(([month, days]) => (
-                <React.Fragment key={month}>
+            {Object.entries(uposathaDays).map(([monthKey, days]) => (
+                <React.Fragment key={monthKey}>
                     <IonItemDivider color="light">
-                        <IonLabel><strong>{month}</strong></IonLabel>
+                        <IonLabel><strong>{monthKey}</strong></IonLabel>
                     </IonItemDivider>
                     {days.map((day, idx) => {
-                        const festival = checkFestival(day.date, observer);
+                        const festival = checkFestival(day.date, observer, day.status.panchangam);
                         return (
                             <IonItem key={idx} routerLink={`/day/${day.date.toISOString().split('T')[0]}`}>
                                 <IonIcon
@@ -45,7 +50,7 @@ const YearView: React.FC<YearViewProps> = ({ year, observer }) => {
                                     }}
                                 />
                                 <IonLabel>
-                                    <h2>{day.date.toLocaleDateString(undefined, { day: 'numeric', weekday: 'short' })}</h2>
+                                    <h2>{formatSanskritDate(day.date)}</h2>
                                     <p>{day.status.label}</p>
                                 </IonLabel>
                                 {festival && <IonNote slot="end" color="warning">☸️ {festival.name}</IonNote>}

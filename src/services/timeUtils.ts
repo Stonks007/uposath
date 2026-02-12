@@ -69,6 +69,29 @@ export function getTimezones(): string[] {
     }
 }
 
+
+/**
+ * Sanskrit Weekday names (Vara)
+ */
+export const SANSKRIT_WEEKDAYS = [
+    'Ravivara',     // Sunday
+    'Somavara',     // Monday
+    'Mangalavara',  // Tuesday
+    'Budhavara',    // Wednesday
+    'Guruvara',     // Thursday
+    'Shukravara',   // Friday
+    'Shanivara'     // Saturday
+];
+
+/**
+ * Formats a date using Sanskrit weekday names.
+ */
+export function formatSanskritDate(date: Date): string {
+    const day = date.getDate();
+    const weekday = SANSKRIT_WEEKDAYS[date.getDay()];
+    return `${day} ${weekday}`;
+}
+
 /**
  * Tries to guess timezone from current environment.
  */

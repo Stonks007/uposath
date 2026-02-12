@@ -12,7 +12,8 @@
  *   - 15th Tithi (Purnima) — Full Moon      → Puṇṇamī
  *   - 30th Tithi (Amavasya) — New Moon      → Amāvāsī
  */
-import { getPanchangam, tithiNames, type Panchangam } from '@ishubhamx/panchangam-js';
+import { tithiNames, type Panchangam } from '@ishubhamx/panchangam-js';
+import { getPanchangam } from './panchangamService';
 import type { Observer } from 'astronomy-engine';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -46,6 +47,12 @@ export interface UposathaStatus {
     sunset: Date | null;
     /** The raw panchangam for this day (for reuse by other services) */
     panchangam: Panchangam;
+    /** Whether this is an optional/secondary observance (e.g. Skipped/Extended) */
+    isOptional: boolean;
+    /** Whether this is a "Skipped" (Kshaya) tithi observance */
+    isKshaya: boolean;
+    /** Whether this is an "Extended" (Vridhi) tithi observance */
+    isVridhi: boolean;
 }
 
 export interface UposathaDay {
@@ -78,12 +85,12 @@ const PALI_LABELS: Record<number, string> = {
 
 /** Short Uposatha type labels */
 const UPOSATHA_TYPE: Record<number, string> = {
-    7: '8th Day Uposatha',
-    13: '14th Day Uposatha',
-    14: 'Full Moon Uposatha',
-    22: '8th Day Uposatha',
-    28: '14th Day Uposatha',
-    29: 'New Moon Uposatha',
+    7: 'Ashtami Uposatha',
+    13: 'Chaturdashi Uposatha',
+    14: 'Purnima Uposatha',
+    22: 'Ashtami Uposatha',
+    28: 'Chaturdashi Uposatha',
+    29: 'Amavasya Uposatha',
 };
 
 // ─── Core Functions ──────────────────────────────────────────────────────────
@@ -100,41 +107,53 @@ export function getUposathaStatus(date: Date, observer: Observer): UposathaStatu
     const tithi = p.tithi; // 0-indexed, computed at sunrise
     const tithiNumber = tithi + 1; // 1-30
     let isUposatha = UPOSATHA_INDICES.has(tithi);
+    // Optional Flags
+    let isOptional = false;
+    let isKshaya = false;
+    let isVridhi = false;
     let kshayaTithi: number | null = null;
 
-    // 1. Handle Tithi Kshaya (Skipped Tithi)
-    // If an Uposatha tithi is skipped between this sunrise and next, 
-    // this day becomes the observance day for that skipped tithi.
-    const tomorrow = new Date(date);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const pTomorrow = getPanchangam(tomorrow, observer);
-    const nextTithi = pTomorrow.tithi;
+    // 1. Handle Tithi Kshaya (Skipped Tithi) - Restoration as Optional
+    // Performance optimization: Only check if current tithi is close to an Uposatha tithi
+    const potentialKshayaTargets = [6, 7, 12, 13, 14, 21, 22, 27, 28, 29];
+    if (potentialKshayaTargets.includes(tithi)) {
+        const tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const pTomorrow = getPanchangam(tomorrow, observer);
+        const nextTithi = pTomorrow.tithi;
 
-    // Check if any Uposatha tithi exists between current and next sunrise
-    for (const target of UPOSATHA_INDICES) {
-        let isSkipped = false;
-        if (nextTithi > tithi) {
-            isSkipped = target > tithi && target < nextTithi;
-        } else if (nextTithi < tithi) {
-            // Wrap around at 29 -> 0
-            isSkipped = target > tithi || target < nextTithi;
-        }
+        // Check if an Uposatha tithi is skipped between this sunrise and next
+        for (const target of UPOSATHA_INDICES) {
+            let isSkipped = false;
+            if (nextTithi > tithi) {
+                isSkipped = target > tithi && target < nextTithi;
+            } else if (nextTithi < tithi) {
+                // Wrap around at 29 -> 0
+                isSkipped = target > tithi || target < nextTithi;
+            }
 
-        if (isSkipped) {
-            isUposatha = true;
-            kshayaTithi = target;
-            break;
+            if (isSkipped) {
+                // Mark as optional observance for the skipped tithi
+                isOptional = true;
+                isKshaya = true;
+                kshayaTithi = target;
+                break;
+            }
         }
     }
 
-    // 2. Handle Tithi Vridhi (Extended Tithi)
-    // Skip the second day of a Tithi Vridhi for Uposatha markers
-    if (isUposatha && kshayaTithi === null) {
+    // 2. Handle Tithi Vridhi (Extended Tithi) - Optional
+    // If today is an Uposatha tithi, but yesterday was ALSO the same tithi,
+    // then today is the "extended" observance (second day).
+    if (isUposatha) {
         const yesterday = new Date(date);
         yesterday.setDate(yesterday.getDate() - 1);
         const pYesterday = getPanchangam(yesterday, observer);
         if (pYesterday.tithi === tithi) {
-            isUposatha = false; // Suppress duplicate marker
+            // It's the same tithi as yesterday
+            isUposatha = false; // It's not the primary observance
+            isOptional = true;
+            isVridhi = true;
         }
     }
 
@@ -144,16 +163,21 @@ export function getUposathaStatus(date: Date, observer: Observer): UposathaStatu
 
     let label = `${tithiNames[tithi]} — ${p.paksha} Paksha`;
     if (isUposatha) {
-        const typeStr = kshayaTithi !== null ? `(Skipped ${tithiNames[kshayaTithi]})` : '';
-        label = `${uposathaType} ${typeStr} (${paliLabel}) — Pakkha Uposatha`;
+        label = `${uposathaType} (${paliLabel}) — Pakkha Uposatha`;
+    } else if (isOptional) {
+        if (isKshaya && kshayaTithi !== null) {
+            label = `Kshaya: ${tithiNames[kshayaTithi]} (${UPOSATHA_TYPE[kshayaTithi]})`;
+        } else if (isVridhi) {
+            label = `Vridhi: ${uposathaType}`;
+        }
     }
 
     return {
         isUposatha,
-        isAshtami: tithi === 7 || tithi === 22,
-        isChaturdashi: tithi === 13 || tithi === 28,
-        isFullMoon: tithi === 14,
-        isNewMoon: tithi === 29,
+        isAshtami: activeTithi === 7 || activeTithi === 22,
+        isChaturdashi: activeTithi === 13 || activeTithi === 28,
+        isFullMoon: activeTithi === 14,
+        isNewMoon: activeTithi === 29,
         tithiIndex: tithi,
         tithiNumber,
         tithiName: tithiNames[tithi],
@@ -163,6 +187,9 @@ export function getUposathaStatus(date: Date, observer: Observer): UposathaStatu
         sunrise: p.sunrise,
         sunset: p.sunset,
         panchangam: p,
+        isOptional,
+        isKshaya,
+        isVridhi,
     };
 }
 
@@ -181,7 +208,7 @@ export function getMonthUposathaDays(
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day, 6, 0, 0); // 6 AM local for stable sunrise calc
         const status = getUposathaStatus(date, observer);
-        if (status.isUposatha) {
+        if (status.isUposatha || status.isOptional) {
             results.push({ date, status });
         }
     }

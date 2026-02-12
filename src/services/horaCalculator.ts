@@ -6,7 +6,8 @@
  * The sequence of rulers follows the Chaldean order.
  */
 
-import { getPanchangam, type Observer } from '@ishubhamx/panchangam-js';
+import { type Observer } from '@ishubhamx/panchangam-js';
+import { getPanchangam } from './panchangamService';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

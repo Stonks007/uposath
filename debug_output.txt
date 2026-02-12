@@ -1,12 +1,4 @@
 
-[Losar check Feb 17] Date: Tue Feb 17 2026
-Masa: Magha (Index: 10)
-Tithi: 29 (Name: undefined)
-
-[Losar check Feb 16] Date: Mon Feb 16 2026
-Masa: Magha (Index: 10)
-Tithi: 28 (Name: undefined)
-
 [Bodhi Day check Jan 26] Date: Mon Jan 26 2026
 Masa: Magha (Index: 10)
 Tithi: 7 (Name: undefined)

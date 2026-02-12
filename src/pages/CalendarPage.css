@@ -155,6 +155,66 @@
     font-size: var(--font-size-xs);
 }
 
+/* Header controls */
+.mode-toggle-button {
+    --background: rgba(255, 255, 255, 0.02);
+    --color: var(--color-text-secondary);
+    --border-radius: 999px;
+    --padding-start: 0.75rem;
+    --padding-end: 0.75rem;
+    --border-color: var(--color-border);
+    font-weight: var(--font-weight-medium);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    transition:
+        background-color var(--transition-base),
+        box-shadow var(--transition-base),
+        transform var(--transition-fast),
+        opacity var(--transition-base);
+    box-shadow: 0 0 0 1px var(--color-border);
+}
+
+.mode-toggle-button--active {
+    --background: var(--gradient-twilight);
+    --color: var(--color-text-primary);
+    box-shadow: var(--shadow-glow-intense);
+    transform: translateY(-1px);
+}
+
+.mode-toggle-button:active {
+    transform: scale(0.96);
+}
+
+.header-today-button {
+    --background: var(--gradient-sunrise);
+    --color: var(--color-text-primary);
+    --border-radius: 999px;
+    --padding-start: 0.75rem;
+    --padding-end: 0.75rem;
+    font-weight: var(--font-weight-medium);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    box-shadow: var(--shadow-glow);
+    transition:
+        background-color var(--transition-base),
+        transform var(--transition-fast),
+        box-shadow var(--transition-base);
+}
+
+.header-today-button ion-label,
+.mode-toggle-button ion-label {
+    font-size: 0.75rem;
+}
+
+.mode-toggle-button:hover,
+.header-today-button:hover {
+    opacity: 0.9;
+}
+
+.header-today-button:active {
+    transform: scale(0.96);
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
