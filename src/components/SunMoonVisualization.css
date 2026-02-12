@@ -1,167 +1,203 @@
+.sunrise-timeline-container {
+    margin-bottom: var(--space-lg);
+    animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    padding: 2px 4px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeline-icon {
+    font-size: 1.25rem;
+    animation: amberGlow 4s infinite ease-in-out;
+}
+
+.celestial-sun {
+    animation: amberGlow 4s infinite ease-in-out;
+}
+
+.celestial-moon {
+    animation: silverGlow 4s infinite ease-in-out;
+}
+
+.timeline-title {
+    font-family: var(--font-family-display);
+    font-weight: 800;
+    color: var(--color-accent-primary);
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.location-badge {
+    background: rgba(255, 198, 112, 0.08);
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    color: var(--color-accent-primary);
+    font-weight: 800;
+    border: 1px solid rgba(255, 198, 112, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.timeline-graph-wrapper {
+    position: relative;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.timeline-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: hidden;
+}
+
+/* Visualization Elements */
+.star {
+    animation: twinkle 2.5s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.1;
+        filter: blur(0.5px);
+    }
+
+    50% {
+        opacity: 1;
+        filter: blur(0px);
+    }
+}
+
+.sun-path-fill {
+    opacity: 0.5;
+    animation: breathOpacity 8s infinite ease-in-out;
+}
+
+@keyframes breathOpacity {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.current-time-line {
+    stroke: var(--color-accent-primary);
+    stroke-width: 2;
+    stroke-dasharray: 4 4;
+    opacity: 0.6;
+}
+
+.current-time-label {
+    font-size: 0.75rem;
+    fill: var(--color-accent-primary);
+    font-family: var(--font-family-display);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+}
+
+.event-label-tiny {
+    font-size: 0.7rem;
+    fill: #ffffff;
+    font-weight: 800;
+    text-transform: uppercase;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.9));
+}
+
+.time-grid-label {
+    font-size: 0.7rem;
+    fill: rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+    font-family: var(--font-family-display);
+}
+
+.timeline-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    margin-top: var(--space-md);
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 800;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.sun-dot {
+    background: #FFD700;
+    box-shadow: 0 0 10px #FFD700;
+}
+
+.moon-dot {
+    background: #E8E8F0;
+    box-shadow: 0 0 10px #E8E8F0;
+}
+
+.time-dot {
+    background: var(--color-accent-primary);
+    box-shadow: 0 0 10px var(--color-accent-primary);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Overrides */
+@media (max-width: 600px) {
     .sunrise-timeline-container {
-        background: #0f0f15;
-        border-radius: var(--radius-xl);
-        border: 1px solid rgba(255, 255, 255, 0.05);
         padding: var(--space-md);
-        font-family: var(--font-family-primary);
-        overflow: hidden;
-        margin-bottom: var(--space-md);
-        position: relative;
-        border-top: 2px solid #3498db;
-        /* Sky theme accent */
-    }
-
-    .timeline-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: var(--space-sm);
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .timeline-icon {
-        font-size: 1.2rem;
     }
 
     .timeline-title {
-        font-weight: 700;
-        color: #3498db;
-        font-size: 1rem;
-        letter-spacing: 0.02em;
-    }
-
-    .location-badge {
-        background: rgba(52, 152, 219, 0.1);
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.7rem;
-        color: #3498db;
-        font-weight: 700;
-        border: 1px solid rgba(52, 152, 219, 0.2);
-        text-transform: uppercase;
-    }
-
-    .timeline-graph-wrapper {
-        position: relative;
-        width: 100%;
-        margin: var(--space-xs) 0;
-    }
-
-    .timeline-svg {
-        width: 100%;
-        height: auto;
-        display: block;
-        overflow: visible;
-    }
-
-    /* Visualization Elements */
-    .star {
-        animation: twinkle 5s infinite ease-in-out;
-    }
-
-    @keyframes twinkle {
-
-        0%,
-        100% {
-            opacity: 0.3;
-        }
-
-        50% {
-            opacity: 0.9;
-        }
-    }
-
-    .sun-path-fill {
-        pointer-events: none;
-    }
-
-    .current-time-line {
-        stroke: #ff4757;
-        stroke-width: 2;
-        stroke-dasharray: 4 2;
-        opacity: 0.6;
-    }
-
-    .current-time-label {
-        font-size: 0.6rem;
-        fill: #ff4757;
-        font-weight: 800;
-        opacity: 0.8;
-    }
-
-    .event-label-tiny {
-        font-size: 0.65rem;
-        fill: #808090;
-        font-weight: 700;
-    }
-
-    .time-grid-label {
-        font-size: 0.7rem;
-        fill: rgba(255, 255, 255, 0.4);
-        font-weight: 600;
+        font-size: 0.95rem;
     }
 
     .timeline-legend {
-        display: flex;
-        justify-content: center;
-        gap: var(--space-lg);
-        margin-top: var(--space-sm);
-        font-size: 0.75rem;
-        color: #a0a0b0;
+        gap: var(--space-md);
+        font-size: 0.65rem;
     }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 600;
-    }
-
-    .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
-
-    .sun-dot {
-        background: #FFD700;
-        box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-    }
-
-    .moon-dot {
-        background: #E8E8F0;
-        box-shadow: 0 0 6px rgba(232, 232, 240, 0.5);
-    }
-
-    .time-dot {
-        background: #ff4757;
-        box-shadow: 0 0 6px rgba(255, 71, 87, 0.5);
-    }
-
-    /* Responsive Overrides */
-    @media (max-width: 600px) {
-        .sunrise-timeline-container {
-            padding: var(--space-sm);
-        }
-
-        .timeline-title {
-            font-size: 0.9rem;
-        }
-
-        .timeline-graph-wrapper {
-            margin: var(--space-xs) 0;
-        }
-
-        .time-grid-label {
-            font-size: 0.65rem;
-        }
-
-        .event-label-tiny {
-            font-size: 0.6rem;
-        }
-    }
+}

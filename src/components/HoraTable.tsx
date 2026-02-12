@@ -8,7 +8,7 @@ interface HoraTableProps {
 
 const HoraTable: React.FC<HoraTableProps> = ({ horas, timezone }) => {
     return (
-        <div className="card-glass" style={{ padding: '0', margin: '16px 0' }}>
+        <div className="glass-card" style={{ padding: '0', margin: '16px 0' }}>
             <div style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
                 <h3 className="text-base font-bold" style={{ margin: 0 }}>Planetary Hours</h3>
             </div>

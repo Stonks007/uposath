@@ -1,23 +1,25 @@
 .dhamma-card {
     position: relative;
-    padding: var(--space-md);
-    border-radius: var(--radius-xl);
-    background: radial-gradient(circle at top left, rgba(149, 76, 233, 0.25), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(255, 198, 112, 0.22), transparent 55%),
-        linear-gradient(135deg, #2c1a47, #120d20);
-    border: 1px solid rgba(255, 198, 112, 0.5);
-    box-shadow: var(--shadow-glow);
+    padding: var(--space-lg);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(165deg, rgba(20, 20, 25, 0.95), rgba(10, 10, 12, 0.98));
+    border: 1px solid rgba(255, 198, 112, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
+        inset 0 0 20px rgba(255, 198, 112, 0.05);
     overflow: hidden;
+    transition: transform 0.3s ease;
 }
 
 .dhamma-card__halo {
     position: absolute;
-    inset: -40%;
-    opacity: 0.22;
-    background: radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
-        radial-gradient(circle at 90% 100%, rgba(255, 198, 112, 0.16), transparent 60%);
+    top: -50%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(circle at center, rgba(255, 198, 112, 0.08), transparent 70%);
     pointer-events: none;
-    mix-blend-mode: screen;
+    mix-blend-mode: overlay;
+    z-index: 0;
 }
 
 .dhamma-card__header {
@@ -25,28 +27,35 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    z-index: 1;
 }
 
 .dhamma-card__title {
-    max-width: 65%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .dhamma-card__eyebrow {
-    display: inline-block;
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.16em;
+    font-family: var(--font-family-display);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
+    color: var(--color-accent-primary);
+    opacity: 0.8;
 }
 
 .dhamma-card__heading {
-    margin: 2px 0 0;
-    font-size: var(--font-size-lg);
-    line-height: var(--line-height-tight);
-    font-weight: var(--font-weight-semibold);
-    color: #f6edff;
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
 }
 
 .dhamma-card__reference {
@@ -54,73 +63,70 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 4px;
+    gap: 6px;
 }
 
 .dhamma-card__reference-label {
-    font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.75);
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: rgba(4, 7, 22, 0.75);
-    border: 1px solid rgba(255, 198, 112, 0.4);
+    font-family: var(--font-family-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dhamma-card__badge {
-    font-size: var(--font-size-xs);
+    font-family: var(--font-family-display);
+    font-size: 0.6rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #fcead0;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-primary);
+    background: rgba(255, 198, 112, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 .dhamma-card__text {
     position: relative;
-    margin: var(--space-sm) 0 var(--space-md);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-relaxed);
-    color: rgba(255, 252, 245, 0.94);
+    margin: var(--space-md) 0 var(--space-xl);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    z-index: 1;
+    border-left: 2px solid rgba(255, 198, 112, 0.3);
+    padding-left: var(--space-md);
 }
 
 .dhamma-card__actions {
     position: relative;
     display: flex;
     justify-content: flex-end;
+    z-index: 1;
 }
 
-.dhamma-card__button {
-    --padding-start: 8px;
-    --padding-end: 8px;
-    --border-radius: 999px;
-    --background: rgba(12, 10, 25, 0.85);
-    --background-activated: rgba(255, 198, 112, 0.18);
-    --color: #ffe8b8;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 198, 112, 0.6);
-    box-shadow: 0 0 0 1px rgba(16, 10, 30, 0.85);
-    color: #ffe8b8;
-}
-
-.dhamma-card__button ion-icon {
-    font-size: 1.1rem;
-}
-
-.dhamma-card__button-label {
-    color: inherit;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-medium);
+/* Override premium-button specifically for card context if needed */
+.dhamma-card .premium-button {
+    margin: 0;
+    height: 30px;
 }
 
 @media (max-width: 480px) {
     .dhamma-card {
-        padding: 12px 14px;
+        padding: var(--space-md);
     }
 
     .dhamma-card__heading {
-        font-size: var(--font-size-base);
+        font-size: 1.1rem;
     }
 
     .dhamma-card__text {
-        font-size: var(--font-size-xs);
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 }
-

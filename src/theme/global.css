@@ -70,20 +70,24 @@ body {
 }
 
 /* --- Card Styles --- */
-.card-glass {
+.glass-card {
     background: var(--color-bg-card);
     backdrop-filter: var(--glass-backdrop);
     -webkit-backdrop-filter: var(--glass-backdrop);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-base);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4),
+        inset 0 0 20px rgba(255, 255, 255, 0.02);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
 }
 
-.card-glass:hover {
+.glass-card:hover {
     background: var(--color-bg-card-hover);
-    border-color: var(--color-border-hover);
-    box-shadow: var(--shadow-md);
+    border-color: rgba(255, 198, 112, 0.2);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(255, 198, 112, 0.05);
 }
 
 /* --- Calendar Grid Utilities --- */
@@ -210,3 +214,80 @@ ion-toolbar {
     --padding-top: 4px;
     --padding-bottom: 4px;
 }
+
+/* --- Global Premium Button System --- */
+/* Standarized effect from Calendar Header (Month, Year, Today) */
+
+.premium-button {
+    /* Default State: Muted / Brutalist Glass */
+    --background: rgba(255, 255, 255, 0.03);
+    --color: var(--color-text-secondary);
+    --border-radius: 12px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-style: solid;
+    --border-width: 1px;
+
+    font-weight: 800;
+    font-family: var(--font-family-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    height: 32px;
+    margin: 0 4px;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        background 0.2s ease;
+
+    /* Internal refinement for Ionic */
+    --padding-top: 0;
+    --padding-bottom: 0;
+}
+
+.premium-button ion-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.premium-button ion-icon {
+    font-size: 1.1rem;
+}
+
+/* States */
+.premium-button:hover:not(.premium-button--active) {
+    --background: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.25);
+    --color: var(--color-text-primary);
+}
+
+/* High Visibility State (Action buttons like Today or selection) */
+.premium-button--active,
+.premium-button--accent {
+    --background: rgba(255, 198, 112, 0.1);
+    --color: var(--color-accent-primary);
+    --border-color: var(--color-accent-primary);
+    box-shadow: 0 0 10px rgba(255, 198, 112, 0.05);
+}
+
+/* PEAK IMPACT: TACTILE SCALE & GLOW FLASH */
+.premium-button:active,
+.premium-button.button-active {
+    transform: scale(0.92) !important;
+    --background: var(--color-accent-primary) !important;
+    --color: var(--color-bg-primary) !important;
+    --border-color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 30px var(--color-accent-primary) !important;
+    opacity: 1 !important;
+}
+
+/* Override child text on active impact */
+.premium-button:active ion-label,
+.premium-button:active ion-icon {
+    color: var(--color-bg-primary) !important;
+}
+/* Celestial Animations */
+@keyframes amberGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 198, 112, 0.4)); opacity: 0.9; } 50% { filter: drop-shadow(0 0 16px rgba(255, 198, 112, 0.8)); opacity: 1; } }
+@keyframes silverGlow { 0%, 100% { filter: drop-shadow(0 0 3px rgba(200, 210, 255, 0.3)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 12px rgba(200, 210, 255, 0.7)); opacity: 1; } }
+.celestial-amber { animation: amberGlow 4s infinite ease-in-out; }
+.celestial-silver { animation: silverGlow 4s infinite ease-in-out; }

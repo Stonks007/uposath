@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonButton, IonIcon } from '@ionic/react';
+import { IonButton, IonIcon, IonLabel } from '@ionic/react';
 import { refreshCircle } from 'ionicons/icons';
 import { DhammapadaVerse, getCleanVerseText, getVerseDisplayReference } from '../services/dhammapadaService';
 import './DhammapadaVerseCard.css';
@@ -42,10 +42,10 @@ const DhammapadaVerseCard: React.FC<Props> = ({ verse, isPrimaryForDay = false, 
             size="small"
             fill="clear"
             onClick={onShowAnother}
-            className="dhamma-card__button"
+            className="dhamma-card__button premium-button premium-button--accent"
           >
             <IonIcon slot="start" icon={refreshCircle} />
-            <span className="dhamma-card__button-label">Show another verse</span>
+            <IonLabel className="dhamma-card__button-label">Show another verse</IonLabel>
           </IonButton>
         </div>
       )}

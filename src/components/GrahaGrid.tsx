@@ -10,7 +10,7 @@ const GrahaGrid: React.FC<GrahaGridProps> = ({ grahas }) => {
     return (
         <div className="graha-grid">
             {grahas.map((g) => (
-                <div key={g.id} className="card-glass" style={{ padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <div key={g.id} className="glass-card" style={{ padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                     <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{g.icon}</div>
                     <div className="text-xs font-bold">{g.sanskritName}</div>
                     <div className="text-xs text-gray-500">{g.englishName}</div>

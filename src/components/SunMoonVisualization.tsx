@@ -29,17 +29,15 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
 
     // Canvas dimensions
     const width = 800;
-    const height = 220; // Reduced from 240
+    const height = 240; // Increased to ensure bottom labels are well within bounds
     const horizonY = 160;
-    const minPeakY = 30; // Max height in sky (lowest Y value)
+    const minPeakY = 30;
 
-    const paddingX = 40; // Horizontal padding to prevent edge clipping
+    const paddingX = 50; // Slightly more padding for edge markers
 
     // Helper: Time to X coordinate (relative to sunrise window)
     const timeToX = (date: Date): number => {
         let diff = date.getTime() - dayStart.getTime();
-        // If it's before sunrise (very early morning), we still want to map it if possible, 
-        // but for this visualization we strictly map from sunrise (0..100%)
         let pct = diff / durationMs;
         return paddingX + pct * (width - 2 * paddingX);
     };
@@ -47,7 +45,7 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
     // Helper: Calculate peak Y based on duration (longer transit = higher arc)
     const getPeakY = (start: Date, end: Date): number => {
         const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-        const heightFactor = Math.min(1.2, Math.max(0.4, durationHours / 12));
+        const heightFactor = Math.min(1.1, Math.max(0.4, durationHours / 12));
         const peakHeight = (horizonY - minPeakY) * heightFactor;
         return horizonY - peakHeight;
     };
@@ -55,7 +53,6 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
     const canvasWidth = width - 2 * paddingX;
 
     // Helper: Generate path curve
-    // Note: We only care about the part of the arc that intersects our display window (dayStart to dayEnd)
     const generatePath = (start: Date, end: Date): string => {
         const startX = timeToX(start);
         const endX = timeToX(end);
@@ -70,12 +67,7 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
         const endMs = end.getTime();
         const currMs = current.getTime();
 
-        // Object must be between its rise and set
         if (currMs < startMs || currMs > endMs) return null;
-
-        // And it must be within our visualization window (dayStart to dayEnd)
-        // Actually, let's just return the point, and the SVG clipping or parent logic will handle it.
-        // But for "current time dot", it must be in the window.
         if (currMs < dayStart.getTime() || currMs > dayEnd.getTime()) return null;
 
         const t = (currMs - startMs) / (endMs - startMs);
@@ -99,9 +91,9 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
         return [...Array(40)].map((_, i) => ({
             id: i,
             x: Math.random() * width,
-            y: Math.random() * (horizonY - 20),
-            size: Math.random() * 1.5 + 0.5,
-            opacity: Math.random() * 0.7 + 0.3,
+            y: Math.random() * (horizonY - 40), // Keep stars well above horizon
+            size: Math.random() * 1.2 + 0.6,
+            opacity: Math.random() * 0.6 + 0.4,
             delay: Math.random() * 5
         }));
     }, []);
@@ -250,17 +242,17 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
 
                     {/* Events */}
                     <g transform={`translate(${timeToX(dayStart)}, ${horizonY})`}>
-                        <circle r="4" fill="#FF9F43" />
+                        <circle r="4" fill="var(--color-accent-secondary)" />
                         <text y="42" textAnchor="middle" className="event-label-tiny">RISE {localFormatTime(sunStart)}</text>
                     </g>
                     {sunset && (
                         <g transform={`translate(${timeToX(sunset)}, ${horizonY})`}>
-                            <circle r="4" fill="#FF4757" />
+                            <circle r="4" fill="var(--color-accent-tertiary)" />
                             <text y="42" textAnchor="middle" className="event-label-tiny">SET {localFormatTime(sunset)}</text>
                         </g>
                     )}
                     <g transform={`translate(${timeToX(dayEnd)}, ${horizonY})`}>
-                        <circle r="4" fill="#FF9F43" />
+                        <circle r="4" fill="var(--color-accent-secondary)" />
                         <text y="42" textAnchor="middle" className="event-label-tiny">NEXT {localFormatTime(dayEnd)}</text>
                     </g>
 
@@ -274,7 +266,7 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
 
                     {/* Sun Icon */}
                     {sunPos && (
-                        <g transform={`translate(${sunPos.x}, ${sunPos.y})`} filter="url(#sunGlow)">
+                        <g transform={`translate(${sunPos.x}, ${sunPos.y})`} filter="url(#sunGlow)" className="celestial-sun">
                             <circle r="14" fill="#FFD700" />
                             <circle r="18" fill="rgba(255, 215, 0, 0.25)" />
                         </g>
@@ -282,7 +274,7 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
 
                     {/* Moon Icon */}
                     {moonPos && (
-                        <g transform={`translate(${moonPos.x}, ${moonPos.y})`} filter="url(#moonGlow)">
+                        <g transform={`translate(${moonPos.x}, ${moonPos.y})`} filter="url(#moonGlow)" className="celestial-moon">
                             <circle r="12" fill="#E8E8F0" />
                             <circle r="16" fill="rgba(200, 210, 255, 0.15)" />
                         </g>

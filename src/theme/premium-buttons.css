@@ -1,0 +1,81 @@
+/* Global CSS Improvements */
+
+/* --- Standardized Premium Button System --- */
+
+.premium-button {
+    /* Default State: Muted / Brutalist Glass */
+    --background: rgba(255, 255, 255, 0.03);
+    --color: var(--color-text-secondary);
+    --border-radius: 12px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-style: solid;
+    --border-width: 1px;
+
+    font-weight: 800;
+    font-family: var(--font-family-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    height: 32px;
+    margin: 0 4px;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        background 0.2s ease;
+
+    /* Ensure child styles work correctly */
+    --padding-top: 0;
+    --padding-bottom: 0;
+}
+
+/* Base text/icon sizing for premium buttons */
+.premium-button ion-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.premium-button ion-icon {
+    font-size: 1.1rem;
+}
+
+/* Hover State */
+.premium-button:hover:not(.premium-button--active) {
+    --background: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.25);
+    --color: var(--color-text-primary);
+}
+
+/* Persistent Gold State (Action buttons like Today, etc.) */
+.premium-button--accent {
+    --background: rgba(255, 198, 112, 0.1);
+    --color: var(--color-accent-primary);
+    --border-color: var(--color-accent-primary);
+    box-shadow: 0 0 10px rgba(255, 198, 112, 0.05);
+}
+
+/* Active State (Selection toggles like Month/Year) */
+.premium-button--active {
+    --background: rgba(255, 198, 112, 0.15);
+    --color: var(--color-accent-primary);
+    --border-color: var(--color-accent-primary);
+    box-shadow: 0 0 15px rgba(255, 198, 112, 0.15);
+}
+
+/* --- THE PEAK IMPACT: CLICK STATE --- */
+/* This is the "Premium Effect" the user specifically wants */
+.premium-button:active,
+.premium-button.button-active {
+    transform: scale(0.92) !important;
+    --background: var(--color-accent-primary) !important;
+    --color: var(--color-bg-primary) !important;
+    --border-color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 30px var(--color-accent-primary) !important;
+    opacity: 1 !important;
+}
+
+/* Extra Glow for active labels/icons during impact */
+.premium-button:active ion-label,
+.premium-button:active ion-icon {
+    color: var(--color-bg-primary) !important;
+}

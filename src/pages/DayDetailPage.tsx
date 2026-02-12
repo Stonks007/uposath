@@ -97,7 +97,7 @@ const DayDetailPage: React.FC = () => {
                 </IonToolbar>
             </IonHeader>
 
-                <IonContent fullscreen className="ion-padding">
+            <IonContent fullscreen className="ion-padding">
 
                 {/* Header Info */}
                 <div className="text-center" style={{ marginBottom: '16px' }}>
@@ -180,7 +180,7 @@ const DayDetailPage: React.FC = () => {
                 )}
 
                 {activeTab === 'info' && (
-                    <div className="card-glass" style={{ padding: '16px' }}>
+                    <div className="glass-card" style={{ padding: '16px' }}>
                         <h3>About this Day</h3>
                         <p><strong>Tithi:</strong> {data.status.tithiNumber} - {data.status.tithiName}</p>
                         <p><strong>Uposatha:</strong> {data.status.isUposatha ? 'Yes' : 'No'}</p>

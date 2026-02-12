@@ -148,14 +148,19 @@ const CalendarPage: React.FC = () => {
                 {emptySlots.map((_, i) => <div key={`empty-${i}`} />)}
 
                 {daysInMonth.map((day, i) => {
-                    const isToday = day.date.toDateString() === new Date().toDateString();
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const isToday = day.date.toDateString() === today.toDateString();
+                    const isFutureOrToday = day.date >= today;
+                    const isUpcomingUposatha = day.uposatha.isUposatha && isFutureOrToday;
+
                     const moon = getMoonIcon(day.uposatha);
                     const festivalColors = day.festival ? getTraditionColors(day.festival.tradition) : null;
 
                     return (
                         <div
                             key={i}
-                            className={`day-cell ${isToday ? 'today' : ''}`}
+                            className={`day-cell ${isToday ? 'today' : ''} ${isUpcomingUposatha ? 'uposatha-day' : ''}`}
                             onClick={() => handleDayClick(day.date)}
                         >
                             <span className="day-number">{day.date.getDate()}</span>
@@ -180,14 +185,14 @@ const CalendarPage: React.FC = () => {
                     <IonButtons slot="start">
                         <IonButton
                             size="small"
-                            className={`mode-toggle-button ${viewMode === 'month' ? 'mode-toggle-button--active' : ''}`}
+                            className={`premium-button ${viewMode === 'month' ? 'premium-button--active' : ''}`}
                             onClick={() => setViewMode('month')}
                         >
                             <IonLabel>Month</IonLabel>
                         </IonButton>
                         <IonButton
                             size="small"
-                            className={`mode-toggle-button ${viewMode === 'year' ? 'mode-toggle-button--active' : ''}`}
+                            className={`premium-button ${viewMode === 'year' ? 'premium-button--active' : ''}`}
                             onClick={() => setViewMode('year')}
                         >
                             <IonLabel>Year</IonLabel>
@@ -198,36 +203,41 @@ const CalendarPage: React.FC = () => {
                         <div className="header-date">
                             {viewMode === 'month'
                                 ? currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })
-                                : currentDate.getFullYear()}
+                                : ''}
                         </div>
                     </IonTitle>
 
                     <IonButtons slot="end">
-                        {viewMode === 'month' ? (
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <IonButton fill="clear" onClick={() => changeMonth(-1)}>
-                                    <IonIcon icon={chevronBack} />
-                                </IonButton>
-                                <IonButton
-                                    onClick={goToToday}
-                                    className="header-today-button"
-                                >
-                                    <IonLabel>Today</IonLabel>
-                                </IonButton>
-                                <IonButton fill="clear" onClick={() => changeMonth(1)}>
-                                    <IonIcon icon={chevronForward} />
-                                </IonButton>
-                            </div>
-                        ) : (
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <IonButton fill="clear" onClick={() => changeYear(-1)}>
-                                    <IonIcon icon={chevronBack} />
-                                </IonButton>
-                                <IonButton fill="clear" onClick={() => changeYear(1)}>
-                                    <IonIcon icon={chevronForward} />
-                                </IonButton>
-                            </div>
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {viewMode === 'month' ? (
+                                <>
+                                    <IonButton fill="clear" onClick={() => changeMonth(-1)}>
+                                        <IonIcon icon={chevronBack} />
+                                    </IonButton>
+                                    <IonButton
+                                        onClick={goToToday}
+                                        className="premium-button premium-button--accent"
+                                    >
+                                        <IonLabel>Today</IonLabel>
+                                    </IonButton>
+                                    <IonButton fill="clear" onClick={() => changeMonth(1)}>
+                                        <IonIcon icon={chevronForward} />
+                                    </IonButton>
+                                </>
+                            ) : (
+                                <>
+                                    <IonButton fill="clear" onClick={() => changeYear(-1)}>
+                                        <IonIcon icon={chevronBack} />
+                                    </IonButton>
+                                    <div className="header-date" style={{ margin: '0 8px' }}>
+                                        {currentDate.getFullYear()}
+                                    </div>
+                                    <IonButton fill="clear" onClick={() => changeYear(1)}>
+                                        <IonIcon icon={chevronForward} />
+                                    </IonButton>
+                                </>
+                            )}
+                        </div>
                     </IonButtons>
                 </IonToolbar>
                 <div className="header-location-bar">

@@ -2,15 +2,13 @@
 .panchang-timeline {
     font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    background: #0f0f15;
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: transparent;
     overflow: hidden;
-    margin-bottom: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    border-top: 2px solid #ff9f43;
-    /* Matches title orange */
+}
+
+.timeline-section {
+    margin-top: var(--space-md);
+    animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
 .timeline-header {
@@ -28,13 +26,18 @@
     gap: var(--space-sm);
 }
 
+.timeline-icon {
+    animation: silverGlow 4s infinite ease-in-out;
+}
+
 .timeline-title {
     margin: 0;
     font-size: 1.1rem;
-    font-weight: 700;
-    color: #ff9f43;
-    /* Match orange in image */
-    letter-spacing: 0.02em;
+    font-weight: 800;
+    color: var(--color-accent-primary);
+    font-family: var(--font-family-display);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
 }
 
 .timeline-legend {
@@ -45,38 +48,48 @@
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
-    color: #f1c40f;
-    font-weight: 600;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--color-accent-primary);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    /* Reset line height to prevent baseline skew */
 }
 
 .legend-star {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--color-accent-primary);
+    line-height: 0;
+    display: inline-block;
+    transform: translateY(-1px);
+    /* Correction for Star glyph baseline */
 }
 
 /* Wrapper Grid */
 .timeline-wrapper {
     display: flex;
     position: relative;
-    background: #0f0f15;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    margin: var(--space-sm);
+    border: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 /* Labels Column */
 .labels-column {
-    width: 140px;
-    /* Increased from 110px to prevent truncation */
+    width: 130px;
     flex-shrink: 0;
     z-index: 50;
     position: sticky;
     left: 0;
-    background: #0f0f15;
+    background: #0c0c12;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .label-spacer {
     height: 60px;
-    /* Aligned with time-scale height */
 }
 
 .row-label {
@@ -84,47 +97,25 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 12px;
+    padding: 0 10px;
     gap: 8px;
     min-width: 0;
 }
 
 .row-icon {
-    font-size: 1.1rem;
+    font-size: 1rem;
     opacity: 0.8;
     flex-shrink: 0;
 }
 
 .row-text {
-    font-size: 0.8rem;
-    /* Slightly increased for better legibility */
-    font-weight: 600;
-    color: #a0a0b0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--color-text-secondary);
     white-space: nowrap;
-    overflow: visible;
-    /* Allow overflow if needed, but width should be enough */
-    min-width: 0;
-}
-
-/* Row-specific label coloring */
-.row-label.row-type-tithi .row-text {
-    color: #ffffff;
-}
-
-.row-label.row-type-nakshatra .row-text {
-    color: #ffffff;
-}
-
-.row-label.row-type-yoga .row-text {
-    color: #ffffff;
-}
-
-.row-label.row-type-karana .row-text {
-    color: #ffffff;
-}
-
-.row-label.row-type-vara .row-text {
-    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-family: var(--font-family-display);
 }
 
 /* Content Area */
@@ -137,7 +128,7 @@
 
 .timeline-scroll-area {
     min-width: 1000px;
-    padding: 0 30px;
+    padding: 0 20px;
     position: relative;
     box-sizing: border-box;
 }
@@ -178,7 +169,6 @@
 .sun-marker {
     position: absolute;
     top: 10px;
-    /* Adjusted for smaller height */
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -188,31 +178,30 @@
 
 .sun-icon-wrapper svg {
     width: 18px;
-    /* Reduced from 20px */
     height: 18px;
+    animation: amberGlow 4s infinite ease-in-out;
 }
 
 .sunset-glow {
-    color: #ff4757;
-    filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.6));
+    color: var(--color-accent-tertiary);
+    filter: drop-shadow(0 0 8px rgba(255, 144, 32, 0.4));
 }
 
 .sun-time {
     font-size: 0.75rem;
     font-weight: 800;
-    color: #ff9f43;
+    color: var(--color-accent-primary);
     margin-bottom: 2px;
 }
 
 .sunset-marker .sun-time {
-    color: #ff4757;
+    color: var(--color-accent-tertiary);
 }
 
 /* Hour Ticks */
 .hour-tick {
     position: absolute;
     top: 30px;
-    /* Adjusted for smaller height */
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -222,16 +211,14 @@
 .tick-mark {
     width: 1px;
     height: 10px;
-    /* Reduced from 12px */
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     margin-bottom: 2px;
 }
 
 .noon .tick-mark {
     width: 2px;
     height: 14px;
-    /* Reduced from 16px */
-    background: #f1c40f;
+    background: var(--color-accent-primary);
 }
 
 .hour-label {
@@ -243,14 +230,12 @@
 /* Rows & Tracks */
 .timeline-row {
     height: 46px;
-    /* Reduced from 54px */
     display: flex;
     align-items: center;
 }
 
 .row-track {
     height: 34px;
-    /* Reduced from 42px */
 }
 
 .segment {
@@ -360,7 +345,6 @@
     box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
     z-index: 110;
     margin-top: 18px;
-    /* Aligned with gradient bar */
 }
 
 .indicator-line {
@@ -386,17 +370,31 @@
 
 /* Responsiveness */
 @media (max-width: 600px) {
+    .timeline-header {
+        padding: 10px 12px;
+        flex-wrap: nowrap;
+        /* Keep Title and Legend on one line */
+        gap: 8px;
+    }
+
+    .timeline-legend {
+        margin-left: auto;
+    }
+
+    .legend-item {
+        font-size: 0.65rem;
+    }
+
     .timeline-scroll-area {
         min-width: 800px;
     }
 
     .labels-column {
         width: 120px;
-        /* Adjusted for mobile to still show full names */
     }
 
     .row-text {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
     .segment {
@@ -407,5 +405,21 @@
 @media (max-width: 400px) {
     .timeline-scroll-area {
         min-width: 650px;
+    }
+
+    .labels-column {
+        width: 100px;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
