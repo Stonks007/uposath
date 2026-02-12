@@ -1,169 +1,169 @@
-.sunrise-timeline-container {
-    background: #0f0f15;
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: var(--space-md);
-    font-family: var(--font-family-primary);
-    overflow: hidden;
-    margin-bottom: var(--space-md);
-    position: relative;
-    border-top: 2px solid #3498db;
-    /* Sky theme accent */
-}
-
-.timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-sm);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.timeline-icon {
-    font-size: 1.2rem;
-}
-
-.timeline-title {
-    font-weight: 700;
-    color: #3498db;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-}
-
-.location-badge {
-    background: rgba(52, 152, 219, 0.1);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    color: #3498db;
-    font-weight: 700;
-    border: 1px solid rgba(52, 152, 219, 0.2);
-    text-transform: uppercase;
-}
-
-.timeline-graph-wrapper {
-    position: relative;
-    width: 100%;
-    margin: var(--space-xs) 0;
-}
-
-.timeline-svg {
-    width: 100%;
-    height: auto;
-    display: block;
-    overflow: visible;
-}
-
-/* Visualization Elements */
-.star {
-    animation: twinkle 5s infinite ease-in-out;
-}
-
-@keyframes twinkle {
-
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.9;
-        transform: scale(1.2);
-    }
-}
-
-.sun-path-fill {
-    pointer-events: none;
-}
-
-.current-time-line {
-    stroke: #ff4757;
-    stroke-width: 2;
-    stroke-dasharray: 4 2;
-    opacity: 0.6;
-}
-
-.current-time-label {
-    font-size: 0.6rem;
-    fill: #ff4757;
-    font-weight: 800;
-    opacity: 0.8;
-}
-
-.event-label-tiny {
-    font-size: 0.65rem;
-    fill: #808090;
-    font-weight: 700;
-}
-
-.time-grid-label {
-    font-size: 0.7rem;
-    fill: rgba(255, 255, 255, 0.4);
-    font-weight: 600;
-}
-
-.timeline-legend {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-lg);
-    margin-top: var(--space-sm);
-    font-size: 0.75rem;
-    color: #a0a0b0;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-}
-
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.sun-dot {
-    background: #FFD700;
-    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-}
-
-.moon-dot {
-    background: #E8E8F0;
-    box-shadow: 0 0 6px rgba(232, 232, 240, 0.5);
-}
-
-.time-dot {
-    background: #ff4757;
-    box-shadow: 0 0 6px rgba(255, 71, 87, 0.5);
-}
-
-/* Responsive Overrides */
-@media (max-width: 600px) {
     .sunrise-timeline-container {
-        padding: var(--space-sm);
+        background: #0f0f15;
+        border-radius: var(--radius-xl);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: var(--space-md);
+        font-family: var(--font-family-primary);
+        overflow: hidden;
+        margin-bottom: var(--space-md);
+        position: relative;
+        border-top: 2px solid #3498db;
+        /* Sky theme accent */
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-sm);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .timeline-icon {
+        font-size: 1.2rem;
     }
 
     .timeline-title {
-        font-size: 0.9rem;
+        font-weight: 700;
+        color: #3498db;
+        font-size: 1rem;
+        letter-spacing: 0.02em;
+    }
+
+    .location-badge {
+        background: rgba(52, 152, 219, 0.1);
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        color: #3498db;
+        font-weight: 700;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+        text-transform: uppercase;
     }
 
     .timeline-graph-wrapper {
+        position: relative;
+        width: 100%;
         margin: var(--space-xs) 0;
     }
 
-    .time-grid-label {
-        font-size: 0.65rem;
+    .timeline-svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        overflow: visible;
+    }
+
+    /* Visualization Elements */
+    .star {
+        animation: twinkle 5s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+
+        0%,
+        100% {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+
+        50% {
+            opacity: 0.9;
+            transform: scale(1.1);
+        }
+    }
+
+    .sun-path-fill {
+        pointer-events: none;
+    }
+
+    .current-time-line {
+        stroke: #ff4757;
+        stroke-width: 2;
+        stroke-dasharray: 4 2;
+        opacity: 0.6;
+    }
+
+    .current-time-label {
+        font-size: 0.6rem;
+        fill: #ff4757;
+        font-weight: 800;
+        opacity: 0.8;
     }
 
     .event-label-tiny {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
+        fill: #808090;
+        font-weight: 700;
     }
-}
+
+    .time-grid-label {
+        font-size: 0.7rem;
+        fill: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+    }
+
+    .timeline-legend {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-lg);
+        margin-top: var(--space-sm);
+        font-size: 0.75rem;
+        color: #a0a0b0;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .sun-dot {
+        background: #FFD700;
+        box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+    }
+
+    .moon-dot {
+        background: #E8E8F0;
+        box-shadow: 0 0 6px rgba(232, 232, 240, 0.5);
+    }
+
+    .time-dot {
+        background: #ff4757;
+        box-shadow: 0 0 6px rgba(255, 71, 87, 0.5);
+    }
+
+    /* Responsive Overrides */
+    @media (max-width: 600px) {
+        .sunrise-timeline-container {
+            padding: var(--space-sm);
+        }
+
+        .timeline-title {
+            font-size: 0.9rem;
+        }
+
+        .timeline-graph-wrapper {
+            margin: var(--space-xs) 0;
+        }
+
+        .time-grid-label {
+            font-size: 0.65rem;
+        }
+
+        .event-label-tiny {
+            font-size: 0.6rem;
+        }
+    }

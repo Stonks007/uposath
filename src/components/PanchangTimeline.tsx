@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import type { TimelineData } from '../services/panchangTimeline';
 import { formatTime } from '../services/timeUtils';
 import { checkFestival, getTraditionColors } from '../services/buddhistFestivalService';
@@ -59,6 +59,24 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
         return markers;
     }, [dayStart, nextSunrise, durationMs]);
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (scrollContainerRef.current && currentTimePercent >= 0 && currentTimePercent <= 100) {
+            const container = scrollContainerRef.current;
+            const scrollWidth = container.scrollWidth;
+            const clientWidth = container.clientWidth;
+
+            // Center the current time
+            const targetScroll = (currentTimePercent / 100) * scrollWidth - (clientWidth / 2);
+
+            container.scrollTo({
+                left: Math.max(0, targetScroll),
+                behavior: 'smooth'
+            });
+        }
+    }, [data.sunrise, currentTimePercent]);
+
     return (
         <div className="timeline-section glass-card">
             <div className="panchang-timeline">
@@ -86,7 +104,7 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
                         ))}
                     </div>
 
-                    <div className="timeline-content">
+                    <div className="timeline-content" ref={scrollContainerRef}>
                         <div className="timeline-scroll-area">
                             <div className="time-scale">
                                 <div className="time-gradient-bar"></div>
