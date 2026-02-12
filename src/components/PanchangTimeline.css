@@ -1,0 +1,397 @@
+.panchang-timeline {
+    font-family: var(--font-family-primary);
+    color: var(--color-text-primary);
+    padding: var(--space-md);
+    background: var(--color-bg-card);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: var(--space-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.timeline-icon {
+    font-size: var(--font-size-lg);
+}
+
+.timeline-title {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-display);
+    letter-spacing: 0.02em;
+}
+
+.timeline-legend {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.legend-star {
+    color: var(--color-accent-primary);
+    font-weight: bold;
+    text-shadow: 0 0 4px rgba(255, 198, 112, 0.4);
+}
+
+/* Wrapper Grid */
+.timeline-wrapper {
+    display: flex;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    background: rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    /* Ensure rounded corners clip content */
+}
+
+/* Labels Column */
+.labels-column {
+    width: 100px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--glass-border);
+    background: rgba(10, 10, 15, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 2;
+}
+
+.label-spacer {
+    height: 44px;
+    /* Matches time-scale height */
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.row-label {
+    height: 36px;
+    /* Reduced height for compactness */
+    display: flex;
+    align-items: center;
+    padding-left: var(--space-sm);
+    gap: 6px;
+    font-size: 0.7rem;
+    /* Slightly smaller to fit */
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid transparent;
+    /* Placeholder for alignment */
+    /* Center vertically relative to row */
+}
+
+.weekday-label {
+    color: var(--color-accent-secondary);
+}
+
+.row-icon {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Content Area */
+.timeline-content {
+    flex-grow: 1;
+    position: relative;
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scroll on iOS */
+    /* Hide scrollbar but allow functionality */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-left: 1px solid var(--glass-border);
+    /* Separator from labels */
+}
+
+.timeline-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* Time Scale */
+.time-scale {
+    position: relative;
+    height: 44px;
+    border-bottom: 1px solid var(--glass-border);
+    width: 200%;
+    /* Force width > 100% to ensure scrolling on most screens, or use min-width */
+    min-width: 600px;
+    /* Ensure logical minimum size for readability */
+    /* Pattern background for structure */
+    background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px);
+    background-size: 4.16% 100%;
+    /* 100/24 hours approx */
+    background-position: 0 0;
+}
+
+.timeline-baseline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-border);
+}
+
+/* Sun Markers */
+.sun-marker {
+    position: absolute;
+    top: 6px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.sun-icon-wrapper {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-accent-primary);
+    color: var(--color-accent-primary);
+    box-shadow: 0 0 6px rgba(255, 198, 112, 0.2);
+}
+
+.sun-icon-wrapper svg {
+    width: 12px;
+    height: 12px;
+}
+
+.sunset-icon {
+    border-color: var(--color-accent-secondary);
+    color: var(--color-accent-secondary);
+}
+
+.sun-time {
+    font-size: 0.6rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-top: 2px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.hour-marker {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+}
+
+.hour-tick {
+    display: none;
+    /* Hide tick, grid lines handle it via background */
+}
+
+.hour-label {
+    font-size: 0.7rem;
+    /* Increased size as requested */
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+.hour-marker.noon .hour-label {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Rows */
+.timeline-row {
+    height: 36px;
+    /* Standardize row height */
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    min-width: 600px;
+    /* Match time-scale min-width */
+    width: 200%;
+    /* Match time-scale width approach */
+}
+
+.timeline-row:last-child {
+    border-bottom: none;
+}
+
+.row-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 4px 0;
+    /* Add vertical padding for segments */
+}
+
+.segment {
+    position: absolute;
+    height: calc(100% - 8px);
+    /* Account for padding */
+    top: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    box-sizing: border-box;
+    font-size: 0.7rem;
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    /* Slight rounded corners for segments */
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Segment colors with gradients - refined for Brutalist look */
+.segment-0.primary {
+    background: var(--gradient-twilight);
+}
+
+/* Tithi - Twilight/Purple */
+.segment-0.secondary {
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(102, 126, 234, 0.4);
+    color: var(--color-text-secondary);
+}
+
+.segment-1.primary {
+    background: var(--gradient-night);
+}
+
+/* Nakshatra - Night/Blue */
+.segment-1.secondary {
+    background: rgba(44, 62, 80, 0.4);
+    border: 1px solid rgba(52, 152, 219, 0.4);
+    color: var(--color-text-secondary);
+}
+
+.segment-2.primary {
+    background: var(--gradient-day);
+}
+
+/* Yoga - Day/Sky */
+.segment-2.secondary {
+    background: rgba(86, 204, 242, 0.2);
+    border: 1px solid rgba(47, 128, 237, 0.4);
+    color: var(--color-text-secondary);
+}
+
+.segment-3.primary {
+    background: var(--gradient-sunset);
+}
+
+/* Karana - Sunset/Pink */
+.segment-3.secondary {
+    background: rgba(252, 70, 107, 0.2);
+    border: 1px solid rgba(63, 94, 251, 0.4);
+    color: var(--color-text-secondary);
+}
+
+.segment-weekday {
+    background: var(--color-today);
+    color: var(--color-accent-secondary);
+    border: 1px solid var(--color-accent-tertiary);
+    font-weight: 600;
+}
+
+.primary-badge {
+    margin-right: 4px;
+    font-size: 0.7rem;
+    color: var(--color-accent-primary);
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.segment-name {
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.transition-marker {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+}
+
+.transition-time {
+    font-size: 0.6rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0 3px;
+    border-radius: 3px;
+    backdrop-filter: blur(2px);
+    font-family: var(--font-family-code, monospace);
+    /* Optional: Use monospace if available */
+}
+
+/* Current Time Indicator */
+.current-time-indicator {
+    position: absolute;
+    top: 44px;
+    /* Matches time-scale height */
+    bottom: 0;
+    width: 2px;
+    background: var(--color-accent-tertiary);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    box-shadow: 0 0 8px var(--color-accent-tertiary);
+}
+
+.current-time-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--color-accent-tertiary);
+    border-radius: 50%;
+    margin-top: -6px;
+    box-shadow: 0 0 4px var(--color-accent-tertiary);
+    border: 2px solid var(--color-bg-card);
+    /* Cutout effect */
+}
+
+.current-time-label {
+    position: absolute;
+    top: -26px;
+    background: var(--color-accent-tertiary);
+    color: #000;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

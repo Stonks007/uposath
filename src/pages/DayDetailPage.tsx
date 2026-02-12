@@ -138,8 +138,8 @@ const DayDetailPage: React.FC = () => {
                         <SunMoonVisualization
                             sunrise={data.status.sunrise}
                             sunset={data.status.sunset}
-                            moonrise={null} // Library doesn't provide moonrise/set in panchangam main obj easily, skipping for now
-                            moonset={null}
+                            moonrise={data.status.panchangam.moonrise}
+                            moonset={data.status.panchangam.moonset}
                         />
                         <PanchangTimeline data={data.timeline} />
                     </>
