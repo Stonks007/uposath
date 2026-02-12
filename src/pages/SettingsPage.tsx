@@ -133,7 +133,7 @@ const SettingsPage: React.FC = () => {
 
                     <IonItem>
                         <IonIcon icon={locationOutline} slot="start" color="primary" />
-                        <IonLabel>
+                        <IonLabel className="ion-text-wrap">
                             <h2>Current Location</h2>
                             <p>{location ? location.name : 'Not set'}</p>
                             {location && <p className="text-xs">{location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>}
@@ -145,10 +145,17 @@ const SettingsPage: React.FC = () => {
 
                     <IonItem>
                         <IonIcon icon={globeOutline} slot="start" color="secondary" />
-                        <IonLabel>Select Major City</IonLabel>
+                        <IonLabel className="ion-text-wrap" style={{ flex: '1 1 auto' }}>
+                            <h2>Preset City</h2>
+                            <p style={{ color: 'var(--ion-color-secondary)', fontWeight: 'bold' }}>
+                                {MAJOR_CITIES.find(c => c.name === location?.name)?.name || 'Custom/GPS'}
+                            </p>
+                        </IonLabel>
                         <IonSelect
                             slot="end"
-                            placeholder="Select City"
+                            interface="action-sheet"
+                            placeholder="Select"
+                            style={{ maxWidth: '40%' }}
                             value={location?.name}
                             onIonChange={e => {
                                 const city = MAJOR_CITIES.find(c => c.name === e.detail.value);
@@ -165,9 +172,17 @@ const SettingsPage: React.FC = () => {
 
                     <IonItem>
                         <IonIcon icon={timeOutline} slot="start" color="tertiary" />
-                        <IonLabel>Timezone Override</IonLabel>
+                        <IonLabel className="ion-text-wrap" style={{ flex: '1 1 auto' }}>
+                            <h2>Timezone</h2>
+                            <p style={{ color: 'var(--ion-color-tertiary)', fontWeight: 'bold' }}>
+                                {location?.timezone || 'Detecting...'}
+                            </p>
+                        </IonLabel>
                         <IonSelect
                             slot="end"
+                            interface="action-sheet"
+                            placeholder="Change"
+                            style={{ maxWidth: '40%' }}
                             value={location?.timezone}
                             onIonChange={e => handleTimezoneChange(e.detail.value)}
                         >

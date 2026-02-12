@@ -121,7 +121,25 @@
   --ion-toolbar-background: var(--color-bg-secondary);
   --ion-tab-bar-background: var(--color-bg-secondary);
 
-  /* --- App Specific Maps --- */
+  /* --- Tradition Color Schemes --- */
+  --color-theravada-primary: #FF9933;
+  --color-theravada-secondary: #A0522D;
+  --color-theravada-accent: #DAA520;
+  --color-theravada-bg: #FFFEF0;
+  --color-theravada-text: #5D4037;
+
+  --color-mahayana-primary: #E34234;
+  --color-mahayana-secondary: #FFD700;
+  --color-mahayana-accent: #00A86B;
+  --color-mahayana-bg: #F5F5DC;
+  --color-mahayana-text: #1C1C1C;
+
+  --color-vajrayana-primary: #1E3A5F;
+  --color-vajrayana-secondary: #C44D34;
+  --color-vajrayana-accent: #C9B037;
+  --color-vajrayana-bg: #FDF5E6;
+  --color-vajrayana-text: #4A0404;
+
   --uposatha-full-moon: var(--color-accent-primary);
   --uposatha-new-moon: var(--color-text-muted);
   --uposatha-half-moon: var(--color-accent-secondary);

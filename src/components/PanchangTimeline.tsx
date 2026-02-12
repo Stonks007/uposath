@@ -2,6 +2,8 @@
 import React, { useMemo } from 'react';
 import type { TimelineData, TimelineRow } from '../services/panchangTimeline';
 import { formatTime } from '../services/timeUtils';
+import { checkFestival, getTraditionColors } from '../services/buddhistFestivalService';
+import { getObserver } from '../services/locationManager';
 import './PanchangTimeline.css';
 
 interface PanchangTimelineProps {
@@ -169,14 +171,33 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
                                         // Cycle classes
                                         const colorClass = sIdx % 2 === 0 ? 'primary' : 'secondary';
 
+                                        // Tradition-specific styling for festivals
+                                        const observer = getObserver({ name: '', latitude: 0, longitude: 0, altitude: 0 }); // Placeholder for getPercent logic
+                                        // We need the ACTUAL observer from props or context eventually, 
+                                        // but for now we detect the festival name and matching tradition.
+
+                                        let customStyle: React.CSSProperties = {};
+                                        if (row.type === 'tithi') {
+                                            const festival = checkFestival(seg.startTime, {} as any, data.panchangam);
+                                            if (festival) {
+                                                const colors = getTraditionColors(festival.tradition);
+                                                customStyle = {
+                                                    background: colors.primary,
+                                                    color: colors.text,
+                                                    border: `1px solid ${colors.secondary}`,
+                                                    boxShadow: `0 0 10px ${colors.accent}`
+                                                };
+                                            }
+                                        }
+
                                         return (
                                             <div
                                                 key={sIdx}
                                                 className={`segment segment-${rIdx} ${colorClass} ${row.type === 'vara' ? 'segment-weekday' : ''}`}
-                                                style={{ left: `${startPct}%`, width: `${width}%` }}
+                                                style={{ ...customStyle, left: `${startPct}%`, width: `${width}%` }}
                                             >
-                                                {seg.isPrimary && <span className="primary-badge">★</span>}
-                                                <span className="segment-name">{seg.name}</span>
+                                                {seg.isPrimary && <span className="primary-badge" style={customStyle.color ? { color: customStyle.color } : {}}>★</span>}
+                                                <span className="segment-name" style={customStyle.color ? { color: customStyle.color } : {}}>{seg.name}</span>
 
                                                 {/* Transition Time Marker (if not end of day) */}
                                                 {(endPct < 99) && (

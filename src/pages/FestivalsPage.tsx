@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
     IonContent,
@@ -6,22 +5,21 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
     IonLabel,
-    IonNote,
-    IonItemDivider,
-    useIonViewWillEnter
+    useIonViewWillEnter,
+    IonButtons,
+    IonBackButton,
+    IonIcon
 } from '@ionic/react';
 import { Observer } from '@ishubhamx/panchangam-js';
-import { getUpcomingFestivals, type FestivalMatch } from '../services/buddhistFestivalService';
+import { getUpcomingFestivals, type FestivalMatch, getTraditionColors } from '../services/buddhistFestivalService';
 import { getSavedLocation } from '../services/locationManager';
+import { calendarOutline, locationOutline, timeOutline, chevronForwardOutline } from 'ionicons/icons';
+import './FestivalsPage.css';
 
 const FestivalsPage: React.FC = () => {
     const [festivals, setFestivals] = useState<FestivalMatch[]>([]);
     const [locationName, setLocationName] = useState('Loading...');
-
-    // TODO: Global state for observer
     const [observer, setObserver] = useState(new Observer(24.7914, 85.0002, 111));
 
     useIonViewWillEnter(() => {
@@ -43,43 +41,87 @@ const FestivalsPage: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader>
+            <IonHeader className="ion-no-border">
                 <IonToolbar>
-                    <IonTitle>Upcoming Festivals</IonTitle>
+                    <IonButtons slot="start">
+                        <IonBackButton defaultHref="/today" />
+                    </IonButtons>
+                    <IonTitle>Dharma Calendar</IonTitle>
                 </IonToolbar>
-                <IonToolbar color="light">
-                    <IonLabel className="ion-padding-start text-xs">📍 {locationName}</IonLabel>
+                <IonToolbar color="translucent" style={{ '--background': 'transparent' }}>
+                    <div className="ion-padding-horizontal" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '8px' }}>
+                        <IonIcon icon={locationOutline} color="primary" />
+                        <IonLabel style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: '500' }}>
+                            {locationName}
+                        </IonLabel>
+                    </div>
                 </IonToolbar>
             </IonHeader>
-            <IonContent fullscreen>
-                <IonList>
-                    {festivals.length === 0 && (
-                        <IonItem>
-                            <IonLabel>No festivals found in next 365 days.</IonLabel>
-                        </IonItem>
-                    )}
 
-                    {festivals.map((match, idx) => {
-                        const isNext = idx === 0;
-                        return (
-                            <IonItem
-                                key={idx}
-                                routerLink={`/day/${match.date.toISOString().split('T')[0]}`}
-                                lines={isNext ? 'full' : 'inset'}
-                                style={isNext ? { '--background': '#FFF3E0' } : {}}
-                            >
-                                <IonLabel>
-                                    <h2 style={{ fontWeight: 'bold', color: 'var(--festival-color)' }}>{match.festival.name}</h2>
-                                    <p>{match.date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                    <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '4px' }}>{match.festival.description}</p>
-                                </IonLabel>
-                                <IonNote slot="end" color="secondary" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
-                                    {match.daysRemaining} days
-                                </IonNote>
-                            </IonItem>
-                        );
-                    })}
-                </IonList>
+            <IonContent fullscreen className="festivals-container">
+                {festivals.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-icon">🗓️</div>
+                        <h3>No Upcoming Festivals</h3>
+                        <p>No major Buddhist events found in the next 365 days for this location.</p>
+                    </div>
+                ) : (
+                    <div className="festivals-list">
+                        {festivals.map((match, idx) => {
+                            const colors = getTraditionColors(match.festival.tradition);
+                            // Convert hex to rgb for rgba usage if needed, or use CSS variables
+                            return (
+                                <div
+                                    key={idx}
+                                    className="festival-card"
+                                    onClick={() => window.location.href = `/day/${match.date.toISOString().split('T')[0]}`}
+                                    style={{
+                                        '--background': colors.background,
+                                    } as React.CSSProperties}
+                                >
+                                    <div className="festival-card-content">
+                                        <div className="festival-header">
+                                            <h2 className="festival-name" style={{ color: colors.primary }}>
+                                                {match.festival.name}
+                                            </h2>
+                                            <span className="tradition-badge" style={{ background: colors.primary, color: '#fff' }}>
+                                                {match.festival.tradition}
+                                            </span>
+                                        </div>
+
+                                        <div className="festival-date" style={{ color: colors.secondary }}>
+                                            <IonIcon icon={calendarOutline} />
+                                            {match.date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </div>
+
+                                        <p className="festival-description" style={{ color: colors.text }}>
+                                            {match.festival.description}
+                                        </p>
+
+                                        <div className="festival-footer">
+                                            <div className="days-count" style={{ color: colors.primary }}>
+                                                <IonIcon icon={timeOutline} />
+                                                <span>{match.daysRemaining} <span className="days-label">days left</span></span>
+                                            </div>
+                                            <div className="view-details" style={{ color: colors.primary }}>
+                                                <span>View Day</span>
+                                                <IonIcon icon={chevronForwardOutline} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        width: '6px',
+                                        background: colors.primary
+                                    }}></div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </IonContent>
         </IonPage>
     );

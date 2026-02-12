@@ -167,7 +167,7 @@ const DayDetailPage: React.FC = () => {
                             <div style={{ marginTop: '16px' }}>
                                 <h4>{data.festival.name}</h4>
                                 <p>{data.festival.description}</p>
-                                <p><em>Traditions: {data.festival.traditions.join(', ')}</em></p>
+                                <p><em>Tradition: {data.festival.tradition}</em></p>
                             </div>
                         )}
                     </div>

@@ -8,7 +8,7 @@
  */
 import { Preferences } from '@capacitor/preferences';
 import { Geolocation } from '@capacitor/geolocation';
-import { Observer } from 'astronomy-engine';
+import { Observer } from '@ishubhamx/panchangam-js';
 import { guessTimezone } from './timeUtils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────

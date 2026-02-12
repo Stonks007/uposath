@@ -1,0 +1,153 @@
+.festivals-container {
+    --padding-top: var(--space-md);
+    --padding-bottom: var(--space-md);
+    --padding-start: var(--space-md);
+    --padding-end: var(--space-md);
+    --background: var(--color-bg-primary);
+}
+
+.festival-card {
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    animation: slideInUp var(--transition-slow) ease-out;
+    display: block;
+    background: var(--background, var(--color-bg-card));
+}
+
+.festival-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.festival-card-content {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-lg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+}
+
+.festival-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-sm);
+}
+
+.festival-name {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0;
+    line-height: var(--line-height-tight);
+}
+
+.tradition-badge {
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.65rem;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-sm);
+}
+
+.festival-date {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    margin: var(--space-xs) 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.festival-description {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    margin-top: var(--space-md);
+    font-style: italic;
+}
+
+.festival-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.days-count {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.days-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+.view-details {
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for cards */
+.festival-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.festival-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.festival-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.festival-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.festival-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    filter: drop-shadow(0 0 10px var(--color-accent-primary));
+}

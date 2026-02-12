@@ -41,6 +41,8 @@ export interface TimelineData {
     moonrise: Date | null;
     /** Moonset time */
     moonset: Date | null;
+    /** Raw panchangam for festival detection */
+    panchangam: Panchangam;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -117,6 +119,7 @@ export function buildTimelineData(panchangam: Panchangam): TimelineData {
         sunset,
         moonrise,
         moonset,
+        panchangam,
     };
 }
 

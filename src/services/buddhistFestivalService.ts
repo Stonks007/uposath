@@ -1,26 +1,27 @@
 /**
  * Buddhist Festival Service
- *
- * Detects Buddhist-only festivals (Vesak, Māgha Pūjā, Āsāḷha Pūjā)
- * based on Full Moon (Purnima) in the correct lunar month.
- *
- * IMPORTANT: No Hindu festivals are included. The Panchang engine is
- * used purely as an astronomical calculator.
+ * 
+ * Detects Buddhist-only festivals based on the Indian Masa calendar system.
+ * Uses the Sanskrit Masa months and specific tithis (lunar days).
+ * 
+ * IMPORTANT: No Hindu festivals are included.
  */
-import { getPanchangam, type Panchangam } from '@ishubhamx/panchangam-js';
-import type { Observer } from 'astronomy-engine';
+import { getPanchangam, type Panchangam, Observer } from '@ishubhamx/panchangam-js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+export type BuddhistTradition = 'Theravada' | 'Mahayana' | 'Vajrayana';
 
 export interface BuddhistFestival {
     id: string;
     name: string;
-    /** Lunar month name to match against panchangam.masa.name */
-    masaName: string;
-    /** 0-indexed tithi (14 = Purnima) */
-    tithiIndex: number;
+    /** Sanskrit Month Index (0 = Chaitra, 1 = Vaishakha, etc.) */
+    masaIndex: number;
+    /** Tithi Index (0-29. 14 = Purnima, 29 = Amavasya) */
+    tithiIndex: number | number[];
     description: string;
-    traditions: string[];
+    tradition: BuddhistTradition;
+    region?: string;
 }
 
 export interface FestivalMatch {
@@ -29,46 +30,91 @@ export interface FestivalMatch {
     daysRemaining: number;
 }
 
+// ─── Month Mapping ───────────────────────────────────────────────────────────
+
+const MASA_MAP: Record<string, number> = {
+    'Chaitra': 0,
+    'Vaiśākha': 1,
+    'Jyeṣṭha': 2,
+    'Āṣāḍha': 3,
+    'Śrāvaṇa': 4,
+    'Bhādrapada': 5,
+    'Āśvina': 6,
+    'Kārttika': 7,
+    'Mārgaśīrṣa': 8,
+    'Pauṣa': 9,
+    'Māgha': 10,
+    'Phālguna': 11
+};
+
+function parseTithi(tithiStr: string): number | number[] {
+    if (tithiStr === 'Purnima') return 14;
+    if (tithiStr === 'Amavasya') return 29;
+    if (tithiStr.includes('-')) {
+        const [start, end] = tithiStr.split('-').map(s => parseInt(s.trim()) - 1);
+        const range = [];
+        for (let i = start; i <= end; i++) range.push(i);
+        return range;
+    }
+    const val = parseInt(tithiStr);
+    if (!isNaN(val)) return val - 1;
+    return -1;
+}
+
 // ─── Festival Definitions ────────────────────────────────────────────────────
 
-const BUDDHIST_FESTIVALS: BuddhistFestival[] = [
-    {
-        id: 'vesak',
-        name: 'Vesak (Buddha Pūrṇimā)',
-        masaName: 'Vaishakha', // masa.index === 1
-        tithiIndex: 14,
-        description:
-            'Celebrates the Birth, Enlightenment, and Parinirvana of the Buddha. The most sacred day in the Buddhist calendar.',
-        traditions: ['Theravada', 'Mahayana', 'Thai'],
-    },
-    {
-        id: 'magha_puja',
-        name: 'Māgha Pūjā',
-        masaName: 'Magha', // masa.index === 10
-        tithiIndex: 14,
-        description:
-            'Commemorates the spontaneous gathering of 1,250 Arahants before the Buddha. Celebrates the qualities of the Sangha.',
-        traditions: ['Theravada', 'Thai'],
-    },
-    {
-        id: 'asalha_puja',
-        name: 'Āsāḷha Pūjā',
-        masaName: 'Ashadha', // masa.index === 3
-        tithiIndex: 14,
-        description:
-            'Marks the Buddha\'s first sermon (Dhammacakkappavattana Sutta) and the beginning of Vassa (Rains Retreat).',
-        traditions: ['Theravada', 'Thai'],
-    },
-];
+const RAW_FESTIVALS = {
+    "Theravada": [
+        { "name": "Māgha Pūjā", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Sangha Day - Gathering of 1,250 Arahants" },
+        { "name": "Vesak", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Buddha's Birth, Enlightenment, Parinirvana" },
+        { "name": "Āsāḷha Pūjā", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "First Sermon (Dhammacakka Day)" },
+        { "name": "Pavāraṇā", "lunar_day": "Purnima", "masa": "Āśvina", "desc": "End of Vassa (Rains Retreat)" },
+        { "name": "Abhidhamma Day", "lunar_day": "Purnima", "masa": "Bhādrapada", "desc": "Buddha taught Abhidhamma in Tavatimsa" },
+        { "name": "Madhu Pūrṇimā", "lunar_day": "Purnima", "masa": "Bhādrapada", "desc": "Honey Full Moon - Parileyyaka Forest" },
+        { "name": "Poson Poya", "lunar_day": "Purnima", "masa": "Jyeṣṭha", "desc": "Arrival of Buddhism in Sri Lanka", "region": "Sri Lanka" },
+        { "name": "Esala Poya", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "Celebration of First Sermon", "region": "Sri Lanka" }
+    ],
+    "Mahayana": [
+        { "name": "Buddha's Birthday", "lunar_day": "8", "masa": "Vaiśākha", "desc": "Siddhartha Gautama's Birthday (Hanamatsuri)" },
+        { "name": "Parinirvāṇa Day", "lunar_day": "15", "masa": "Pauṣa", "desc": "Buddha's passing into Parinirvana" },
+        { "name": "Bodhi Day", "lunar_day": "8", "masa": "Pauṣa", "desc": "Buddha's Enlightenment (Rohatsu)" },
+        { "name": "Avalokiteśvara Birthday", "lunar_day": "Purnima", "masa": "Phālguna", "desc": "Compassion Bodhisattva's Birthday" },
+        { "name": "Ullambana", "lunar_day": "15", "masa": "Bhādrapada", "desc": "Ghost Festival - Merit for ancestors" },
+        { "name": "Medicine Buddha Birthday", "lunar_day": "8", "masa": "Kārttika", "desc": "Bhaisajyaguru's Birthday" },
+        { "name": "Manjuśrī Birthday", "lunar_day": "4", "masa": "Vaiśākha", "desc": "Wisdom Bodhisattva's Birthday" },
+        { "name": "Kṣitigarbha Birthday", "lunar_day": "30", "masa": "Bhādrapada", "desc": "Dizang Pusa's Birthday" },
+        { "name": "Guanyin Enlightenment", "lunar_day": "19", "masa": "Āṣāḍha", "desc": "Avalokiteśvara's attainment" },
+        { "name": "Loy Krathong", "lunar_day": "Purnima", "masa": "Kārttika", "desc": "Lantern Festival - Releasing karma", "region": "Thailand" }
+    ],
+    "Vajrayana": [
+        { "name": "Losar", "lunar_day": "Amavasya", "masa": "Phālguna", "desc": "Tibetan New Year" },
+        { "name": "Chotrul Düchen", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Festival of Miracles" },
+        { "name": "Saga Dawa", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Birth, Enlightenment, and Parinirvana" },
+        { "name": "Chokhor Düchen", "lunar_day": "4", "masa": "Āṣāḍha", "desc": "Turning the Dhamma Wheel" },
+        { "name": "Lhabab Düchen", "lunar_day": "22", "masa": "Pauṣa", "desc": "Descent from Heaven" },
+        { "name": "Monlam Chenmo", "lunar_day": "4-25", "masa": "Māgha", "desc": "Great Prayer Festival" },
+        { "name": "Ganden Ngamchoe", "lunar_day": "25", "masa": "Vaiśākha", "desc": "Tsongkhapa Memorial Day" }
+    ]
+};
+
+const BUDDHIST_FESTIVALS: BuddhistFestival[] = [];
+
+Object.entries(RAW_FESTIVALS).forEach(([tradition, festivals]) => {
+    festivals.forEach(f => {
+        BUDDHIST_FESTIVALS.push({
+            id: f.name.toLowerCase().replace(/\s+/g, '_'),
+            name: f.name,
+            masaIndex: MASA_MAP[f.masa],
+            tithiIndex: parseTithi(f.lunar_day),
+            description: f.desc,
+            tradition: tradition as BuddhistTradition,
+            region: (f as any).region
+        });
+    });
+});
 
 // ─── Core Functions ──────────────────────────────────────────────────────────
 
-/**
- * Check if a date has a Buddhist festival.
- * All three festivals occur on Purnima (tithi index 14) of specific months.
- *
- * Can optionally accept a pre-computed panchangam to avoid redundant calls.
- */
 export function checkFestival(
     date: Date,
     observer: Observer,
@@ -76,34 +122,27 @@ export function checkFestival(
 ): BuddhistFestival | null {
     const p = panchangam ?? getPanchangam(date, observer);
 
-    // All Buddhist festivals are on Purnima
-    if (p.tithi !== 14) return null;
+    return BUDDHIST_FESTIVALS.find(f => {
+        if (f.masaIndex !== p.masa.index) return false;
 
-    // Match the lunar month name
-    const match = BUDDHIST_FESTIVALS.find((f) => f.masaName === p.masa.name);
-    return match ?? null;
+        if (Array.isArray(f.tithiIndex)) {
+            return f.tithiIndex.includes(p.tithi);
+        }
+        return f.tithiIndex === p.tithi;
+    }) ?? null;
 }
 
-/**
- * Check if a date has a Buddhist festival, filtered by tradition.
- */
 export function checkFestivalByTradition(
     date: Date,
     observer: Observer,
-    tradition: string,
+    tradition: BuddhistTradition,
     panchangam?: Panchangam
 ): BuddhistFestival | null {
     const festival = checkFestival(date, observer, panchangam);
     if (!festival) return null;
-    return festival.traditions.includes(tradition) ? festival : null;
+    return festival.tradition === tradition ? festival : null;
 }
 
-/**
- * Scan forward from a start date and return all upcoming Buddhist festivals.
- *
- * Optimization: since all festivals are on Purnima, once we find a Purnima
- * we skip ahead ~25 days for the next one instead of checking every single day.
- */
 export function getUpcomingFestivals(
     startDate: Date,
     observer: Observer,
@@ -117,34 +156,39 @@ export function getUpcomingFestivals(
 
     while (current < endDate) {
         const p = getPanchangam(current, observer);
+        const festival = checkFestival(current, observer, p);
 
-        if (p.tithi === 14) {
-            // This is a Purnima — check for festival
-            const festival = checkFestival(current, observer, p);
-            if (festival) {
-                const daysRemaining = Math.ceil(
-                    (current.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-                );
-                results.push({
-                    festival,
-                    date: new Date(current),
-                    daysRemaining,
-                });
-            }
-            // Skip ahead ~25 days to next probable Purnima
-            current.setDate(current.getDate() + 25);
-        } else {
-            // Not Purnima — advance by 1 day
-            current.setDate(current.getDate() + 1);
+        if (festival) {
+            const daysRemaining = Math.max(0, Math.ceil(
+                (current.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+            ));
+
+            results.push({
+                festival,
+                date: new Date(current),
+                daysRemaining,
+            });
         }
+        current.setDate(current.getDate() + 1);
     }
 
     return results;
 }
 
-/**
- * Get the list of all defined Buddhist festivals (for reference/display).
- */
 export function getAllFestivalDefinitions(): BuddhistFestival[] {
     return [...BUDDHIST_FESTIVALS];
+}
+
+/**
+ * Returns CSS variable names for a specific tradition.
+ */
+export function getTraditionColors(tradition: BuddhistTradition) {
+    const lower = tradition.toLowerCase();
+    return {
+        primary: `var(--color-${lower}-primary)`,
+        secondary: `var(--color-${lower}-secondary)`,
+        accent: `var(--color-${lower}-accent)`,
+        background: `var(--color-${lower}-bg)`,
+        text: `var(--color-${lower}-text)`
+    };
 }
