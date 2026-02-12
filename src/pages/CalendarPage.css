@@ -126,33 +126,58 @@
 
 /* Legend Styling */
 .calendar-legend {
-    margin: var(--space-xl) var(--space-md);
-    padding: var(--space-lg);
-    border-radius: var(--radius-xl);
+    margin: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--color-border);
 }
 
 .legend-title {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    opacity: 0.6;
-    margin-bottom: var(--space-md);
+    opacity: 0.7;
+    margin-bottom: 6px;
+    color: var(--color-text-secondary);
 }
 
 .legend-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 2px 8px;
+    margin-bottom: 6px;
+}
+
+.traditions-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: var(--font-size-xs);
+    gap: 4px;
+    font-size: 0.6rem;
+    opacity: 0.8;
+    line-height: 1.2;
+}
+
+.liturgical-meanings {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+.liturgical-meanings strong {
+    color: var(--color-text-primary);
+    opacity: 1;
 }
 
 /* Header controls */
@@ -225,4 +250,112 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Practice Calendar Card - Premium Dashboard Widget */
+.practice-card {
+    margin: var(--space-md);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-card);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.practice-card:active {
+    transform: scale(0.98);
+}
+
+.practice-card.uposatha-glow {
+    border: 1px solid var(--color-accent-primary);
+    background: rgba(255, 193, 7, 0.05);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.15);
+}
+
+.practice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.practice-title {
+    font-family: var(--font-family-display);
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.practice-streak {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-bold);
+    color: #FF5722;
+    background: rgba(255, 87, 34, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.practice-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: var(--space-md);
+    text-align: center;
+}
+
+.practice-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: var(--radius-lg);
+    background: rgba(127, 127, 127, 0.08);
+    /* Works on both light and dark */
+}
+
+.practice-stat-value {
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    line-height: 1;
+}
+
+.practice-stat-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
+}
+
+.practice-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-sm);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.practice-total {
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+}
+
+.practice-action {
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }

@@ -1,0 +1,341 @@
+{
+    "title": {
+        "pali": "Ānāpānasati",
+        "roman": "Anapanasati",
+        "en": "Mindfulness of Breathing",
+        "hi": "श्वास का स्मरण",
+        "pa": "ਸਾਹ ਦਾ ਸਮਰਨ",
+        "si": "හුස්ම ගැනීමේ සිහිය",
+        "th": "อานาปานสติ",
+        "my": "အာနာပါနသတိ"
+    },
+    "source": {
+        "en": "Ānāpānassati Sutta (MN 118)",
+        "hi": "आनापानस्सति सुत्त (MN 118)",
+        "pa": "ਆਨਾਪਾਨਸਤੀ ਸੁੱਤ (MN 118)"
+    },
+    "description": {
+        "en": "The Buddha's systematic teaching on using mindfulness of breathing to develop concentration, insight, and liberation.",
+        "hi": "एकाग्रता, अंतर्दृष्टि और मुक्ति विकसित करने के लिए श्वास की सावधानी का उपयोग करने पर बुद्ध की व्यवस्थित शिक्षा।",
+        "pa": "ਇਕਾਗਰਤਾ, ਸੂਝ ਅਤੇ ਮੁਕਤੀ ਦਾ ਵਿਕਾਸ ਕਰਨ ਲਈ ਸਾਹ ਦੀ ਸੁਚੇਤਨਤਾ ਦੀ ਵਰਤੋਂ 'ਤੇ ਬੁੱਧ ਦੀ ਵਿਵਸਥਿਤ ਸਿੱਖਿਆ।"
+    },
+    "tetrads": [
+        {
+            "id": "body",
+            "order": 1,
+            "title": {
+                "pali": "Kāyānupassanā",
+                "en": "Contemplation of the Body",
+                "hi": "शरीर का अवलोकन",
+                "pa": "ਸਰੀਰ ਦਾ ਨਿਰੀਖਣ"
+            },
+            "icon": "🌬️",
+            "color": "#06B6D4",
+            "description": {
+                "en": "Developing awareness of breath and bodily sensations",
+                "hi": "श्वास और शारीरिक संवेदनाओं की जागरूकता विकसित करना",
+                "pa": "ਸਾਹ ਅਤੇ ਸਰੀਰਕ ਸੰਵੇਦਨਾਵਾਂ ਦੀ ਜਾਗਰੂਕਤਾ ਵਿਕਸਤ ਕਰਨਾ"
+            },
+            "steps": [
+                {
+                    "number": 1,
+                    "title": {
+                        "en": "Long and Short Breaths",
+                        "hi": "लंबी और छोटी सांसें",
+                        "pa": "ਲੰਬੀਆਂ ਅਤੇ ਛੋਟੀਆਂ ਸਾਹਾਂ"
+                    },
+                    "pali": {
+                        "roman": "Dīghaṁ vā assasanto 'dīghaṁ assasāmī' ti pajānāti, dīghaṁ vā passasanto 'dīghaṁ passasāmī' ti pajānāti. Rassaṁ vā assasanto 'rassaṁ assasāmī' ti pajānāti, rassaṁ vā passasanto 'rassaṁ passasāmī' ti pajānāti.",
+                        "devanagari": "दीघं वा अस्ससन्तो 'दीघं अस्ससामी' ति पजानाति, दीघं वा पस्ससन्तो 'दीघं पस्ससामी' ति पजानाति। रस्सं वा अस्ससन्तो 'रस्सं अस्ससामी' ति पजानाति, रस्सं वा पस्ससन्तो 'रस्सं पस्ससामी' ति पजानाति।"
+                    },
+                    "translation": {
+                        "en": "Breathing in long, one knows 'I breathe in long'; breathing out long, one knows 'I breathe out long'. Breathing in short, one knows 'I breathe in short'; breathing out short, one knows 'I breathe out short'.",
+                        "hi": "लंबी सांस लेते हुए, व्यक्ति जानता है 'मैं लंबी सांस ले रहा हूं'; लंबी सांस छोड़ते हुए, व्यक्ति जानता है 'मैं लंबी सांस छोड़ रहा हूं'। छोटी सांस लेते हुए, व्यक्ति जानता है 'मैं छोटी सांस ले रहा हूं'; छोटी सांस छोड़ते हुए, व्यक्ति जानता है 'मैं छोटी सांस छोड़ रहा हूं'।",
+                        "pa": "ਲੰਬਾ ਸਾਹ ਲੈਂਦੇ ਹੋਏ, ਕੋਈ ਜਾਣਦਾ ਹੈ 'ਮੈਂ ਲੰਬਾ ਸਾਹ ਲੈ ਰਿਹਾ ਹਾਂ'; ਲੰਬਾ ਸਾਹ ਛੱਡਦੇ ਹੋਏ, ਕੋਈ ਜਾਣਦਾ ਹੈ 'ਮੈਂ ਲੰਬਾ ਸਾਹ ਛੱਡ ਰਿਹਾ ਹਾਂ'। ਛੋਟਾ ਸਾਹ ਲੈਂਦੇ ਹੋਏ, ਕੋਈ ਜਾਣਦਾ ਹੈ 'ਮੈਂ ਛੋਟਾ ਸਾਹ ਲੈ ਰਿਹਾ ਹਾਂ'; ਛੋਟਾ ਸਾਹ ਛੱਡਦੇ ਹੋਏ, ਕੋਈ ਜਾਣਦਾ ਹੈ 'ਮੈਂ ਛੋਟਾ ਸਾਹ ਛੱਡ ਰਿਹਾ ਹਾਂ'।"
+                    },
+                    "guidance": {
+                        "en": "Begin by simply observing the natural breath. Notice when breaths are long or short without trying to control them. This develops basic awareness of the breathing process.",
+                        "hi": "केवल प्राकृतिक सांस का अवलोकन करके शुरुआत करें। जब सांसें लंबी या छोटी हों तो उन्हें नियंत्रित करने की कोशिश किए बिना ध्यान दें।",
+                        "pa": "ਕੇਵਲ ਕੁਦਰਤੀ ਸਾਹ ਨੂੰ ਦੇਖ ਕੇ ਸ਼ੁਰੂ ਕਰੋ। ਜਦੋਂ ਸਾਹ ਲੰਬੇ ਜਾਂ ਛੋਟੇ ਹੋਣ ਤਾਂ ਉਨ੍ਹਾਂ ਨੂੰ ਕੰਟਰੋਲ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕੀਤੇ ਬਿਨਾਂ ਨੋਟ ਕਰੋ।"
+                    }
+                },
+                {
+                    "number": 2,
+                    "title": {
+                        "en": "Experiencing the Whole Body",
+                        "hi": "संपूर्ण शरीर का अनुभव",
+                        "pa": "ਪੂਰੇ ਸਰੀਰ ਦਾ ਅਨੁਭਵ"
+                    },
+                    "pali": {
+                        "roman": "Sabbakāya-paṭisaṁvedī assasissāmī ti sikkhati, sabbakāya-paṭisaṁvedī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in experiencing the whole body'; one trains thus: 'I shall breathe out experiencing the whole body'.",
+                        "hi": "व्यक्ति इस प्रकार प्रशिक्षित होता है: 'मैं संपूर्ण शरीर का अनुभव करते हुए सांस लूंगा'; व्यक्ति इस प्रकार प्रशिक्षित होता है: 'मैं संपूर्ण शरीर का अनुभव करते हुए सांस छोड़ूंगा'।",
+                        "pa": "ਕੋਈ ਇਸ ਤਰ੍ਹਾਂ ਸਿਖਲਾਈ ਕਰਦਾ ਹੈ: 'ਮੈਂ ਪੂਰੇ ਸਰੀਰ ਦਾ ਅਨੁਭਵ ਕਰਦੇ ਹੋਏ ਸਾਹ ਲਵਾਂਗਾ'; ਕੋਈ ਇਸ ਤਰ੍ਹਾਂ ਸਿਖਲਾਈ ਕਰਦਾ ਹੈ: 'ਮੈਂ ਪੂਰੇ ਸਰੀਰ ਦਾ ਅਨੁਭਵ ਕਰਦੇ ਹੋਏ ਸਾਹ ਛੱਡਾਂਗਾ'।"
+                    },
+                    "guidance": {
+                        "en": "Expand awareness to include the entire body. Feel the breath throughout the body, not just at one point. Notice subtle sensations, movements, and energy as you breathe."
+                    }
+                },
+                {
+                    "number": 3,
+                    "title": {
+                        "en": "Calming the Bodily Formation",
+                        "hi": "शारीरिक संस्कार को शांत करना",
+                        "pa": "ਸਰੀਰਕ ਰਚਨਾ ਨੂੰ ਸ਼ਾਂਤ ਕਰਨਾ"
+                    },
+                    "pali": {
+                        "roman": "Passambhayaṁ kāya-saṅkhāraṁ assasissāmī ti sikkhati, passambhayaṁ kāya-saṅkhāraṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in calming the bodily formation'; one trains thus: 'I shall breathe out calming the bodily formation'."
+                    },
+                    "guidance": {
+                        "en": "Allow the breath and body to become calm and tranquil. Let go of physical tension and restlessness. The breath naturally becomes finer and more subtle."
+                    }
+                },
+                {
+                    "number": 4,
+                    "title": {
+                        "en": "Tranquillising the Bodily Formation"
+                    },
+                    "pali": {
+                        "roman": "Passambhayaṁ kāya-saṅkhāraṁ assasissāmī ti sikkhati, passambhayaṁ kāya-saṅkhāraṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in tranquillising the bodily formation'; one trains thus: 'I shall breathe out tranquillising the bodily formation'."
+                    },
+                    "guidance": {
+                        "en": "Deepen the calmness. As the breath becomes very subtle, the body feels very light and peaceful. This prepares the mind for the next tetrad."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "feelings",
+            "order": 2,
+            "title": {
+                "pali": "Vedanānupassanā",
+                "en": "Contemplation of Feelings"
+            },
+            "icon": "💫",
+            "color": "#8B5CF6",
+            "description": {
+                "en": "Awareness of pleasant, unpleasant, and neutral feelings"
+            },
+            "steps": [
+                {
+                    "number": 5,
+                    "title": {
+                        "en": "Experiencing Rapture (Pīti)"
+                    },
+                    "pali": {
+                        "roman": "Pīti-paṭisaṁvedī assasissāmī ti sikkhati, pīti-paṭisaṁvedī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in experiencing rapture'; one trains thus: 'I shall breathe out experiencing rapture'."
+                    },
+                    "guidance": {
+                        "en": "Observe any feelings of joy, interest, or rapture that arise from the calm breath. If none are present, simply be aware of the potential for joy."
+                    }
+                },
+                {
+                    "number": 6,
+                    "title": {
+                        "en": "Experiencing Happiness (Sukha)"
+                    },
+                    "pali": {
+                        "roman": "Sukha-paṭisaṁvedī assasissāmī ti sikkhati, sukha-paṭisaṁvedī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in experiencing happiness'; one trains thus: 'I shall breathe out experiencing happiness'."
+                    },
+                    "guidance": {
+                        "en": "Shift focus to a more subtle, peaceful happiness or comfort. Let the excitement of rapture settle into deep contentment."
+                    }
+                },
+                {
+                    "number": 7,
+                    "title": {
+                        "en": "Experiencing the Mental Formation"
+                    },
+                    "pali": {
+                        "roman": "Citta-saṅkhāra-paṭisaṁvedī assasissāmī ti sikkhati, citta-saṅkhāra-paṭisaṁvedī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in experiencing the mental formation'; one trains thus: 'I shall breathe out experiencing the mental formation'."
+                    },
+                    "guidance": {
+                        "en": "Observe how feelings and perceptions affect the mind. Notice if they cause agitation or peace."
+                    }
+                },
+                {
+                    "number": 8,
+                    "title": {
+                        "en": "Calming the Mental Formation"
+                    },
+                    "pali": {
+                        "roman": "Passambhayaṁ citta-saṅkhāraṁ assasissāmī ti sikkhati, passambhayaṁ citta-saṅkhāraṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in calming the mental formation'; one trains thus: 'I shall breathe out calming the mental formation'."
+                    },
+                    "guidance": {
+                        "en": "Calm the reactions to feelings. Let go of attachment to pleasant feelings and aversion to unpleasant ones."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mind",
+            "order": 3,
+            "title": {
+                "pali": "Cittānupassanā",
+                "en": "Contemplation of Mind"
+            },
+            "icon": "🧠",
+            "color": "#EC4899",
+            "description": {
+                "en": "Observing mental states and consciousness"
+            },
+            "steps": [
+                {
+                    "number": 9,
+                    "title": {
+                        "en": "Experiencing the Mind"
+                    },
+                    "pali": {
+                        "roman": "Citta-paṭisaṁvedī assasissāmī ti sikkhati, citta-paṭisaṁvedī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in experiencing the mind'; one trains thus: 'I shall breathe out experiencing the mind'."
+                    },
+                    "guidance": {
+                        "en": "Turn awareness explicitly to the state of the mind itself. Is it lustful or not? Angry or not? Deluded or not? Constricted or scattered?"
+                    }
+                },
+                {
+                    "number": 10,
+                    "title": {
+                        "en": "Gladdening the Mind"
+                    },
+                    "pali": {
+                        "roman": "Abhippamodayaṁ cittaṁ assasissāmī ti sikkhati, abhippamodayaṁ cittaṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in gladdening the mind'; one trains thus: 'I shall breathe out gladdening the mind'."
+                    },
+                    "guidance": {
+                        "en": "If the mind is dull, uplift it. Bring up an inspiring image or reflection to brighten the mind."
+                    }
+                },
+                {
+                    "number": 11,
+                    "title": {
+                        "en": "Concentrating the Mind"
+                    },
+                    "pali": {
+                        "roman": "Samādahaṁ cittaṁ assasissāmī ti sikkhati, samādahaṁ cittaṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in concentrating the mind'; one trains thus: 'I shall breathe out concentrating the mind'."
+                    },
+                    "guidance": {
+                        "en": "Steadily focus the mind on the breath. Let it become unified and still."
+                    }
+                },
+                {
+                    "number": 12,
+                    "title": {
+                        "en": "Liberating the Mind"
+                    },
+                    "pali": {
+                        "roman": "Vimocayaṁ cittaṁ assasissāmī ti sikkhati, vimocayaṁ cittaṁ passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in liberating the mind'; one trains thus: 'I shall breathe out liberating the mind'."
+                    },
+                    "guidance": {
+                        "en": "Free the mind from any hindrances or heavy states that remain. Let go."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dhammas",
+            "order": 4,
+            "title": {
+                "pali": "Dhammānupassanā",
+                "en": "Contemplation of Dhammas"
+            },
+            "icon": "☸️",
+            "color": "#F59E0B",
+            "description": {
+                "en": "Understanding impermanence and liberation"
+            },
+            "steps": [
+                {
+                    "number": 13,
+                    "title": {
+                        "en": "Contemplating Impermanence"
+                    },
+                    "pali": {
+                        "roman": "Aniccānupassī assasissāmī ti sikkhati, aniccānupassī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in contemplating impermanence'; one trains thus: 'I shall breathe out contemplating impermanence'."
+                    },
+                    "guidance": {
+                        "en": "Observe the constant rising and falling of the breath, feelings, and thoughts. See nothing lasts."
+                    }
+                },
+                {
+                    "number": 14,
+                    "title": {
+                        "en": "Contemplating Fading Away"
+                    },
+                    "pali": {
+                        "roman": "Virāgānupassī assasissāmī ti sikkhati, virāgānupassī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in contemplating fading away'; one trains thus: 'I shall breathe out contemplating fading away'."
+                    },
+                    "guidance": {
+                        "en": "Notice how things fade away and disappear. Let interest in worldly things fade."
+                    }
+                },
+                {
+                    "number": 15,
+                    "title": {
+                        "en": "Contemplating Cessation"
+                    },
+                    "pali": {
+                        "roman": "Nirodhānupassī assasissāmī ti sikkhati, nirodhānupassī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in contemplating cessation'; one trains thus: 'I shall breathe out contemplating cessation'."
+                    },
+                    "guidance": {
+                        "en": "Observe the ending of phenomena. Find peace in the cessation of stress."
+                    }
+                },
+                {
+                    "number": 16,
+                    "title": {
+                        "en": "Contemplating Relinquishment"
+                    },
+                    "pali": {
+                        "roman": "Paṭinissaggānupassī assasissāmī ti sikkhati, paṭinissaggānupassī passasissāmī ti sikkhati."
+                    },
+                    "translation": {
+                        "en": "One trains thus: 'I shall breathe in contemplating relinquishment'; one trains thus: 'I shall breathe out contemplating relinquishment'."
+                    },
+                    "guidance": {
+                        "en": "Give up all holding and clinging. Return everything to nature. Rest in total freedom."
+                    }
+                }
+            ]
+        }
+    ]
+}

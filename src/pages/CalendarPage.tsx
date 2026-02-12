@@ -26,6 +26,7 @@ import YearView from '../components/YearView';
 import { getSavedLocation } from '../services/locationManager';
 import DhammapadaVerseCard from '../components/DhammapadaVerseCard';
 import { DhammapadaVerse, getVerseForDate, getRandomVerse } from '../services/dhammapadaService';
+import PracticeCalendarCard from '../components/sati/PracticeCalendarCard';
 import './CalendarPage.css';
 
 const CalendarPage: React.FC = () => {
@@ -297,6 +298,8 @@ const CalendarPage: React.FC = () => {
                             )}
                         </div>
 
+                        <PracticeCalendarCard />
+
                         {showVerseCard && currentVerse && (
                             <div className="ion-padding-horizontal" style={{ marginBottom: '12px' }}>
                                 <DhammapadaVerseCard
@@ -338,26 +341,32 @@ const CalendarPage: React.FC = () => {
                         <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
                         <div className="legend-item"><span>🌗</span> Ashtami / Chaturdashi</div>
                         <div className="legend-item"><span>○</span> Kshaya / Vridhi (Optional)</div>
+                    </div>
+
+                    <div className="traditions-row">
                         <div className="legend-item">
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF9933' }} />
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF9933' }} />
                             Theravada
                         </div>
                         <div className="legend-item">
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E34234' }} />
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E34234' }} />
                             Mahayana
                         </div>
                         <div className="legend-item">
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#1E3A5F' }} />
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1E3A5F' }} />
                             Vajrayana
                         </div>
                     </div>
-                    <div style={{ marginTop: '12px', fontSize: '0.75rem', opacity: 0.8, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px', lineHeight: '1.4' }}>
-                        <div style={{ marginBottom: '6px' }}><strong>Liturgical Meanings:</strong></div>
-                        <div style={{ marginBottom: '4px' }}>
-                            • <strong>Kshaya (Skipped):</strong> Occurs when a Tithi starts after one sunrise and ends before the next. It never exists at the moment of sunrise, causing it to be "skipped" in the primary udaya-based count. These are marked as optional observances.
+
+                    <div className="liturgical-meanings">
+                        <div style={{ marginBottom: '4px' }}><strong>Liturgical Meanings:</strong></div>
+                        <div style={{ marginBottom: '4px', display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
+                            <span>•</span>
+                            <span><strong>Kshaya (Skipped):</strong> Occurs when a Tithi starts after one sunrise and ends before the next. It never exists at the moment of sunrise, causing it to be "skipped" in the primary udaya-based count. These are marked as optional observances.</span>
                         </div>
-                        <div>
-                            • <strong>Vridhi (Extended):</strong> Occurs when a Tithi is long enough to span across two consecutive sunrises. The same Tithi is counted twice; the first is the primary day, and the second is marked as an optional/extended day.
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
+                            <span>•</span>
+                            <span><strong>Vridhi (Extended):</strong> Occurs when a Tithi is long enough to span across two consecutive sunrises. The same Tithi is counted twice; the first is the primary day, and the second is marked as an optional/extended day.</span>
                         </div>
                     </div>
                 </div>

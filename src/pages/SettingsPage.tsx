@@ -29,7 +29,8 @@ import { Observer } from '@ishubhamx/panchangam-js';
 import { getTimezones } from '../services/timeUtils';
 import { MAJOR_CITIES } from '../services/locationData';
 import { IonSelect, IonSelectOption, IonIcon } from '@ionic/react';
-import { locationOutline, timeOutline, globeOutline } from 'ionicons/icons';
+import { locationOutline, timeOutline, globeOutline, caretUpCircleOutline } from 'ionicons/icons';
+import { MalaService } from '../services/MalaService';
 
 const SettingsPage: React.FC = () => {
     const [location, setLocation] = useState<SavedLocation | null>(null);
@@ -40,6 +41,7 @@ const SettingsPage: React.FC = () => {
     const [dailyVerseTimeLabel, setDailyVerseTimeLabel] = useState('06:00');
     const [showDailyVerseCard, setShowDailyVerseCard] = useState(true);
     const [timezones] = useState(getTimezones());
+    const [paliScript, setPaliScript] = useState('roman');
 
     useIonViewWillEnter(() => {
         loadSettings();
@@ -75,6 +77,9 @@ const SettingsPage: React.FC = () => {
 
         const { value: showVerse } = await Preferences.get({ key: 'settings_show_daily_verse' });
         setShowDailyVerseCard(showVerse === null || showVerse === '' || showVerse === 'true');
+
+        const prefs = await MalaService.getPreferences();
+        setPaliScript(prefs.paliScript);
     };
 
     const handleTimezoneChange = async (tz: string) => {
@@ -164,6 +169,12 @@ const SettingsPage: React.FC = () => {
     const toggleShowDailyVerseCard = async (enabled: boolean) => {
         setShowDailyVerseCard(enabled);
         await Preferences.set({ key: 'settings_show_daily_verse', value: String(enabled) });
+    };
+
+    const handlePaliScriptChange = async (script: string) => {
+        setPaliScript(script);
+        const prefs = await MalaService.getPreferences();
+        await MalaService.savePreferences({ ...prefs, paliScript: script });
     };
 
     const updateSchedules = async (uposatha: boolean, festivals: boolean) => {
@@ -334,6 +345,44 @@ const SettingsPage: React.FC = () => {
 
                 <IonList inset>
                     <IonItemDivider>
+                        <IonLabel>Pali Text Settings</IonLabel>
+                    </IonItemDivider>
+                    <IonItem>
+                        <IonIcon icon={caretUpCircleOutline} slot="start" color="warning" />
+                        <IonLabel className="ion-text-wrap">
+                            <h2>Pali Script</h2>
+                            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Script used for all Pali texts (Triple Gem, Anapanasati, etc.)</p>
+                        </IonLabel>
+                        <IonSelect
+                            slot="end"
+                            interface="action-sheet"
+                            placeholder="Select"
+                            value={paliScript}
+                            onIonChange={e => handlePaliScriptChange(e.detail.value)}
+                        >
+                            <IonSelectOption value="roman">Roman (Default)</IonSelectOption>
+                            <IonSelectOption value="devanagari">Devanagari (देवनागरी)</IonSelectOption>
+                            <IonSelectOption value="sinhala">Sinhala (සිංහල)</IonSelectOption>
+                            <IonSelectOption value="thai">Thai (ไทย)</IonSelectOption>
+                            <IonSelectOption value="burmese">Burmese (မြန်မာ)</IonSelectOption>
+                        </IonSelect>
+                    </IonItem>
+                </IonList>
+
+                <IonList inset>
+                    <IonItemDivider>
+                        <IonLabel>Sati Practice</IonLabel>
+                    </IonItemDivider>
+                    <IonItem button routerLink="/sati" detail>
+                        <IonLabel>Go to Sati Practice</IonLabel>
+                    </IonItem>
+                    <IonItem button routerLink="/sati/stats" detail>
+                        <IonLabel>View Practice Statistics</IonLabel>
+                    </IonItem>
+                </IonList>
+
+                <IonList inset>
+                    <IonItemDivider>
                         <IonLabel>About & Credits</IonLabel>
                     </IonItemDivider>
                     <IonItem lines="none">
@@ -351,7 +400,7 @@ const SettingsPage: React.FC = () => {
                     <p>Calculations by @ishubhamx/panchangam-js</p>
                 </div>
             </IonContent>
-        </IonPage>
+        </IonPage >
     );
 };
 

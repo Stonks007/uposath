@@ -1,0 +1,400 @@
+{
+    "title": {
+        "pali": "Ti-ratana Anussati",
+        "en": "Triple Gem Recollection",
+        "hi": "त्रिरत्न अनुस्मृति",
+        "pa": "ਤਿਰਤਨ ਅਨੁਸ੍ਮ੍ਰਿਤਿ",
+        "si": "තිරතන අනුස්සති",
+        "th": "ติรตน อนุสสติ",
+        "my": "တိရတန အနုဿတိ",
+        "zh": "三宝念",
+        "ja": "三宝念",
+        "ko": "삼보념",
+        "es": "Recuerdo de la Triple Gema",
+        "pt": "Recordação da Tríplice Joia",
+        "de": "Betrachtung der Drei Juwelen",
+        "fr": "Récollection des Trois Joyaux"
+    },
+    "subtitle": {
+        "roman": "Buddhaṁ Dhammaṁ Saṅghaṁ saraṇaṁ gacchāmi",
+        "devanagari": "बुद्धं धम्मं सङ्घं सरणं गच्छामि",
+        "sinhala": "බුද්ධං ධම්මං සංඝං සරණං ගච්ඡාමි",
+        "thai": "พุทธัง ธัมมัง สังฆัง สรณัง คัจฉามิ",
+        "burmese": "ဗုဒ္ဓံ ဓမ္မံ သံဃံ သရဏံ ဂစ္ဆာမိ"
+    },
+    "recollections": [
+        {
+            "id": "buddha",
+            "order": 1,
+            "title": {
+                "en": "Recollection of the Buddha",
+                "hi": "बुद्ध अनुस्मृति",
+                "pa": "ဘုရားဂုဏ်တော်",
+                "si": "බුද්ධානුස්සති",
+                "th": "พุทธานุสสติ",
+                "my": "ဗုဒ္ဓါနုဿတိ",
+                "zh": "念佛",
+                "ja": "念佛",
+                "ko": "염불",
+                "es": "Recuerdo del Buda",
+                "pt": "Recordação do Buda",
+                "de": "Betrachtung des Buddha",
+                "fr": "Récollection du Bouddha"
+            },
+            "icon": "🔆",
+            "color": "#D4AF37",
+            "verse": {
+                "roman": "Itipi so bhagavā arahaṁ sammāsambuddho vijjācaraṇasampanno sugato lokavidū anuttaro purisadammāsarathi satthā devamanussānaṁ buddho bhagavāti.",
+                "devanagari": "इतिपि सो भगवा अरहं सम्ماسम्बुद्धो विज्जाचरणसम्पन्नो सुगतो लोकविदू अनुत्तरो पुरिसदम्मासारथि सत्था देवमनुस्सानं बुद्धो भगवाति।",
+                "sinhala": "ඉතිපි සො භගවා අරහං සම්මාසම්බුද්ධො විජ්ජාචරණසම්පන්නො සුගතො ලොකවිදූ අනුත්තරො පුරිසදම්මාසාරථි සත්ථා දෙවමනුස්සානං බුද්ධො භගවාති.",
+                "thai": "อิติปิ โส ภควา อรหํ สมฺมาสมฺพุทฺโธ วิชฺชาจรณสมฺปนฺโน สุคโต โลกวิทู อนุตฺตโร ปุริสทมฺมสารถิ สตฺถา เทวมนุสฺสานํ พุทฺโธ ภควาติ.",
+                "burmese": "ဣတိပိ သော ဘဂဝါ အရဟံ သမ္မာသမ္ဗုဒ္ဓေါ ဝိဇ္ဇာစရဏသမ္ပန္နေါ သုဂတော လောကဝိဒူ အနုတ္တရော ပုရိသဒမ္မသာရထိ သတ္ထာ ဒေဝမနုဿာနံ ဗုဒ္ဓေါ ဘဂဝါတိ။"
+            },
+            "translation": {
+                "en": "Indeed, the Blessed One is worthy, perfectly self-enlightened, endowed with clear vision and virtuous conduct, sublime, the knower of worlds, the incomparable leader of persons to be tamed, the teacher of gods and humans, enlightened and blessed.",
+                "hi": "निश्चय ही, वे भगवान अर्हंत हैं, सम्यक सम्बुद्ध हैं, विद्या और आचरण से संपन्न हैं, सुगत हैं, लोकविद् हैं, दम्य पुरुषों के अनुत्तर सारथी हैं, देवताओं और मनुष्यों के शास्ता हैं, बुद्ध हैं, भगवान हैं।",
+                "es": "En verdad, el Bendito es digno, perfectamente auto-iluminado, dotado de clara visión y conducta virtuosa, sublime, conocedor de los mundos, el líder incomparable de personas a ser domesticadas, el maestro de dioses y humanos, iluminado y bendito."
+            },
+            "qualities": [
+                {
+                    "number": 1,
+                    "pali": {
+                        "roman": "Arahaṁ"
+                    },
+                    "name": {
+                        "en": "The Worthy One"
+                    },
+                    "explanation": {
+                        "en": "One who has eradicated all mental impurities and is worthy of offerings."
+                    }
+                },
+                {
+                    "number": 2,
+                    "pali": {
+                        "roman": "Sammā-sambuddho"
+                    },
+                    "name": {
+                        "en": "Perfectly Self-Enlightened"
+                    },
+                    "explanation": {
+                        "en": "One who has discovered the truth by himself without a teacher."
+                    }
+                },
+                {
+                    "number": 3,
+                    "pali": {
+                        "roman": "Vijjā-caraṇa-sampanno"
+                    },
+                    "name": {
+                        "en": "Endowed with knowledge and conduct"
+                    },
+                    "explanation": {
+                        "en": "Possessing both the theoretical knowledge of the path and the practical conduct to walk it."
+                    }
+                },
+                {
+                    "number": 4,
+                    "pali": {
+                        "roman": "Sugato"
+                    },
+                    "name": {
+                        "en": "The Well-Gone One"
+                    },
+                    "explanation": {
+                        "en": "One who has gone to the deathless state of Nibbana correctly."
+                    }
+                },
+                {
+                    "number": 5,
+                    "pali": {
+                        "roman": "Lokavidū"
+                    },
+                    "name": {
+                        "en": "Knower of the Worlds"
+                    },
+                    "explanation": {
+                        "en": "One who understands the nature of the world, its origin, its cessation, and the path to its cessation."
+                    }
+                },
+                {
+                    "number": 6,
+                    "pali": {
+                        "roman": "Anuttaro Purisa-damma-sārathi"
+                    },
+                    "name": {
+                        "en": "Incomparable Trainer of Tamable People"
+                    },
+                    "explanation": {
+                        "en": "Unsurpassed in the skill of teaching and guiding those who are ready to be trained."
+                    }
+                },
+                {
+                    "number": 7,
+                    "pali": {
+                        "roman": "Satthā Deva-manussānaṁ"
+                    },
+                    "name": {
+                        "en": "Teacher of Gods and Humans"
+                    },
+                    "explanation": {
+                        "en": "The universal teacher who guides both celestial and human beings to fabrication."
+                    }
+                },
+                {
+                    "number": 8,
+                    "pali": {
+                        "roman": "Buddho"
+                    },
+                    "name": {
+                        "en": "The Awakened One"
+                    },
+                    "explanation": {
+                        "en": "One who has awakened from the sleep of ignorance and knows the Four Noble Truths."
+                    }
+                },
+                {
+                    "number": 9,
+                    "pali": {
+                        "roman": "Bhagavā"
+                    },
+                    "name": {
+                        "en": "The Blessed One"
+                    },
+                    "explanation": {
+                        "en": "The most fortunate one, endowed with special powers and merits."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dhamma",
+            "order": 2,
+            "title": {
+                "en": "Recollection of the Dhamma",
+                "hi": "धम्म अनुस्मृति",
+                "es": "Recuerdo del Dhamma"
+            },
+            "icon": "☸️",
+            "color": "#1E3A8A",
+            "verse": {
+                "roman": "Svākkhato bhagavatā dhammo sandiṭṭhiko akāliko ehipassiko opanayiko paccattaṁ veditabbo viññūhīti.",
+                "devanagari": "स्वाक्खातो भगवता धम्मो सन्दिट्ठिको अकालिको एहिपस्सिको ओपनयिको पच्चत्तं वेदितब्बो विञ्ञाहीति।",
+                "sinhala": "ස්වාක්ඛාතො භගවතා ධම්මො සන්දිට්ඨිකො අකාලිකො එහිපස්සිකො ඔපනයිකො පච්චත්තං වෙදිතබ්බො විඤ්ඤූහීති.",
+                "thai": "สฺวากฺขาโต ภควตา ธมฺโม สนฺทิฏฺฐิโก อกาลิโก เอหิปสฺสิโก โอปนยิโก ปจฺจตฺตํ เวทิตพฺโพ วิญฺญูหีติ.",
+                "burmese": "သွာက္ခာတော ဘဂဝတာ ဓမ္မော သန္ဒိဋ္ဌိကော အကာလိကော ဧဟိပဿိကော ဩပနယိကော ပစ္စတ္တံ ဝေဒိတဗ္ဗော ဝိညူဟီတိ။"
+            },
+            "translation": {
+                "en": "The Dhamma is well-expounded by the Blessed One, to be seen here and now, timeless, inviting one to come and see, leading onward, to be experienced personally by the wise.",
+                "hi": "भगवान द्वारा धम्म का व्याख्यान भली-भांति किया गया है, यह इसी जन्म में फल देने वाला है, कालातीत है, 'आओ और देखो' - ऐसा निमंत्रण देने वाला है, निर्वाण की ओर ले जाने वाला है, और विज्ञ जनों द्वारा स्वयं अनुभव करने योग्य है।",
+                "es": "El Dhamma ha sido bien expuesto por el Bendito, es visible aquí y ahora, atemporal, invita a venir y ver, conduce hacia adelante, para ser experimentado personalmente por los sabios."
+            },
+            "qualities": [
+                {
+                    "number": 1,
+                    "pali": {
+                        "roman": "Svākkhato"
+                    },
+                    "name": {
+                        "en": "Well-Expounded"
+                    },
+                    "explanation": {
+                        "en": "Taught perfectly, with a beginning, middle, and end that are good."
+                    }
+                },
+                {
+                    "number": 2,
+                    "pali": {
+                        "roman": "Sandiṭṭhiko"
+                    },
+                    "name": {
+                        "en": "Visible Here and Now"
+                    },
+                    "explanation": {
+                        "en": "Can be realized in this very life; not a matter of mere belief."
+                    }
+                },
+                {
+                    "number": 3,
+                    "pali": {
+                        "roman": "Akāliko"
+                    },
+                    "name": {
+                        "en": "Timeless"
+                    },
+                    "explanation": {
+                        "en": "Giving immediate results; not subject to delay."
+                    }
+                },
+                {
+                    "number": 4,
+                    "pali": {
+                        "roman": "Ehipassiko"
+                    },
+                    "name": {
+                        "en": "Inviting to Come and See"
+                    },
+                    "explanation": {
+                        "en": "Open to verification; inviting investigation rather than blind faith."
+                    }
+                },
+                {
+                    "number": 5,
+                    "pali": {
+                        "roman": "Opanayiko"
+                    },
+                    "name": {
+                        "en": "Leading Onward"
+                    },
+                    "explanation": {
+                        "en": "Worthy of inducing into one's own mind; leading to Nibbana."
+                    }
+                },
+                {
+                    "number": 6,
+                    "pali": {
+                        "roman": "Paccattaṁ veditabbo viññūhi"
+                    },
+                    "name": {
+                        "en": "To Be Experienced Personally by the Wise"
+                    },
+                    "explanation": {
+                        "en": "Must be realized by each person for themselves; cannot be handed down."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sangha",
+            "order": 3,
+            "title": {
+                "en": "Recollection of the Sangha",
+                "hi": "संघ अनुस्मृति",
+                "es": "Recuerdo del Sangha"
+            },
+            "icon": "👥",
+            "color": "#FF8C42",
+            "verse": {
+                "roman": "Supaṭipanno bhagavato sāvakasaṅgho ujuppaṭipanno bhagavato sāvakasaṅgho ñāyappaṭipanno bhagavato sāvakasaṅgho sāmīcippaṭipanno bhagavato sāvakasaṅgho yadidaṁ cattāri purisayugāni aṭṭha purisapuggalā esa bhagavato sāvakasaṅgho āhuneyyo pāhuneyyo dakkhiṇeyyo añjalikaraṇīyo anuttaraṁ puññakkhettaṁ lokassāti.",
+                "devanagari": "सुपटिपन्नो भगवतो सावकसङ्घो उजुप्पटिपन्नो भगवतो सावकसङ्घो ञायप्पटिपन्नो भगवतो सावकसङ्घो सामीचिप्पटिपन्नो भगवतो सावकसङ्घो यदिदं चत्तारि पुरिसयुगानि अट्ठ पुरिसपुग्गला एस भगवतो सावकसङ्घो आहुनेय्यो पाहुनेय्यो दक्खिणेय्यो अञ्जलिकरणीयो अनुत्तरं पुञ्ञक्खेत्तं लोकस्साति।",
+                "sinhala": "සුපටිපන්නො භගවතො සාවකසංඝො උජුප්පටිපන්නො භගවතො සාවකසංඝො ඤායප්පටිපන්නො භගවතො සාවකසංඝො සාමීචිප්පටිපන්නො භගවතො සාවකසංඝො යදිදං චත්තාරි පුරිසයුගානි අට්ඨ පුරිසපුග්ගලා එස භගවතො සාවකසංඝො ආහුනෙය්‍යො පාහුනෙය්‍යො දක්ඛිණෙය්‍යො අඤ්ජලිකරණීයො අනුත්තරං පුඤ්ඤක්ඛෙත්තං ලොකස්සාති.",
+                "thai": "สุปฏิปนฺโน ภควโต สาวกสงฺโฆ อุชุปฏิปนฺโน ภควโต สาวกสงฺโฆ ญายปฏิปนฺโน ภควโต สาวกสงฺโฆ สามีจิปฏิปนฺโน ภควโต สาวกสงฺโฆ ยทิทํ จตฺตาริ ปุริสยุกานิ อฏฺฐ ปุริสปุคฺคลา เอส ภควโต สาวกสงฺโฆ อาหุเนยฺโย ปาหุเนยฺโย ทกฺขิเณยฺโย อญฺชลิกรณีโย อนุตฺตรํ ปุญฺญกฺเขตฺตํ โลกสฺสาติ.",
+                "burmese": "သုပ္ပဋိပန္နော ဘဂဝတော သာဝကသံဃော၊ ဥဇုပ္ပဋိပန္နော ဘဂဝတော သာဝကသံဃော၊ ဉာယပ္ပဋိပန္နော ဘဂဝတော သာဝကသံဃော၊ သာမီစိပ္ပဋိပန္နော ဘဂဝတော သာဝကသံဃော၊ ယဒိဒံ စတ္တာရိ ပုရိသယုဂါနိ အဋ္ဌ ပုရိသပုဂ္ဂလာ၊ ဧသ ဘဂဝတော သာဝကသံဃော၊ အာဟုနေယျော၊ ပါဟုနေယျော၊ ဒက္ခိဏေယျော၊ အဉ္ဇလိကရဏီယော၊ အနုတ္တရံ ပုညက္ခေတ္တံ လောကဿာတိ။"
+            },
+            "translation": {
+                "en": "The Sangha of the Blessed One's disciples has practiced well, practiced straightforwardly, practiced correctly, practiced properly; that is, the four pairs of persons, the eight types of individuals. This Sangha of the Blessed One's disciples is worthy of gifts, worthy of hospitality, worthy of offerings, worthy of reverential salutation, the unsurpassed field of merit for the world.",
+                "hi": "भगवान के श्रावक संघ सुप्रतिपन्न हैं (अच्छी तरह से साधना करने वाले), ऋजुप्रतिपन्न हैं (सीधे मार्ग पर चलने वाले), न्यायप्रतिपन्न हैं (सही मार्ग पर चलने वाले), समीचिप्रतिपन्न हैं (उचित मार्ग पर चलने वाले); अर्थात्, चार युगल पुरुष, आठ प्रकार के व्यक्ति। यह भगवान का श्रावक संघ आहूत सामग्री के योग्य है, पाहुनता के योग्य है, दक्षिणा के योग्य है, अंजलि (प्रणाम) के योग्य है, लोक के लिए अनुत्तर पुण्य क्षेत्र है।",
+                "es": "El Sangha de los discípulos del Bendito ha practicado bien, ha practicado rectamente, ha practicado correctamente, ha practicado apropiadamente; es decir, los cuatro pares de personas, los ocho tipos de individuos. Este Sangha de los discípulos del Bendito es digno de regalos, digno de hospitalidad, digno de ofrendas, digno de saludo reverencial, el campo de méritos insuperable para el mundo."
+            },
+            "qualities": [
+                {
+                    "number": 1,
+                    "pali": {
+                        "roman": "Supaṭipanno"
+                    },
+                    "name": {
+                        "en": "Practicing the Good Way"
+                    },
+                    "explanation": {
+                        "en": "Practicing according to the instructions of the Buddha."
+                    }
+                },
+                {
+                    "number": 2,
+                    "pali": {
+                        "roman": "Ujuppaṭipanno"
+                    },
+                    "name": {
+                        "en": "Practicing the Straight Way"
+                    },
+                    "explanation": {
+                        "en": "Following the direct path to Nibbana without deviation."
+                    }
+                },
+                {
+                    "number": 3,
+                    "pali": {
+                        "roman": "Ñāyappaṭipanno"
+                    },
+                    "name": {
+                        "en": "Practicing the Logical Way"
+                    },
+                    "explanation": {
+                        "en": "Practicing the path that leads to the realization of truth."
+                    }
+                },
+                {
+                    "number": 4,
+                    "pali": {
+                        "roman": "Sāmīcippaṭipanno"
+                    },
+                    "name": {
+                        "en": "Practicing the Proper Way"
+                    },
+                    "explanation": {
+                        "en": "Practicing in a way that is worthy of respect."
+                    }
+                },
+                {
+                    "number": 5,
+                    "pali": {
+                        "roman": "Āhuneyyo"
+                    },
+                    "name": {
+                        "en": "Worthy of Gifts"
+                    },
+                    "explanation": {
+                        "en": "Worthy of receiving offerings brought even from afar."
+                    }
+                },
+                {
+                    "number": 6,
+                    "pali": {
+                        "roman": "Pāhuneyyo"
+                    },
+                    "name": {
+                        "en": "Worthy of Hospitality"
+                    },
+                    "explanation": {
+                        "en": "Worthy of the welcome and hospitality shown to dear guests."
+                    }
+                },
+                {
+                    "number": 7,
+                    "pali": {
+                        "roman": "Dakkhiṇeyyo"
+                    },
+                    "name": {
+                        "en": "Worthy of Offerings"
+                    },
+                    "explanation": {
+                        "en": "Worthy of religious donations given with faith in future results."
+                    }
+                },
+                {
+                    "number": 8,
+                    "pali": {
+                        "roman": "Añjalikaraṇīyo"
+                    },
+                    "name": {
+                        "en": "Worthy of Reverential Salutation"
+                    },
+                    "explanation": {
+                        "en": "Worthy of being bowed to with joined palms."
+                    }
+                },
+                {
+                    "number": 9,
+                    "pali": {
+                        "roman": "Anuttaraṁ Puññakkhettaṁ Lokassa"
+                    },
+                    "name": {
+                        "en": "Unsurpassed Field of Merit"
+                    },
+                    "explanation": {
+                        "en": "The best place to plant seeds of merit for the world."
+                    }
+                }
+            ]
+        }
+    ]
+}
