@@ -226,6 +226,18 @@ const CalendarPage: React.FC = () => {
                                 >
                                     <IonIcon icon={chevronBack} />
                                 </IonButton>
+                                <span
+                                    style={{
+                                        fontSize: '0.8rem',
+                                        fontWeight: 600,
+                                        opacity: 0.8,
+                                        margin: '0 4px',
+                                        minWidth: '3.5rem',
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    {currentDate.getFullYear()}
+                                </span>
                                 <IonButton
                                     fill="clear"
                                     size="small"
