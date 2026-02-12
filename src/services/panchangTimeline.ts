@@ -4,7 +4,7 @@
  * Transforms raw Panchangam transition data into normalized timeline
  * segments suitable for rendering a horizontal 24-hour visualization.
  */
-import { dayNames, type Panchangam, type TithiTransition, type NakshatraTransition, type YogaTransition, type KaranaTransition } from '@ishubhamx/panchangam-js';
+import { type Panchangam, type TithiTransition, type NakshatraTransition, type YogaTransition, type KaranaTransition } from '@ishubhamx/panchangam-js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -35,6 +35,8 @@ export interface TimelineData {
     rows: TimelineRow[];
     /** Sunrise time (for marker rendering) */
     sunrise: Date | null;
+    /** Next day's sunrise time (for accurate timeline duration) */
+    nextSunrise: Date | null;
     /** Sunset time (for marker rendering) */
     sunset: Date | null;
     /** Moonrise time */
@@ -62,6 +64,16 @@ function mapTransitions<T extends { name: string; startTime: Date; endTime: Date
     }));
 }
 
+const SANSKRIT_WEEKDAYS = [
+    'Ravivara',     // Sunday
+    'Somavara',     // Monday
+    'Mangalavara',  // Tuesday
+    'Budhavara',    // Wednesday
+    'Guruvara',     // Thursday
+    'Shukravara',   // Friday
+    'Shanivara'     // Saturday
+];
+
 // ─── Core Function ───────────────────────────────────────────────────────────
 
 /**
@@ -72,6 +84,12 @@ function mapTransitions<T extends { name: string; startTime: Date; endTime: Date
  */
 export function buildTimelineData(panchangam: Panchangam): TimelineData {
     const { sunrise, sunset, moonrise, moonset, vara } = panchangam;
+
+    // The library doesn't strictly have nextSunrise on the object, 
+    // it's usually calculated or part of the transitions.
+    // However, the last transition's endTime IS the next sunrise.
+    const lastTithi = panchangam.tithiTransitions[panchangam.tithiTransitions.length - 1];
+    const nextSunrise = lastTithi ? lastTithi.endTime : new Date((sunrise?.getTime() || Date.now()) + 24 * 3600000);
 
     const rows: TimelineRow[] = [
         {
@@ -104,9 +122,9 @@ export function buildTimelineData(panchangam: Panchangam): TimelineData {
             icon: '📆',
             segments: [
                 {
-                    name: dayNames[vara] ?? `Day ${vara}`,
+                    name: SANSKRIT_WEEKDAYS[vara] ?? `Day ${vara}`,
                     startTime: sunrise ?? new Date(),
-                    endTime: sunset ?? new Date(),
+                    endTime: nextSunrise ?? new Date((sunrise ? sunrise.getTime() : Date.now()) + 24 * 3600000),
                     isPrimary: true,
                 },
             ],
@@ -116,6 +134,7 @@ export function buildTimelineData(panchangam: Panchangam): TimelineData {
     return {
         rows,
         sunrise,
+        nextSunrise,
         sunset,
         moonrise,
         moonset,

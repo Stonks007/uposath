@@ -1,26 +1,25 @@
+/* Panchang Timeline Redesign */
 .panchang-timeline {
     font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    padding: var(--space-md);
-    background: var(--color-bg-card);
-    backdrop-filter: var(--glass-backdrop);
-    -webkit-backdrop-filter: var(--glass-backdrop);
+    background: #0f0f15;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden;
     margin-bottom: var(--space-md);
     display: flex;
     flex-direction: column;
+    border-top: 2px solid #ff9f43;
+    /* Matches title orange */
 }
 
 .timeline-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-sm);
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .header-left {
@@ -29,16 +28,12 @@
     gap: var(--space-sm);
 }
 
-.timeline-icon {
-    font-size: var(--font-size-lg);
-}
-
 .timeline-title {
     margin: 0;
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    font-family: var(--font-family-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ff9f43;
+    /* Match orange in image */
     letter-spacing: 0.02em;
 }
 
@@ -50,348 +45,364 @@
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: var(--font-size-xs);
-    color: var(--color-text-secondary);
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #f1c40f;
+    font-weight: 600;
 }
 
 .legend-star {
-    color: var(--color-accent-primary);
-    font-weight: bold;
-    text-shadow: 0 0 4px rgba(255, 198, 112, 0.4);
+    font-size: 0.9rem;
 }
 
 /* Wrapper Grid */
 .timeline-wrapper {
     display: flex;
     position: relative;
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    background: rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    /* Ensure rounded corners clip content */
+    background: #0f0f15;
 }
 
 /* Labels Column */
 .labels-column {
-    width: 100px;
+    width: 110px;
     flex-shrink: 0;
-    border-right: 1px solid var(--glass-border);
-    background: rgba(10, 10, 15, 0.4);
-    backdrop-filter: blur(4px);
-    z-index: 2;
+    z-index: 50;
+    position: sticky;
+    left: 0;
+    background: #0f0f15;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .label-spacer {
-    height: 44px;
-    /* Matches time-scale height */
-    border-bottom: 1px solid var(--glass-border);
+    height: 60px;
+    /* Aligned with time-scale height */
 }
 
 .row-label {
-    height: 36px;
-    /* Reduced height for compactness */
+    height: 46px;
     display: flex;
     align-items: center;
-    padding-left: var(--space-sm);
-    gap: 6px;
-    font-size: 0.7rem;
-    /* Slightly smaller to fit */
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    border-bottom: 1px solid transparent;
-    /* Placeholder for alignment */
-    /* Center vertically relative to row */
-}
-
-.weekday-label {
-    color: var(--color-accent-secondary);
+    justify-content: flex-end;
+    padding: 0 12px;
+    gap: 8px;
+    min-width: 0;
 }
 
 .row-icon {
-    font-size: 0.9rem;
-    opacity: 0.9;
+    font-size: 1.1rem;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+.row-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a0a0b0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* Row-specific label coloring */
+.row-label.row-type-tithi .row-text {
+    color: #ffffff;
+}
+
+.row-label.row-type-nakshatra .row-text {
+    color: #ffffff;
+}
+
+.row-label.row-type-yoga .row-text {
+    color: #ffffff;
+}
+
+.row-label.row-type-karana .row-text {
+    color: #ffffff;
+}
+
+.row-label.row-type-vara .row-text {
+    color: #ffffff;
 }
 
 /* Content Area */
 .timeline-content {
     flex-grow: 1;
-    position: relative;
     overflow-x: auto;
-    /* Enable horizontal scrolling */
     -webkit-overflow-scrolling: touch;
-    /* Smooth scroll on iOS */
-    /* Hide scrollbar but allow functionality */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    border-left: 1px solid var(--glass-border);
-    /* Separator from labels */
+    scrollbar-width: thin;
 }
 
-.timeline-content::-webkit-scrollbar {
-    display: none;
+.timeline-scroll-area {
+    min-width: 1000px;
+    padding: 0 30px;
+    position: relative;
+    box-sizing: border-box;
 }
 
 /* Time Scale */
 .time-scale {
+    height: 60px;
     position: relative;
-    height: 44px;
-    border-bottom: 1px solid var(--glass-border);
-    width: 200%;
-    /* Force width > 100% to ensure scrolling on most screens, or use min-width */
-    min-width: 600px;
-    /* Ensure logical minimum size for readability */
-    /* Pattern background for structure */
-    background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px);
-    background-size: 4.16% 100%;
-    /* 100/24 hours approx */
-    background-position: 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.timeline-baseline {
+.time-gradient-bar {
     position: absolute;
-    bottom: 0;
+    top: 42px;
     left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right,
+            #f39c12 0%,
+            #f1c40f 15%,
+            #3498db 35%,
+            #9b59b6 55%,
+            #e74c3c 75%,
+            #f39c12 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+}
+
+.coordinate-system {
+    position: relative;
     width: 100%;
-    height: 1px;
-    background: var(--color-border);
+    height: 100%;
 }
 
 /* Sun Markers */
 .sun-marker {
     position: absolute;
-    top: 6px;
+    top: 10px;
+    /* Adjusted for smaller height */
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.sun-icon-wrapper {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-accent-primary);
-    color: var(--color-accent-primary);
-    box-shadow: 0 0 6px rgba(255, 198, 112, 0.2);
+    z-index: 20;
 }
 
 .sun-icon-wrapper svg {
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    /* Reduced from 20px */
+    height: 18px;
 }
 
-.sunset-icon {
-    border-color: var(--color-accent-secondary);
-    color: var(--color-accent-secondary);
+.sunset-glow {
+    color: #ff4757;
+    filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.6));
 }
 
 .sun-time {
-    font-size: 0.6rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-top: 2px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 1px 4px;
-    border-radius: 3px;
-    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #ff9f43;
+    margin-bottom: 2px;
 }
 
-.hour-marker {
+.sunset-marker .sun-time {
+    color: #ff4757;
+}
+
+/* Hour Ticks */
+.hour-tick {
     position: absolute;
-    bottom: 0;
+    top: 30px;
+    /* Adjusted for smaller height */
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-    padding-bottom: 2px;
 }
 
-.hour-tick {
-    display: none;
-    /* Hide tick, grid lines handle it via background */
+.tick-mark {
+    width: 1px;
+    height: 10px;
+    /* Reduced from 12px */
+    background: rgba(255, 255, 255, 0.3);
+    margin-bottom: 2px;
+}
+
+.noon .tick-mark {
+    width: 2px;
+    height: 14px;
+    /* Reduced from 16px */
+    background: #f1c40f;
 }
 
 .hour-label {
     font-size: 0.7rem;
-    /* Increased size as requested */
-    color: var(--color-text-muted);
-    font-weight: var(--font-weight-medium);
+    color: #808090;
+    font-weight: 600;
 }
 
-.hour-marker.noon .hour-label {
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-bold);
-}
-
-/* Rows */
+/* Rows & Tracks */
 .timeline-row {
-    height: 36px;
-    /* Standardize row height */
-    position: relative;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    min-width: 600px;
-    /* Match time-scale min-width */
-    width: 200%;
-    /* Match time-scale width approach */
-}
-
-.timeline-row:last-child {
-    border-bottom: none;
+    height: 46px;
+    /* Reduced from 54px */
+    display: flex;
+    align-items: center;
 }
 
 .row-track {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    padding: 4px 0;
-    /* Add vertical padding for segments */
+    height: 34px;
+    /* Reduced from 42px */
 }
 
 .segment {
     position: absolute;
-    height: calc(100% - 8px);
-    /* Account for padding */
-    top: 4px;
+    top: 0;
+    height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 6px;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 8px;
     box-sizing: border-box;
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     color: white;
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    /* Slight rounded corners for segments */
-    transition: all 0.2s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Segment colors with gradients - refined for Brutalist look */
-.segment-0.primary {
-    background: var(--gradient-twilight);
-}
-
-/* Tithi - Twilight/Purple */
-.segment-0.secondary {
-    background: rgba(102, 126, 234, 0.2);
-    border: 1px solid rgba(102, 126, 234, 0.4);
-    color: var(--color-text-secondary);
-}
-
-.segment-1.primary {
-    background: var(--gradient-night);
-}
-
-/* Nakshatra - Night/Blue */
-.segment-1.secondary {
-    background: rgba(44, 62, 80, 0.4);
-    border: 1px solid rgba(52, 152, 219, 0.4);
-    color: var(--color-text-secondary);
-}
-
-.segment-2.primary {
-    background: var(--gradient-day);
-}
-
-/* Yoga - Day/Sky */
-.segment-2.secondary {
-    background: rgba(86, 204, 242, 0.2);
-    border: 1px solid rgba(47, 128, 237, 0.4);
-    color: var(--color-text-secondary);
-}
-
-.segment-3.primary {
-    background: var(--gradient-sunset);
-}
-
-/* Karana - Sunset/Pink */
-.segment-3.secondary {
-    background: rgba(252, 70, 107, 0.2);
-    border: 1px solid rgba(63, 94, 251, 0.4);
-    color: var(--color-text-secondary);
-}
-
-.segment-weekday {
-    background: var(--color-today);
-    color: var(--color-accent-secondary);
-    border: 1px solid var(--color-accent-tertiary);
     font-weight: 600;
 }
 
-.primary-badge {
-    margin-right: 4px;
-    font-size: 0.7rem;
-    color: var(--color-accent-primary);
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+.segment-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.segment-name {
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+.primary-star {
+    color: #f1c40f;
 }
 
-.transition-marker {
+.segment-end-time {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    background: #1e2029;
+    color: #808090;
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
 }
 
-.transition-time {
-    font-size: 0.6rem;
-    background: rgba(0, 0, 0, 0.6);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 0 3px;
-    border-radius: 3px;
-    backdrop-filter: blur(2px);
-    font-family: var(--font-family-code, monospace);
-    /* Optional: Use monospace if available */
+/* Row-specific coloring */
+.row-type-tithi .segment.even {
+    background: #8e44ad;
+}
+
+.row-type-tithi .segment.odd {
+    background: #6c3483;
+}
+
+.row-type-nakshatra .segment.even {
+    background: #e91d63;
+}
+
+.row-type-nakshatra .segment.odd {
+    background: #c2185b;
+}
+
+.row-type-yoga .segment.even {
+    background: #00897b;
+}
+
+.row-type-yoga .segment.odd {
+    background: #00695c;
+}
+
+.row-type-karana .segment.even {
+    background: #2e7d32;
+}
+
+.row-type-karana .segment.odd {
+    background: #1b5e20;
+}
+
+.row-type-vara .segment {
+    background: #d35400;
 }
 
 /* Current Time Indicator */
+.current-time-container {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    right: 30px;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
 .current-time-indicator {
     position: absolute;
-    top: 44px;
-    /* Matches time-scale height */
+    top: 0;
     bottom: 0;
-    width: 2px;
-    background: var(--color-accent-tertiary);
-    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    pointer-events: none;
-    box-shadow: 0 0 8px var(--color-accent-tertiary);
+    transform: translateX(-50%);
 }
 
-.current-time-dot {
-    width: 10px;
-    height: 10px;
-    background: var(--color-accent-tertiary);
-    border-radius: 50%;
-    margin-top: -6px;
-    box-shadow: 0 0 4px var(--color-accent-tertiary);
-    border: 2px solid var(--color-bg-card);
-    /* Cutout effect */
-}
-
-.current-time-label {
-    position: absolute;
-    top: -26px;
-    background: var(--color-accent-tertiary);
-    color: #000;
+.time-pill {
+    background: #ff4757;
+    color: white;
+    font-weight: 800;
     font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 12px;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 1px 6px;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+    z-index: 110;
+    margin-top: 18px;
+    /* Aligned with gradient bar */
+}
+
+.indicator-line {
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #ff4757, rgba(255, 71, 87, 0.1));
+}
+
+.indicator-dot {
+    width: 8px;
+    height: 8px;
+    background: white;
+    border: 2px solid #ff4757;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #ff4757;
+}
+
+/* Responsiveness */
+@media (max-width: 600px) {
+    .timeline-scroll-area {
+        min-width: 800px;
+    }
+
+    .labels-column {
+        width: 100px;
+    }
+
+    .row-text {
+        font-size: 0.7rem;
+    }
+
+    .segment {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .timeline-scroll-area {
+        min-width: 650px;
+    }
 }

@@ -139,6 +139,7 @@ const DayDetailPage: React.FC = () => {
                     <>
                         <SunMoonVisualization
                             sunrise={data.status.sunrise}
+                            nextSunrise={data.timeline.nextSunrise}
                             sunset={data.status.sunset}
                             moonrise={data.status.panchangam.moonrise}
                             moonset={data.status.panchangam.moonset}

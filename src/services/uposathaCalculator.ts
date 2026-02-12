@@ -100,9 +100,36 @@ export function getUposathaStatus(date: Date, observer: Observer): UposathaStatu
     const tithi = p.tithi; // 0-indexed, computed at sunrise
     const tithiNumber = tithi + 1; // 1-30
     let isUposatha = UPOSATHA_INDICES.has(tithi);
+    let kshayaTithi: number | null = null;
 
-    // Skip the second day of a Tithi Vridhi (extended tithi) for Uposatha markers
-    if (isUposatha) {
+    // 1. Handle Tithi Kshaya (Skipped Tithi)
+    // If an Uposatha tithi is skipped between this sunrise and next, 
+    // this day becomes the observance day for that skipped tithi.
+    const tomorrow = new Date(date);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const pTomorrow = getPanchangam(tomorrow, observer);
+    const nextTithi = pTomorrow.tithi;
+
+    // Check if any Uposatha tithi exists between current and next sunrise
+    for (const target of UPOSATHA_INDICES) {
+        let isSkipped = false;
+        if (nextTithi > tithi) {
+            isSkipped = target > tithi && target < nextTithi;
+        } else if (nextTithi < tithi) {
+            // Wrap around at 29 -> 0
+            isSkipped = target > tithi || target < nextTithi;
+        }
+
+        if (isSkipped) {
+            isUposatha = true;
+            kshayaTithi = target;
+            break;
+        }
+    }
+
+    // 2. Handle Tithi Vridhi (Extended Tithi)
+    // Skip the second day of a Tithi Vridhi for Uposatha markers
+    if (isUposatha && kshayaTithi === null) {
         const yesterday = new Date(date);
         yesterday.setDate(yesterday.getDate() - 1);
         const pYesterday = getPanchangam(yesterday, observer);
@@ -111,11 +138,15 @@ export function getUposathaStatus(date: Date, observer: Observer): UposathaStatu
         }
     }
 
-    const paliLabel = PALI_LABELS[tithi] ?? '';
-    const uposathaType = UPOSATHA_TYPE[tithi] ?? '';
-    const label = isUposatha
-        ? `${uposathaType} (${paliLabel}) — Pakkha Uposatha`
-        : `${tithiNames[tithi]} — ${p.paksha} Paksha`;
+    const activeTithi = kshayaTithi !== null ? kshayaTithi : tithi;
+    const paliLabel = PALI_LABELS[activeTithi] ?? '';
+    const uposathaType = UPOSATHA_TYPE[activeTithi] ?? '';
+
+    let label = `${tithiNames[tithi]} — ${p.paksha} Paksha`;
+    if (isUposatha) {
+        const typeStr = kshayaTithi !== null ? `(Skipped ${tithiNames[kshayaTithi]})` : '';
+        label = `${uposathaType} ${typeStr} (${paliLabel}) — Pakkha Uposatha`;
+    }
 
     return {
         isUposatha,

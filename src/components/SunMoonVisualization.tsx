@@ -5,6 +5,7 @@ import './SunMoonVisualization.css';
 
 interface SunMoonVisualizationProps {
     sunrise: Date | null;
+    nextSunrise: Date | null;
     sunset: Date | null;
     moonrise: Date | null;
     moonset: Date | null;
@@ -14,46 +15,52 @@ interface SunMoonVisualizationProps {
 
 const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
     sunrise,
+    nextSunrise,
     sunset,
     moonrise,
     moonset,
     currentTime = new Date(),
     location
 }) => {
+    // Standardized durations
+    const dayStart = sunrise || new Date(new Date(currentTime).setHours(6, 0, 0, 0));
+    const dayEnd = nextSunrise || new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    const durationMs = dayEnd.getTime() - dayStart.getTime();
+
     // Canvas dimensions
     const width = 800;
-    const height = 280;
-    const horizonY = 180;
-    const peakY = 40;
+    const height = 220; // Reduced from 240
+    const horizonY = 160;
+    const minPeakY = 30; // Max height in sky (lowest Y value)
 
-    // Helper: Time to X coordinate (0..800)
+    const paddingX = 40; // Horizontal padding to prevent edge clipping
+
+    // Helper: Time to X coordinate (relative to sunrise window)
     const timeToX = (date: Date): number => {
-        const h = date.getHours();
-        const m = date.getMinutes();
-        const totalMinutes = h * 60 + m;
-        return (totalMinutes / 1440) * width;
+        let diff = date.getTime() - dayStart.getTime();
+        // If it's before sunrise (very early morning), we still want to map it if possible, 
+        // but for this visualization we strictly map from sunrise (0..100%)
+        let pct = diff / durationMs;
+        return paddingX + pct * (width - 2 * paddingX);
     };
 
+    // Helper: Calculate peak Y based on duration (longer transit = higher arc)
+    const getPeakY = (start: Date, end: Date): number => {
+        const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+        const heightFactor = Math.min(1.2, Math.max(0.4, durationHours / 12));
+        const peakHeight = (horizonY - minPeakY) * heightFactor;
+        return horizonY - peakHeight;
+    };
+
+    const canvasWidth = width - 2 * paddingX;
+
     // Helper: Generate path curve
-    // We use a quadratic bezier.
-    // Start: (startX, horizonY)
-    // End: (endX, horizonY)
-    // Control: (midX, peakY)
+    // Note: We only care about the part of the arc that intersects our display window (dayStart to dayEnd)
     const generatePath = (start: Date, end: Date): string => {
-        let startX = timeToX(start);
-        let endX = timeToX(end);
-
-        // Handle wrapping (if end < start, it implies crossing midnight, but for single-day visualization we handle simple cases)
-        // If endX < startX, it usually means it sets the next day.
-        // In that case, we might want to extend the curve off-screen.
-        // For simplicity, if end is "tomorrow", we project X > width.
-
-        if (end.getDate() !== start.getDate() && end.getHours() < start.getHours()) {
-            endX += width; // Approximate next day projection
-        }
-
+        const startX = timeToX(start);
+        const endX = timeToX(end);
+        const peakY = getPeakY(start, end);
         const midX = (startX + endX) / 2;
-        // Peak Y is lowest (SVG coords)
         return `M ${startX} ${horizonY} Q ${midX} ${peakY} ${endX} ${horizonY}`;
     };
 
@@ -63,67 +70,73 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
         const endMs = end.getTime();
         const currMs = current.getTime();
 
+        // Object must be between its rise and set
         if (currMs < startMs || currMs > endMs) return null;
 
-        const t = (currMs - startMs) / (endMs - startMs); // 0 to 1
+        // And it must be within our visualization window (dayStart to dayEnd)
+        // Actually, let's just return the point, and the SVG clipping or parent logic will handle it.
+        // But for "current time dot", it must be in the window.
+        if (currMs < dayStart.getTime() || currMs > dayEnd.getTime()) return null;
 
-        // Quadratic Bezier Formula:
-        // P = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+        const t = (currMs - startMs) / (endMs - startMs);
         const startX = timeToX(start);
-        let endX = timeToX(end);
-        if (end.getDate() !== start.getDate() && end.getHours() < start.getHours()) endX += width;
-
+        const endX = timeToX(end);
+        const peakY = getPeakY(start, end);
         const midX = (startX + endX) / 2;
 
         const P0 = { x: startX, y: horizonY };
-        const P1 = { x: midX, y: peakY }; // Control point
+        const P1 = { x: midX, y: peakY };
         const P2 = { x: endX, y: horizonY };
 
         const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
         const y = Math.pow(1 - t, 2) * P0.y + 2 * (1 - t) * t * P1.y + Math.pow(t, 2) * P2.y;
 
-        // Clip if x is wildly off-screen (though SVG handles it)
         return { x, y };
     };
 
-    // --- Graph Logic ---
+    // Memoize Stars to prevent flickering
+    const stars = useMemo(() => {
+        return [...Array(40)].map((_, i) => ({
+            id: i,
+            x: Math.random() * width,
+            y: Math.random() * (horizonY - 20),
+            size: Math.random() * 1.5 + 0.5,
+            opacity: Math.random() * 0.7 + 0.3,
+            delay: Math.random() * 5
+        }));
+    }, []);
 
-    // Sun: Simple single arc
-    const sunStart = sunrise || new Date(new Date().setHours(6, 0, 0, 0));
-    const sunEnd = sunset || new Date(new Date().setHours(18, 0, 0, 0));
+    // --- Graph Logic ---
+    const sunStart = dayStart; // Sunrise
+    const sunEnd = sunset || new Date(dayStart.getTime() + 12 * 60 * 60 * 1000);
     const sunPathD = generatePath(sunStart, sunEnd);
     const sunPos = getPointOnCurve(sunStart, sunEnd, currentTime);
 
-    // Moon: Complex logic
-    // We define up to 2 curves to handle split days (set in morning, rise in evening)
+    // Moon:
     const moonCurves: { start: Date; end: Date; path: string }[] = [];
-
-    // Heuristic:
     if (moonrise && moonset) {
         if (moonrise < moonset) {
-            // Rise then Set (Day/Night transit)
+            // Moon rises and sets on same 24h block? 
+            // Or more likely, we just show the part in our window.
             moonCurves.push({ start: moonrise, end: moonset, path: generatePath(moonrise, moonset) });
         } else {
-            // Set then Rise (Morning set, Evening rise)
-            // Curve 1: Start of day -> Set (approximate start as set - 12h)
-            const simulatedRise = new Date(moonset.getTime() - 12 * 60 * 60 * 1000);
-            moonCurves.push({ start: simulatedRise, end: moonset, path: generatePath(simulatedRise, moonset) });
+            // Wraps around - handle two potential arcs hitting our window
+            const yesterdayRise = new Date(moonrise.getTime() - 24.8 * 60 * 60 * 1000);
+            const tomorrowSet = new Date(moonset.getTime() + 24.8 * 60 * 60 * 1000);
 
-            // Curve 2: Rise -> End of day (approximate end as rise + 12h)
-            const simulatedSet = new Date(moonrise.getTime() + 12 * 60 * 60 * 1000);
-            moonCurves.push({ start: moonrise, end: simulatedSet, path: generatePath(moonrise, simulatedSet) });
+            // Previous day's moon that is setting today
+            moonCurves.push({ start: yesterdayRise, end: moonset, path: generatePath(yesterdayRise, moonset) });
+            // Today's moon that rises and sets tomorrow
+            moonCurves.push({ start: moonrise, end: tomorrowSet, path: generatePath(moonrise, tomorrowSet) });
         }
-    } else if (moonrise && !moonset) {
-        // Rises, doesn't set today
-        const simulatedSet = new Date(moonrise.getTime() + 12 * 60 * 60 * 1000);
-        moonCurves.push({ start: moonrise, end: simulatedSet, path: generatePath(moonrise, simulatedSet) });
-    } else if (moonset && !moonrise) {
-        // Sets, didn't rise today
-        const simulatedRise = new Date(moonset.getTime() - 12 * 60 * 60 * 1000);
-        moonCurves.push({ start: simulatedRise, end: moonset, path: generatePath(simulatedRise, moonset) });
+    } else if (moonrise) {
+        const estSet = new Date(moonrise.getTime() + 12 * 60 * 60 * 1000);
+        moonCurves.push({ start: moonrise, end: estSet, path: generatePath(moonrise, estSet) });
+    } else if (moonset) {
+        const estRise = new Date(moonset.getTime() - 12 * 60 * 60 * 1000);
+        moonCurves.push({ start: estRise, end: moonset, path: generatePath(estRise, moonset) });
     }
 
-    // Determine Moon Position
     let moonPos: { x: number, y: number } | null = null;
     for (const curve of moonCurves) {
         const pos = getPointOnCurve(curve.start, curve.end, currentTime);
@@ -134,179 +147,153 @@ const SunMoonVisualization: React.FC<SunMoonVisualizationProps> = ({
     }
 
     const currentX = timeToX(currentTime);
-
-    // Grid lines labels
-    const gridTimes = [0, 3, 6, 9, 12, 15, 18, 21]; // hours
-
-    // Simplified time formatting
     const localFormatTime = (date?: Date | null) => formatTime(date, location?.timezone);
-    const dayDisplayTime = localFormatTime(currentTime);
+
+    // Grid: Hour ticks relative to sunrise
+    const hourMarkers = useMemo(() => {
+        const markers = [];
+        const firstHour = new Date(dayStart);
+        firstHour.setMinutes(0, 0, 0);
+        if (dayStart.getMinutes() > 0) firstHour.setHours(dayStart.getHours() + 1);
+
+        for (let i = 0; i < 28; i++) {
+            const mTime = new Date(firstHour);
+            mTime.setHours(firstHour.getHours() + i);
+            if (mTime.getTime() > dayEnd.getTime()) break;
+
+            const h = mTime.getHours();
+            if (h % 3 === 0) { // Show every 3 hours to keep mobile clean
+                markers.push({
+                    x: timeToX(mTime),
+                    label: h === 12 ? 'Noon' : h === 0 ? 'Mid' : h > 12 ? `${h - 12}p` : `${h}a`
+                });
+            }
+        }
+        return markers;
+    }, [dayStart, dayEnd, durationMs]);
 
     return (
-        <div className="sunrise-timeline-container">
+        <div className="sunrise-timeline-container glass-card">
             <div className="timeline-header">
                 <div className="header-left">
-                    <span className="timeline-icon">🌅</span>
-                    <span className="timeline-title">Sun & Moon Timeline</span>
+                    <span className="timeline-icon">🌌</span>
+                    <span className="timeline-title">Sky Chart</span>
                 </div>
                 <div className="header-right">
-                    <span className="current-time-badge">
-                        🕐 {dayDisplayTime}
+                    <span className="location-badge">
+                        {location?.name || 'Local Sky'}
                     </span>
                 </div>
             </div>
 
             <div className="timeline-graph-wrapper">
-                <svg viewBox={`0 0 ${width} ${height}`} className="timeline-svg" preserveAspectRatio="xMidYMid meet">
+                <svg viewBox={`0 0 ${width} ${height}`} className="timeline-svg" preserveAspectRatio="xMidYMin meet">
                     <defs>
                         <linearGradient id="sunGradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="rgba(255, 200, 50, 0.6)" />
-                            <stop offset="100%" stopColor="rgba(255, 150, 0, 0.1)" />
+                            <stop offset="0%" stopColor="rgba(255, 220, 100, 0.45)" />
+                            <stop offset="100%" stopColor="rgba(255, 150, 0, 0)" />
                         </linearGradient>
                         <linearGradient id="moonGradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="rgba(200, 200, 255, 0.4)" />
-                            <stop offset="100%" stopColor="rgba(150, 150, 200, 0.05)" />
+                            <stop offset="0%" stopColor="rgba(200, 210, 255, 0.3)" />
+                            <stop offset="100%" stopColor="rgba(150, 160, 220, 0)" />
                         </linearGradient>
-                        <filter id="sunGlow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                            <feMerge>
-                                <feMergeNode in="coloredBlur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
+                        <filter id="sunGlow" x="-100%" y="-100%" width="300%" height="300%">
+                            <feGaussianBlur stdDeviation="10" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
                         </filter>
-                        <filter id="moonGlow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                            <feMerge>
-                                <feMergeNode in="coloredBlur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
+                        <filter id="moonGlow" x="-100%" y="-100%" width="300%" height="300%">
+                            <feGaussianBlur stdDeviation="8" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
                         </filter>
                         <linearGradient id="skyGradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="rgba(135, 206, 250, 0.15)" />
-                            <stop offset="100%" stopColor="rgba(25, 25, 50, 0)" />
+                            <stop offset="0%" stopColor="rgba(15, 20, 45, 0.6)" />
+                            <stop offset="100%" stopColor="rgba(10, 10, 20, 0.2)" />
                         </linearGradient>
-                        <clipPath id="moonClip">
-                            <circle r="12" />
-                        </clipPath>
                     </defs>
 
-                    {/* Background */}
-                    <rect x="0" y="0" width={width} height={horizonY} fill="url(#skyGradient)" />
+                    <rect x="0" y="0" width={width} height={horizonY} fill="url(#skyGradient)" rx="12" />
 
-                    {/* Random Stars - Static positions for consistency */}
-                    {[...Array(20)].map((_, i) => (
+                    {stars.map(star => (
                         <circle
-                            key={i}
-                            cx={Math.random() * width}
-                            cy={Math.random() * (horizonY - 20)}
-                            r={Math.random() * 1.5 + 0.5}
+                            key={star.id}
+                            cx={star.x}
+                            cy={star.y}
+                            r={star.size}
                             fill="white"
-                            opacity={Math.random() * 0.5 + 0.2}
+                            opacity={star.opacity}
                             className="star"
+                            style={{ animationDelay: `${star.delay}s` }}
                         />
                     ))}
 
-                    {/* Horizon */}
-                    <line x1="0" y1={horizonY} x2={width} y2={horizonY} className="horizon-line" />
-                    <rect x="0" y={horizonY} width={width} height={height - horizonY} fill="rgba(40, 60, 40, 0.3)" rx="4" />
-
-                    {/* Sun Path */}
-                    <path d={sunPathD} fill="url(#sunGradient)" className="sun-path-fill" />
-                    <path d={sunPathD} stroke="#FFD700" strokeWidth="3" strokeLinecap="round" className="sun-path-stroke" />
-
-                    {/* Moon Path(s) */}
-                    {moonCurves.map((curve, i) => (
+                    {/* Accurate Grid */}
+                    {hourMarkers.map((m, i) => (
                         <g key={i}>
-                            <path d={curve.path} fill="url(#moonGradient)" className="moon-path-fill" />
-                            <path d={curve.path} stroke="rgba(200, 200, 255, 0.8)" strokeWidth="2" strokeDasharray="8 4" className="moon-path-stroke" />
+                            <line x1={m.x} y1="20" x2={m.x} y2={horizonY} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4" />
+                            <text x={m.x} y={horizonY + 20} textAnchor="middle" className="time-grid-label">
+                                {m.label}
+                            </text>
                         </g>
                     ))}
 
-                    {/* Time Grid Lines */}
-                    {gridTimes.map(hour => {
-                        const x = (hour / 24) * width;
-                        return (
-                            <g key={hour}>
-                                <line x1={x} y1="50" x2={x} y2={horizonY + 5} stroke="rgba(255,255,255,0.1)" strokeDasharray="2 4" />
-                                <text x={x} y={horizonY + 20} textAnchor="middle" className="time-grid-label">
-                                    {hour === 0 ? '12AM' : hour === 12 ? '12PM' : hour > 12 ? `${hour - 12}PM` : `${hour}AM`}
-                                </text>
-                            </g>
-                        );
-                    })}
+                    {/* Sun Path */}
+                    <path d={sunPathD} fill="url(#sunGradient)" className="sun-path-fill" />
+                    <path d={sunPathD} stroke="rgba(255, 215, 0, 0.5)" strokeWidth="2" strokeDasharray="6 4" fill="none" />
 
-                    {/* Current Time Line */}
-                    <line x1={currentX} y1="20" x2={currentX} y2={horizonY + 10} className="current-time-line" />
+                    {/* Moon Paths */}
+                    {moonCurves.map((curve, i) => (
+                        <path key={i} d={curve.path} fill="url(#moonGradient)" stroke="rgba(170, 180, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 4" />
+                    ))}
 
-                    {/* Sunrise Marker */}
-                    {sunrise && (
-                        <g className="event-marker sunrise-marker" transform={`translate(${timeToX(sunrise)}, 0)`}>
-                            <line x1="0" y1={horizonY - 10} x2="0" y2={horizonY + 45} stroke="#FF9933" strokeWidth="2" strokeDasharray="4 2" />
-                            <circle cx="0" cy={horizonY} r="6" fill="#FF9933" />
-                            <text x="0" y={horizonY + 60} textAnchor="middle" className="event-label">🌅 {localFormatTime(sunrise)}</text>
-                        </g>
-                    )}
+                    {/* Horizon */}
+                    <line x1="0" y1={horizonY} x2={width} y2={horizonY} stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
 
-                    {/* Sunset Marker */}
+                    {/* Events */}
+                    <g transform={`translate(${timeToX(dayStart)}, ${horizonY})`}>
+                        <circle r="4" fill="#FF9F43" />
+                        <text y="42" textAnchor="middle" className="event-label-tiny">RISE {localFormatTime(sunStart)}</text>
+                    </g>
                     {sunset && (
-                        <g className="event-marker sunset-marker" transform={`translate(${timeToX(sunset)}, 0)`}>
-                            <line x1="0" y1={horizonY - 10} x2="0" y2={horizonY + 45} stroke="#E65C00" strokeWidth="2" strokeDasharray="4 2" />
-                            <circle cx="0" cy={horizonY} r="6" fill="#E65C00" />
-                            <text x="0" y={horizonY + 60} textAnchor="middle" className="event-label">🌇 {localFormatTime(sunset)}</text>
+                        <g transform={`translate(${timeToX(sunset)}, ${horizonY})`}>
+                            <circle r="4" fill="#FF4757" />
+                            <text y="42" textAnchor="middle" className="event-label-tiny">SET {localFormatTime(sunset)}</text>
+                        </g>
+                    )}
+                    <g transform={`translate(${timeToX(dayEnd)}, ${horizonY})`}>
+                        <circle r="4" fill="#FF9F43" />
+                        <text y="42" textAnchor="middle" className="event-label-tiny">NEXT {localFormatTime(dayEnd)}</text>
+                    </g>
+
+                    {/* Now Line */}
+                    {currentX >= paddingX && currentX <= width - paddingX && (
+                        <g>
+                            <line x1={currentX} y1="0" x2={currentX} y2={horizonY + 45} className="current-time-line" />
+                            <text x={currentX} y="15" textAnchor="middle" className="current-time-label">NOW</text>
                         </g>
                     )}
 
-                    {/* Moon Markers */}
-                    {moonrise && (
-                        <g className="event-marker moonrise-marker" transform={`translate(${timeToX(moonrise)}, 0)`}>
-                            {/* Short line just to mark axis if needed, or just dot */}
-                            <circle cx="0" cy={horizonY} r="5" fill="#9090FF" />
-                            <text x="0" y={horizonY + 75} textAnchor="middle" className="event-label moon-label">🌙↑ {localFormatTime(moonrise)}</text>
-                        </g>
-                    )}
-                    {moonset && (
-                        <g className="event-marker moonset-marker" transform={`translate(${timeToX(moonset)}, 0)`}>
-                            <circle cx="0" cy={horizonY} r="5" fill="#7070CC" />
-                            <text x="0" y={horizonY + 75} textAnchor="middle" className="event-label moon-label">🌙↓ {localFormatTime(moonset)}</text>
-                        </g>
-                    )}
-
-                    {/* Sun Icon (animated position) */}
+                    {/* Sun Icon */}
                     {sunPos && (
-                        <g transform={`translate(${sunPos.x}, ${sunPos.y})`} filter="url(#sunGlow)" className="sun-icon">
-                            <circle r="20" fill="rgba(255, 200, 50, 0.3)" />
-                            <circle r="14" fill="rgba(255, 180, 0, 0.5)" />
-                            <circle r="10" fill="#FFD700" />
-                            <text y="4" textAnchor="middle" fontSize="14" className="celestial-emoji">☀️</text>
+                        <g transform={`translate(${sunPos.x}, ${sunPos.y})`} filter="url(#sunGlow)">
+                            <circle r="14" fill="#FFD700" />
+                            <circle r="18" fill="rgba(255, 215, 0, 0.25)" />
                         </g>
                     )}
 
-                    {/* Moon Icon (animated position) */}
+                    {/* Moon Icon */}
                     {moonPos && (
-                        <g transform={`translate(${moonPos.x}, ${moonPos.y})`} filter="url(#moonGlow)" className="moon-icon" opacity="0.9">
-                            <circle r="16" fill="rgba(200, 200, 255, 0.2)" />
+                        <g transform={`translate(${moonPos.x}, ${moonPos.y})`} filter="url(#moonGlow)">
                             <circle r="12" fill="#E8E8F0" />
-                            {/* Simple crescent - using clip for now or just circle */}
-                            <text y="4" textAnchor="middle" fontSize="14" className="celestial-emoji">🌙</text>
+                            <circle r="16" fill="rgba(200, 210, 255, 0.15)" />
                         </g>
                     )}
-
                 </svg>
             </div>
 
             <div className="timeline-legend">
-                <div className="legend-item sun-legend">
-                    <span className="legend-line sun-line"></span>
-                    <span>Sun Path</span>
-                </div>
-                <div className="legend-item moon-legend">
-                    <span className="legend-line moon-line"></span>
-                    <span>Moon Path</span>
-                </div>
-                <div className="legend-item">
-                    <span className="legend-dot current-dot"></span>
-                    <span>Current Time</span>
-                </div>
+                <div className="legend-item"><span className="dot sun-dot"></span> Sun</div>
+                <div className="legend-item"><span className="dot moon-dot"></span> Moon</div>
+                <div className="legend-item"><span className="dot time-dot"></span> Time</div>
             </div>
         </div>
     );
