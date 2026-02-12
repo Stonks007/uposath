@@ -113,7 +113,6 @@ export const MAJOR_CITIES: SavedLocation[] = [
     { name: 'Prague, Czechia', latitude: 50.0755, longitude: 14.4378, altitude: 190, timezone: 'Europe/Prague' },
     { name: 'Warsaw, Poland', latitude: 52.2297, longitude: 21.0122, altitude: 103, timezone: 'Europe/Warsaw' },
     { name: 'Budapest, Hungary', latitude: 47.4979, longitude: 19.0402, altitude: 96, timezone: 'Europe/Budapest' },
-    { name: 'Vienna, Austria', latitude: 48.2082, longitude: 16.3738, altitude: 189, timezone: 'Europe/Vienna' },
     { name: 'Bratislava, Slovakia', latitude: 48.1486, longitude: 17.1077, altitude: 152, timezone: 'Europe/Bratislava' },
     { name: 'Ljubljana, Slovenia', latitude: 46.0569, longitude: 14.5058, altitude: 298, timezone: 'Europe/Ljubljana' },
     { name: 'Zagreb, Croatia', latitude: 45.8150, longitude: 15.9819, altitude: 122, timezone: 'Europe/Zagreb' },

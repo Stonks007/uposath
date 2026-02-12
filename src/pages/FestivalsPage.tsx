@@ -81,9 +81,24 @@ const FestivalsPage: React.FC = () => {
                                 >
                                     <div className="festival-card-content">
                                         <div className="festival-header">
-                                            <h2 className="festival-name" style={{ color: colors.primary }}>
-                                                {match.festival.name}
-                                            </h2>
+                                            <div style={{ flex: 1 }}>
+                                                <h2 className="festival-name" style={{ color: colors.primary }}>
+                                                    {match.festival.name}
+                                                </h2>
+                                                {match.festival.region && (
+                                                    <div style={{
+                                                        fontSize: '0.7rem',
+                                                        color: colors.primary,
+                                                        opacity: 0.8,
+                                                        fontWeight: 'bold',
+                                                        letterSpacing: '0.05em',
+                                                        textTransform: 'uppercase',
+                                                        marginTop: '2px'
+                                                    }}>
+                                                        {match.festival.region}
+                                                    </div>
+                                                )}
+                                            </div>
                                             <span className="tradition-badge" style={{ background: colors.primary, color: colors.background }}>
                                                 {match.festival.tradition}
                                             </span>

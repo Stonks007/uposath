@@ -65,35 +65,35 @@ function parseTithi(tithiStr: string): number | number[] {
 
 const RAW_FESTIVALS = {
     "Theravada": [
-        { "name": "Māgha Pūjā", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Sangha Day - Gathering of 1,250 Arahants" },
-        { "name": "Vesak", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Buddha's Birth, Enlightenment, Parinirvana" },
-        { "name": "Āsāḷha Pūjā", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "First Sermon (Dhammacakka Day)" },
-        { "name": "Pavāraṇā", "lunar_day": "Purnima", "masa": "Āśvina", "desc": "End of Vassa (Rains Retreat)" },
-        { "name": "Abhidhamma Day", "lunar_day": "Purnima", "masa": "Bhādrapada", "desc": "Buddha taught Abhidhamma in Tavatimsa" },
-        { "name": "Madhu Pūrṇimā", "lunar_day": "Purnima", "masa": "Bhādrapada", "desc": "Honey Full Moon - Parileyyaka Forest" },
+        { "name": "Māgha Pūjā", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Sangha Day - Gathering of 1,250 Arahants", "region": "Thailand, Cambodia, Laos, Sri Lanka" },
+        { "name": "Vesak", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Buddha's Birth, Enlightenment, Parinirvana", "region": "Global" },
+        { "name": "Āsāḷha Pūjā", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "First Sermon (Dhammacakka Day)", "region": "Thailand, Myanmar, Sri Lanka" },
+        { "name": "Pavāraṇā", "lunar_day": "Purnima", "masa": "Āśvina", "desc": "End of Vassa (Rains Retreat)", "region": "Theravada Countries" },
+        { "name": "Abhidhamma Day", "lunar_day": "Purnima", "masa": "Āśvina", "desc": "Buddha taught Abhidhamma in Tavatimsa", "region": "Myanmar" },
+        { "name": "Madhu Pūrṇimā", "lunar_day": "Purnima", "masa": "Bhādrapada", "desc": "Honey Full Moon - Parileyyaka Forest", "region": "Bangladesh, India, Thailand" },
         { "name": "Poson Poya", "lunar_day": "Purnima", "masa": "Jyeṣṭha", "desc": "Arrival of Buddhism in Sri Lanka", "region": "Sri Lanka" },
-        { "name": "Esala Poya", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "Celebration of First Sermon", "region": "Sri Lanka" }
-    ],
-    "Mahayana": [
-        { "name": "Buddha's Birthday", "lunar_day": "8", "masa": "Vaiśākha", "desc": "Siddhartha Gautama's Birthday (Hanamatsuri)" },
-        { "name": "Parinirvāṇa Day", "lunar_day": "15", "masa": "Pauṣa", "desc": "Buddha's passing into Parinirvana" },
-        { "name": "Bodhi Day", "lunar_day": "8", "masa": "Pauṣa", "desc": "Buddha's Enlightenment (Rohatsu)" },
-        { "name": "Avalokiteśvara Birthday", "lunar_day": "Purnima", "masa": "Phālguna", "desc": "Compassion Bodhisattva's Birthday" },
-        { "name": "Ullambana", "lunar_day": "15", "masa": "Bhādrapada", "desc": "Ghost Festival - Merit for ancestors" },
-        { "name": "Medicine Buddha Birthday", "lunar_day": "8", "masa": "Kārttika", "desc": "Bhaisajyaguru's Birthday" },
-        { "name": "Manjuśrī Birthday", "lunar_day": "4", "masa": "Vaiśākha", "desc": "Wisdom Bodhisattva's Birthday" },
-        { "name": "Kṣitigarbha Birthday", "lunar_day": "30", "masa": "Bhādrapada", "desc": "Dizang Pusa's Birthday" },
-        { "name": "Guanyin Enlightenment", "lunar_day": "19", "masa": "Āṣāḍha", "desc": "Avalokiteśvara's attainment" },
+        { "name": "Esala Poya", "lunar_day": "Purnima", "masa": "Āṣāḍha", "desc": "Celebration of First Sermon", "region": "Sri Lanka" },
         { "name": "Loy Krathong", "lunar_day": "Purnima", "masa": "Kārttika", "desc": "Lantern Festival - Releasing karma", "region": "Thailand" }
     ],
+    "Mahayana": [
+        { "name": "Buddha's Birthday", "lunar_day": "8", "masa": "Vaiśākha", "desc": "Siddhartha Gautama's Birthday (Hanamatsuri)", "region": "East Asia" },
+        { "name": "Parinirvāṇa Day", "lunar_day": "15", "masa": "Pauṣa", "desc": "Buddha's passing into Parinirvana", "region": "Global" },
+        { "name": "Bodhi Day", "lunar_day": "8", "masa": "Pauṣa", "desc": "Buddha's Enlightenment (Rohatsu)", "region": "Japan, China, Korea" },
+        { "name": "Avalokiteśvara Birthday", "lunar_day": "Purnima", "masa": "Phālguna", "desc": "Compassion Bodhisattva's Birthday", "region": "East Asia" },
+        { "name": "Ullambana", "lunar_day": "15", "masa": "Bhādrapada", "desc": "Ghost Festival - Merit for ancestors", "region": "China, Vietnam, Japan" },
+        { "name": "Medicine Buddha Birthday", "lunar_day": "8", "masa": "Kārttika", "desc": "Bhaisajyaguru's Birthday", "region": "East Asia" },
+        { "name": "Manjuśrī Birthday", "lunar_day": "4", "masa": "Vaiśākha", "desc": "Wisdom Bodhisattva's Birthday", "region": "East Asia" },
+        { "name": "Kṣitigarbha Birthday", "lunar_day": "30", "masa": "Bhādrapada", "desc": "Dizang Pusa's Birthday", "region": "East Asia" },
+        { "name": "Guanyin Enlightenment", "lunar_day": "19", "masa": "Āṣāḍha", "desc": "Avalokiteśvara's attainment", "region": "East Asia" }
+    ],
     "Vajrayana": [
-        { "name": "Losar", "lunar_day": "Amavasya", "masa": "Phālguna", "desc": "Tibetan New Year" },
-        { "name": "Chotrul Düchen", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Festival of Miracles" },
-        { "name": "Saga Dawa", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Birth, Enlightenment, and Parinirvana" },
-        { "name": "Chokhor Düchen", "lunar_day": "4", "masa": "Āṣāḍha", "desc": "Turning the Dhamma Wheel" },
-        { "name": "Lhabab Düchen", "lunar_day": "22", "masa": "Pauṣa", "desc": "Descent from Heaven" },
-        { "name": "Monlam Chenmo", "lunar_day": "4-25", "masa": "Māgha", "desc": "Great Prayer Festival" },
-        { "name": "Ganden Ngamchoe", "lunar_day": "25", "masa": "Vaiśākha", "desc": "Tsongkhapa Memorial Day" }
+        { "name": "Losar", "lunar_day": "Amavasya", "masa": "Phālguna", "desc": "Tibetan New Year", "region": "Tibet, Nepal, Bhutan" },
+        { "name": "Chotrul Düchen", "lunar_day": "Purnima", "masa": "Māgha", "desc": "Festival of Miracles", "region": "Tibet, Himalaya" },
+        { "name": "Saga Dawa", "lunar_day": "Purnima", "masa": "Vaiśākha", "desc": "Birth, Enlightenment, and Parinirvana", "region": "Tibet, Himalaya" },
+        { "name": "Chokhor Düchen", "lunar_day": "4", "masa": "Āṣāḍha", "desc": "Turning the Dhamma Wheel", "region": "Tibet, Himalaya" },
+        { "name": "Lhabab Düchen", "lunar_day": "22", "masa": "Pauṣa", "desc": "Descent from Heaven", "region": "Tibet, Himalaya" },
+        { "name": "Monlam Chenmo", "lunar_day": "4-25", "masa": "Māgha", "desc": "Great Prayer Festival", "region": "Tibet, Himalaya" },
+        { "name": "Ganden Ngamchoe", "lunar_day": "25", "masa": "Vaiśākha", "desc": "Tsongkhapa Memorial Day", "region": "Tibet, Himalaya" }
     ]
 };
 

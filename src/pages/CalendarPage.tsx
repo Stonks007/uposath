@@ -89,6 +89,9 @@ const CalendarPage: React.FC = () => {
     };
 
     const handleDayClick = (date: Date) => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
         history.push(`/day/${date.toISOString().split('T')[0]}`);
     };
 
@@ -142,7 +145,10 @@ const CalendarPage: React.FC = () => {
             <IonHeader className="ion-no-border">
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonButton onClick={() => setViewMode(viewMode === 'month' ? 'year' : 'month')}>
+                        <IonButton onClick={() => {
+                            if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+                            setViewMode(viewMode === 'month' ? 'year' : 'month');
+                        }}>
                             <IonIcon icon={viewMode === 'month' ? list : calendarNumber} />
                         </IonButton>
                     </IonButtons>
@@ -192,11 +198,17 @@ const CalendarPage: React.FC = () => {
                         </div>
 
                         <div className="ion-padding-horizontal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <IonButton fill="clear" size="small" onClick={() => changeMonth(-1)}>
+                            <IonButton fill="clear" size="small" onClick={() => {
+                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+                                changeMonth(-1);
+                            }}>
                                 <IonIcon icon={chevronBack} />
                             </IonButton>
                             <span style={{ fontSize: '0.8rem', fontWeight: 'bold', opacity: 0.6 }}>LUNAR CALENDAR</span>
-                            <IonButton fill="clear" size="small" onClick={() => changeMonth(1)}>
+                            <IonButton fill="clear" size="small" onClick={() => {
+                                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+                                changeMonth(1);
+                            }}>
                                 <IonIcon icon={chevronForward} />
                             </IonButton>
                         </div>
