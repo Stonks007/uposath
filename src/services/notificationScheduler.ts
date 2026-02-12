@@ -60,10 +60,12 @@ async function scheduleNotification(
  * Schedule notifications for the next 6 months.
  */
 export async function scheduleAllNotifications(observer: Observer) {
-    // 1. Cancel existing
     await cancelAllNotifications();
+    await scheduleUposathaNotifications(observer);
+    await scheduleFestivalNotifications(observer);
+}
 
-    // 2. Schedule Uposatha reminders
+export async function scheduleUposathaNotifications(observer: Observer) {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -103,7 +105,10 @@ export async function scheduleAllNotifications(observer: Observer) {
             }
         }
     }
+}
 
+export async function scheduleFestivalNotifications(observer: Observer) {
+    const now = new Date();
     // 3. Schedule Festival reminders
     // Scan next 365 days
     const upcomingFestivals = getUpcomingFestivals(now, observer, 365);
