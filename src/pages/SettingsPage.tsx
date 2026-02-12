@@ -21,7 +21,9 @@ import { getSavedLocation, saveLocation, getCurrentGPS, type SavedLocation } fro
 import { scheduleUposathaNotifications, scheduleFestivalNotifications, cancelAllNotifications } from '../services/notificationScheduler';
 import { Observer } from '@ishubhamx/panchangam-js';
 import { getTimezones } from '../services/timeUtils';
-import { IonSelect, IonSelectOption } from '@ionic/react';
+import { MAJOR_CITIES } from '../services/locationData';
+import { IonSelect, IonSelectOption, IonIcon } from '@ionic/react';
+import { locationOutline, timeOutline, globeOutline } from 'ionicons/icons';
 
 const SettingsPage: React.FC = () => {
     const [location, setLocation] = useState<SavedLocation | null>(null);
@@ -52,6 +54,15 @@ const SettingsPage: React.FC = () => {
         // Reschedule if notifications are on
         if (notificationsEnabled || festivalsEnabled) {
             await reschedule(updated);
+        }
+    };
+
+    const handlePresetCityChange = async (city: SavedLocation) => {
+        setLocation(city);
+        await saveLocation(city);
+        // Reschedule if notifications are on
+        if (notificationsEnabled || festivalsEnabled) {
+            await reschedule(city);
         }
     };
 
@@ -117,18 +128,44 @@ const SettingsPage: React.FC = () => {
             <IonContent fullscreen>
                 <IonList inset>
                     <IonItemDivider>
-                        <IonLabel>Location</IonLabel>
+                        <IonLabel>Location & Timezone</IonLabel>
                     </IonItemDivider>
+
                     <IonItem>
+                        <IonIcon icon={locationOutline} slot="start" color="primary" />
                         <IonLabel>
                             <h2>Current Location</h2>
                             <p>{location ? location.name : 'Not set'}</p>
                             {location && <p className="text-xs">{location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>}
                         </IonLabel>
-                        <IonButton slot="end" size="small" fill="outline" onClick={handleGPS}>Use GPS</IonButton>
+                        <IonButton slot="end" size="small" fill="outline" onClick={handleGPS}>
+                            Detect GPS
+                        </IonButton>
                     </IonItem>
+
                     <IonItem>
-                        <IonLabel>Timezone</IonLabel>
+                        <IonIcon icon={globeOutline} slot="start" color="secondary" />
+                        <IonLabel>Select Major City</IonLabel>
+                        <IonSelect
+                            slot="end"
+                            placeholder="Select City"
+                            value={location?.name}
+                            onIonChange={e => {
+                                const city = MAJOR_CITIES.find(c => c.name === e.detail.value);
+                                if (city) handlePresetCityChange(city);
+                            }}
+                        >
+                            {MAJOR_CITIES.map(city => (
+                                <IonSelectOption key={city.name} value={city.name}>
+                                    {city.name}
+                                </IonSelectOption>
+                            ))}
+                        </IonSelect>
+                    </IonItem>
+
+                    <IonItem>
+                        <IonIcon icon={timeOutline} slot="start" color="tertiary" />
+                        <IonLabel>Timezone Override</IonLabel>
                         <IonSelect
                             slot="end"
                             value={location?.timezone}

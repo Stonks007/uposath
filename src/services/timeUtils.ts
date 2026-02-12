@@ -26,11 +26,14 @@ export function formatTime(date: Date | null | undefined, timezone?: string): st
     try {
         return date.toLocaleTimeString([], {
             ...DEFAULT_OPTIONS,
-            timeZone: timezone || undefined
+            timeZone: timezone || 'Asia/Kolkata'
         });
     } catch (e) {
         // Fallback if timezone is invalid
-        return date.toLocaleTimeString([], DEFAULT_OPTIONS);
+        return date.toLocaleTimeString([], {
+            ...DEFAULT_OPTIONS,
+            timeZone: 'Asia/Kolkata'
+        });
     }
 }
 
@@ -70,5 +73,9 @@ export function getTimezones(): string[] {
  * Tries to guess timezone from current environment.
  */
 export function guessTimezone(): string {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata';
+    } catch (e) {
+        return 'Asia/Kolkata';
+    }
 }
