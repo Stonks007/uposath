@@ -1,4 +1,4 @@
-import dhammapadaData from '../assets/dhammapada_max_muller_clean.json';
+import dhammapadaData from '../assets/data/dhammapada_max_muller_clean.json';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 

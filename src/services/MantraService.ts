@@ -16,7 +16,7 @@ const DEFAULT_MANTRAS: Mantra[] = [
         },
         text: {
             primaryScript: 'devanagari',
-            primaryText: 'ॐ मणिपद्मे हूँ',
+            primaryText: 'ॐ मणि पद्मे हूँ',
             transliteration: 'Oṃ Maṇipadme Hūṃ',
             translation: 'Om, the jewel in the lotus, hum'
         },
@@ -74,9 +74,9 @@ const DEFAULT_MANTRAS: Mantra[] = [
         },
         text: {
             primaryScript: 'devanagari',
-            primaryText: 'तद्यथा ॐ भैषज्ये भैषज्ये महाभैषज्ये भैषज्य समुद्गते स्वाहा',
-            transliteration: 'Tadyathā Oṃ Bhaiṣajye Bhaiṣajye Mahābhaiṣajye Bhaiṣajya Samudgate Svāhā',
-            translation: 'Thus: Om, healing, healing, great healing, healing perfectly arisen, hail!'
+            primaryText: 'ॐ भैषज्ये भैषज्ये महाभैषज्ये भैषज्य समुद्गते स्वाहा',
+            transliteration: 'Oṃ Bhaiṣajye Bhaiṣajye Mahābhaiṣajye Bhaiṣajya Samudgate Svāhā',
+            translation: 'Om, healing, healing, great healing, healing perfectly arisen, hail!'
         },
         tradition: 'mahayana',
         purpose: 'Healing and purification',
