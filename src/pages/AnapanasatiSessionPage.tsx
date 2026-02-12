@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     IonPage, IonContent, IonHeader, IonToolbar, IonButtons, IonButton,
-    IonIcon, IonRange, IonLabel, IonSegment, IonSegmentButton, IonDatetime
+    IonIcon, IonRange, IonLabel, IonActionSheet
 } from '@ionic/react';
-import { close, play, pause, stop, timeOutline, musicalNotes, settingsOutline } from 'ionicons/icons';
+import { close, play, pause, stop, settingsOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { AnapanasatiService, AnapanasatiSession, AnapanasatiSettings } from '../services/AnapanasatiService';
-import TetradCard from '../components/sati/TetradCard'; // Reusing for reference view? Or maybe just simple list
+import { MalaService } from '../services/MalaService';
+import { PaliTransliterator } from '../services/PaliTransliterator';
 
 const AnapanasatiSessionPage: React.FC = () => {
     const history = useHistory();
@@ -20,6 +21,10 @@ const AnapanasatiSessionPage: React.FC = () => {
     const [isActive, setIsActive] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
+
+    // Preferences
+    const [language, setLanguage] = useState('en');
+    const [script, setScript] = useState('roman');
 
     // Summary State
     const [startTime, setStartTime] = useState<string>('');
@@ -42,6 +47,10 @@ const AnapanasatiSessionPage: React.FC = () => {
         setSettings(s);
         setDuration(s.defaultDuration);
         setFocus(s.defaultFocus);
+
+        const prefs = await MalaService.getPreferences();
+        if (prefs.translationLanguage) setLanguage(prefs.translationLanguage);
+        if (prefs.paliScript) setScript(prefs.paliScript);
     };
 
     const startSession = () => {
@@ -113,7 +122,6 @@ const AnapanasatiSessionPage: React.FC = () => {
     };
 
     // Calculate current step based on time and focus
-    // Simple logic: Divide time equally among steps for now
     useEffect(() => {
         if (mode === 'active' && duration > 0) {
             const totalSteps = focus === 'all_16' ? 16 : 4;
@@ -130,6 +138,25 @@ const AnapanasatiSessionPage: React.FC = () => {
             setCurrentStep(Math.min(startStep + stepIndex, startStep + totalSteps - 1));
         }
     }, [timeLeft, duration, focus, mode]);
+
+
+    const getLocalized = (obj: any) => {
+        if (!obj) return '';
+        return obj[language] || obj['en'] || Object.values(obj)[0] || '';
+    };
+
+    const getPaliText = (paliObj: any) => {
+        if (!paliObj) return '';
+        // If specific script exists in data, use it (e.g. devanagari)
+        if (paliObj[script]) return paliObj[script];
+
+        // Otherwise transliterate from roman/pali
+        const source = paliObj.pali || paliObj.roman || (typeof paliObj === 'string' ? paliObj : '');
+        if (source && script !== 'roman') {
+            return PaliTransliterator.transliterate(source, script as any);
+        }
+        return source;
+    };
 
 
     // --- RENDERERS ---
@@ -244,16 +271,27 @@ const AnapanasatiSessionPage: React.FC = () => {
                                 letterSpacing: '0.05em',
                                 marginBottom: '8px'
                             }}>
-                                {tetradData?.title.en}
+                                {getLocalized(tetradData?.title)}
                             </div>
                             <h3 style={{ fontSize: '1.5rem', marginBottom: '16px', fontWeight: 'bold' }}>
-                                {stepData.number}. {stepData.title.en}
+                                {stepData.number}. {getLocalized(stepData.title)}
                             </h3>
+
+                            {/* Pali Text */}
+                            <p style={{
+                                fontFamily: script !== 'roman' ? 'sans-serif' : '"Noto Serif", serif',
+                                fontSize: '1.1rem',
+                                color: '#1f2937',
+                                marginBottom: '12px'
+                            }}>
+                                {getPaliText(stepData.pali)}
+                            </p>
+
                             <p style={{ fontStyle: 'italic', color: '#4b5563', marginBottom: '16px' }}>
-                                "{stepData.translation.en}"
+                                "{getLocalized(stepData.translation)}"
                             </p>
                             <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>
-                                💡 {stepData.guidance.en}
+                                💡 {getLocalized(stepData.guidance)}
                             </div>
                         </div>
                     )}

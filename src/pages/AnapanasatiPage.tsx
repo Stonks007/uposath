@@ -9,13 +9,17 @@ import {
     IonContent,
     IonButton,
     IonIcon,
-    useIonViewWillEnter
+    useIonViewWillEnter,
+    IonPopover,
+    IonList,
+    IonListHeader,
+    IonItem,
+    IonLabel
 } from '@ionic/react';
-import { barChartOutline, play, flame, settingsOutline } from 'ionicons/icons';
+import { barChartOutline, play, flame, settingsOutline, checkmark } from 'ionicons/icons';
 import { AnapanasatiService } from '../services/AnapanasatiService';
 import { MalaService } from '../services/MalaService';
 import TetradCard from '../components/sati/TetradCard';
-import { IonActionSheet } from '@ionic/react';
 
 import './AnapanasatiPage.css';
 
@@ -27,11 +31,18 @@ const SUPPORTED_SCRIPTS = [
     { code: 'burmese', label: 'Burmese (မြန်မာ)' }
 ];
 
+const SUPPORTED_LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'Hindi (हिंदी)' },
+    { code: 'pa', label: 'Punjabi (ਪੰਜਾਬੀ)' }
+];
+
 const AnapanasatiPage: React.FC = () => {
     const [content, setContent] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
     const [currentScript, setCurrentScript] = useState('roman');
-    const [showScriptMenu, setShowScriptMenu] = useState(false);
+    const [currentLanguage, setCurrentLanguage] = useState('en');
+
 
     useIonViewWillEnter(() => {
         loadData();
@@ -47,6 +58,7 @@ const AnapanasatiPage: React.FC = () => {
 
             const prefs = await MalaService.getPreferences();
             if (prefs.paliScript) setCurrentScript(prefs.paliScript);
+            if (prefs.translationLanguage) setCurrentLanguage(prefs.translationLanguage);
         } catch (error) {
             console.error('AnapanasatiPage: Error loading data', error);
         }
@@ -56,7 +68,12 @@ const AnapanasatiPage: React.FC = () => {
         setCurrentScript(script);
         const prefs = await MalaService.getPreferences();
         await MalaService.savePreferences({ ...prefs, paliScript: script });
-        setShowScriptMenu(false);
+    };
+
+    const handleLanguageChange = async (language: string) => {
+        setCurrentLanguage(language);
+        const prefs = await MalaService.getPreferences();
+        await MalaService.savePreferences({ ...prefs, translationLanguage: language });
     };
 
     if (!content) {
@@ -86,7 +103,7 @@ const AnapanasatiPage: React.FC = () => {
                     </IonButtons>
                     <IonTitle>{content.title.pali}</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton onClick={() => setShowScriptMenu(true)}>
+                        <IonButton id="anapanasati-settings-btn">
                             <IonIcon icon={settingsOutline} />
                         </IonButton>
                         <IonButton routerLink="/sati/anapanasati/stats">
@@ -96,22 +113,41 @@ const AnapanasatiPage: React.FC = () => {
                 </IonToolbar>
             </IonHeader>
 
-            <IonActionSheet
-                isOpen={showScriptMenu}
-                onDidDismiss={() => setShowScriptMenu(false)}
-                header="Select Pali Script"
-                buttons={[
-                    ...SUPPORTED_SCRIPTS.map(script => ({
-                        text: script.label,
-                        handler: () => handleScriptChange(script.code),
-                        cssClass: currentScript === script.code ? 'selected-script' : ''
-                    })),
-                    {
-                        text: 'Cancel',
-                        role: 'cancel'
-                    }
-                ]}
-            />
+            <IonPopover trigger="anapanasati-settings-btn" dismissOnSelect={false}>
+                <IonContent class="ion-padding-vertical">
+                    <IonList lines="none">
+                        <IonListHeader>
+                            <IonLabel>Pali Script</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_SCRIPTS.map(script => (
+                            <IonItem
+                                key={script.code}
+                                button
+                                detail={false}
+                                onClick={() => handleScriptChange(script.code)}
+                            >
+                                <IonLabel>{script.label}</IonLabel>
+                                {currentScript === script.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+
+                        <IonListHeader>
+                            <IonLabel>Translation Language</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_LANGUAGES.map(lang => (
+                            <IonItem
+                                key={lang.code}
+                                button
+                                detail={false}
+                                onClick={() => handleLanguageChange(lang.code)}
+                            >
+                                <IonLabel>{lang.label}</IonLabel>
+                                {currentLanguage === lang.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+                    </IonList>
+                </IonContent>
+            </IonPopover>
 
             <IonContent fullscreen className="ion-padding">
                 {/* Header Card */}
@@ -120,7 +156,7 @@ const AnapanasatiPage: React.FC = () => {
                         {content.title.pali}
                     </h2>
                     <p className="anapanasati-subtitle">
-                        {content.title.en}
+                        {content.title[currentLanguage] || content.title.en}
                     </p>
                 </div>
 
@@ -149,7 +185,7 @@ const AnapanasatiPage: React.FC = () => {
                         <TetradCard
                             key={tetrad.id}
                             tetrad={tetrad}
-                            language="en"
+                            language={currentLanguage}
                             script={currentScript}
                         />
                     ))}

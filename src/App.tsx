@@ -119,6 +119,7 @@ const App: React.FC = () => (
           <Route path="/day/:dateStr">
             <DayDetailPage />
           </Route>
+          <Route exact path="/settings" component={SettingsPage} />
           <Route exact path="/">
             <Redirect to="/calendar" />
           </Route>

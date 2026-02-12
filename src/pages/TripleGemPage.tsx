@@ -9,43 +9,59 @@ import {
     IonButtons,
     IonButton,
     IonIcon,
-    IonSelect,
-    IonSelectOption,
-    IonBackButton
+    IonBackButton,
+    IonPopover,
+    IonList,
+    IonListHeader,
+    IonItem,
+    IonLabel,
+    useIonViewWillEnter
 } from '@ionic/react';
-import { ellipsisVertical } from 'ionicons/icons';
-import { AVAILABLE_LANGUAGES, AVAILABLE_SCRIPTS, getTripleGemData, getLocalizedText, getPaliScriptText } from '../services/TripleGemService';
-import { SatiPreferences, DEFAULT_PREFERENCES } from '../types/SatiTypes';
+import { settingsOutline, checkmark } from 'ionicons/icons';
+import { getTripleGemData, getLocalizedText, getPaliScriptText } from '../services/TripleGemService';
 import { MalaService } from '../services/MalaService';
+import { SatiPreferences, DEFAULT_PREFERENCES } from '../types/SatiTypes';
 import TripleGemCard from '../components/sati/TripleGemCard';
 import './TripleGemPage.css';
 
+const SUPPORTED_SCRIPTS = [
+    { code: 'roman', label: 'Roman (Default)' },
+    { code: 'devanagari', label: 'Devanagari (देवनागरी)' },
+    { code: 'sinhala', label: 'Sinhala (සිංහල)' },
+    { code: 'thai', label: 'Thai (ไทย)' },
+    { code: 'burmese', label: 'Burmese (မြန်မာ)' }
+];
+
+const SUPPORTED_LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'Hindi (हिंदी)' },
+    { code: 'pa', label: 'Punjabi (ਪੰਜਾਬੀ)' }
+];
+
 const TripleGemPage: React.FC = () => {
+    // Maintain full preferences state to pass down to children
     const [prefs, setPrefs] = useState<SatiPreferences>(DEFAULT_PREFERENCES);
     const data = getTripleGemData();
 
-    // Initial load
-    useEffect(() => {
-        const load = async () => {
-            const p = await MalaService.getPreferences();
-            setPrefs(p);
-        };
-        load();
-    }, []);
+    useIonViewWillEnter(() => {
+        loadSettings();
+    });
 
-    // Handlers for header dropdowns
-    const handleScriptChange = (e: CustomEvent) => {
-        const newScript = e.detail.value;
-        const newPrefs = { ...prefs, paliScript: newScript };
-        setPrefs(newPrefs);
-        MalaService.savePreferences(newPrefs);
+    const loadSettings = async () => {
+        const p = await MalaService.getPreferences();
+        setPrefs(p);
     };
 
-    const handleLanguageChange = (e: CustomEvent) => {
-        const newLang = e.detail.value;
-        const newPrefs = { ...prefs, translationLanguage: newLang };
+    const handleScriptChange = async (script: string) => {
+        const newPrefs = { ...prefs, paliScript: script };
         setPrefs(newPrefs);
-        MalaService.savePreferences(newPrefs);
+        await MalaService.savePreferences(newPrefs);
+    };
+
+    const handleLanguageChange = async (language: string) => {
+        const newPrefs = { ...prefs, translationLanguage: language };
+        setPrefs(newPrefs);
+        await MalaService.savePreferences(newPrefs);
     };
 
     return (
@@ -57,55 +73,50 @@ const TripleGemPage: React.FC = () => {
                     </IonButtons>
                     <IonTitle>Triple Gem</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton routerLink="/settings">
-                            <IonIcon icon={ellipsisVertical} />
+                        <IonButton id="triple-gem-settings-btn">
+                            <IonIcon icon={settingsOutline} />
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
 
+            <IonPopover trigger="triple-gem-settings-btn" dismissOnSelect={false}>
+                <IonContent class="ion-padding-vertical">
+                    <IonList lines="none">
+                        <IonListHeader>
+                            <IonLabel>Pali Script</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_SCRIPTS.map(script => (
+                            <IonItem
+                                key={script.code}
+                                button
+                                detail={false}
+                                onClick={() => handleScriptChange(script.code)}
+                            >
+                                <IonLabel>{script.label}</IonLabel>
+                                {prefs.paliScript === script.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+
+                        <IonListHeader>
+                            <IonLabel>Translation Language</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_LANGUAGES.map(lang => (
+                            <IonItem
+                                key={lang.code}
+                                button
+                                detail={false}
+                                onClick={() => handleLanguageChange(lang.code)}
+                            >
+                                <IonLabel>{lang.label}</IonLabel>
+                                {prefs.translationLanguage === lang.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+                    </IonList>
+                </IonContent>
+            </IonPopover>
+
             <IonContent fullscreen className="ion-padding">
-                {/* Preferences Control Row */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    marginBottom: '20px',
-                    padding: '8px',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    borderRadius: '12px'
-                }}>
-                    <IonSelect
-                        value={prefs.paliScript}
-                        interface="action-sheet"
-                        onIonChange={handleScriptChange}
-                        className="toggle-button"
-                        style={{ '--background': 'var(--color-bg-secondary)', width: 'auto' }}
-                        placeholder="Script"
-                    >
-                        {AVAILABLE_SCRIPTS.map(s => (
-                            <IonSelectOption key={s.code} value={s.code}>
-                                {s.label}
-                            </IonSelectOption>
-                        ))}
-                    </IonSelect>
-
-                    <IonSelect
-                        value={prefs.translationLanguage}
-                        interface="action-sheet"
-                        onIonChange={handleLanguageChange}
-                        className="toggle-button"
-                        style={{ '--background': 'var(--color-bg-secondary)', width: 'auto' }}
-                        placeholder="Language"
-                    >
-                        {AVAILABLE_LANGUAGES.map(l => (
-                            <IonSelectOption key={l.code} value={l.code}>
-                                {l.label}
-                            </IonSelectOption>
-                        ))}
-                    </IonSelect>
-                </div>
-
                 {/* Title Section */}
                 <div className="triple-gem-header-card">
                     <h1 className="triple-gem-title">

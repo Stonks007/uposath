@@ -2,26 +2,64 @@ import React, { useState } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton,
     IonTitle, IonContent, IonButton, IonIcon, IonFab, IonFabButton,
+    IonPopover, IonList, IonListHeader, IonItem, IonLabel,
     useIonViewWillEnter
 } from '@ionic/react';
-import { add, settingsOutline, play } from 'ionicons/icons';
+import { add, settingsOutline, play, checkmark } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { MantraService } from '../services/MantraService';
-import { Mantra } from '../types/SatiTypes';
+import { MalaService } from '../services/MalaService';
+import { PaliTransliterator } from '../services/PaliTransliterator';
+import { Mantra, SatiPreferences, DEFAULT_PREFERENCES } from '../types/SatiTypes';
 import './MantraListPage.css';
+
+const SUPPORTED_SCRIPTS = [
+    { code: 'roman', label: 'Roman (Default)' },
+    { code: 'devanagari', label: 'Devanagari (देवनागरी)' },
+    { code: 'sinhala', label: 'Sinhala (සිංහල)' },
+    { code: 'thai', label: 'Thai (ไทย)' },
+    { code: 'burmese', label: 'Burmese (မြန်မာ)' }
+];
+
+const SUPPORTED_LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'Hindi (हिंदी)' },
+    { code: 'pa', label: 'Punjabi (ਪੰਜਾਬੀ)' }
+];
 
 const MantraListPage: React.FC = () => {
     const history = useHistory();
     const [mantras, setMantras] = useState<Mantra[]>([]);
+    const [prefs, setPrefs] = useState<SatiPreferences>(DEFAULT_PREFERENCES);
 
     const loadData = async () => {
         const data = await MantraService.getMantras();
         setMantras(data);
+        const p = await MalaService.getPreferences();
+        setPrefs(p);
     };
 
     useIonViewWillEnter(() => {
         loadData();
     });
+
+    const handleScriptChange = async (script: string) => {
+        const newPrefs = { ...prefs, paliScript: script };
+        setPrefs(newPrefs);
+        await MalaService.savePreferences(newPrefs);
+    };
+
+    const handleLanguageChange = async (language: string) => {
+        const newPrefs = { ...prefs, translationLanguage: language };
+        setPrefs(newPrefs);
+        await MalaService.savePreferences(newPrefs);
+    };
+
+    const getDisplayText = (text: string) => {
+        if (!text) return '';
+        if (prefs.paliScript === 'roman') return text;
+        return PaliTransliterator.transliterate(text, prefs.paliScript as any);
+    };
 
     return (
         <IonPage>
@@ -32,12 +70,48 @@ const MantraListPage: React.FC = () => {
                     </IonButtons>
                     <IonTitle>Custom Mantras</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton>
+                        <IonButton id="mantra-list-settings-btn">
                             <IonIcon icon={settingsOutline} />
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
+
+            <IonPopover trigger="mantra-list-settings-btn" dismissOnSelect={false}>
+                <IonContent class="ion-padding-vertical">
+                    <IonList lines="none">
+                        <IonListHeader>
+                            <IonLabel>Pali Script</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_SCRIPTS.map(script => (
+                            <IonItem
+                                key={script.code}
+                                button
+                                detail={false}
+                                onClick={() => handleScriptChange(script.code)}
+                            >
+                                <IonLabel>{script.label}</IonLabel>
+                                {prefs.paliScript === script.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+
+                        <IonListHeader>
+                            <IonLabel>Translation Language</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_LANGUAGES.map(lang => (
+                            <IonItem
+                                key={lang.code}
+                                button
+                                detail={false}
+                                onClick={() => handleLanguageChange(lang.code)}
+                            >
+                                <IonLabel>{lang.label}</IonLabel>
+                                {prefs.translationLanguage === lang.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+                    </IonList>
+                </IonContent>
+            </IonPopover>
 
             <IonContent fullscreen className="ion-padding">
                 <div className="mantra-list-header">
@@ -66,11 +140,15 @@ const MantraListPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="mantra-preview-text">
-                                    {mantra.text.primaryText}
+                                <div className="mantra-preview-text" style={{
+                                    fontFamily: prefs.paliScript === 'roman' ? 'inherit' : 'sans-serif'
+                                }}>
+                                    {getDisplayText(mantra.text.primaryText)}
                                 </div>
-                                <div className="mantra-transliteration">
-                                    {mantra.text.transliteration}
+                                <div className="mantra-transliteration" style={{
+                                    fontFamily: prefs.paliScript === 'roman' ? 'inherit' : 'sans-serif'
+                                }}>
+                                    {getDisplayText(mantra.text.transliteration || '')}
                                 </div>
 
                                 <div className="card-stats">

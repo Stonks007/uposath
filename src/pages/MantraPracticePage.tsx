@@ -2,14 +2,31 @@ import React, { useState, useEffect } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonButtons, IonButton,
     IonTitle, IonContent, IonIcon, useIonAlert, useIonToast,
-    useIonViewWillEnter, IonProgressBar
+    useIonViewWillEnter, IonProgressBar,
+    IonPopover, IonList, IonListHeader, IonItem, IonLabel
 } from '@ionic/react';
-import { close, volumeHigh, volumeMute, pause, play } from 'ionicons/icons';
+import { close, volumeHigh, volumeMute, pause, play, settingsOutline, checkmark } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { MantraService } from '../services/MantraService';
-import { Mantra, MantraSession } from '../types/SatiTypes';
+import { MalaService } from '../services/MalaService';
+import { PaliTransliterator } from '../services/PaliTransliterator';
+import { Mantra, MantraSession, SatiPreferences, DEFAULT_PREFERENCES } from '../types/SatiTypes';
 import MalaCounter from '../components/sati/MalaCounter';
 import './MantraPracticePage.css';
+
+const SUPPORTED_SCRIPTS = [
+    { code: 'roman', label: 'Roman (Default)' },
+    { code: 'devanagari', label: 'Devanagari (देवनागरी)' },
+    { code: 'sinhala', label: 'Sinhala (සිංහල)' },
+    { code: 'thai', label: 'Thai (ไทย)' },
+    { code: 'burmese', label: 'Burmese (မြန်မာ)' }
+];
+
+const SUPPORTED_LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'Hindi (हिंदी)' },
+    { code: 'pa', label: 'Punjabi (ਪੰਜਾਬੀ)' }
+];
 
 const MantraPracticePage: React.FC = () => {
     const history = useHistory();
@@ -19,6 +36,7 @@ const MantraPracticePage: React.FC = () => {
     const [sessionState, setSessionState] = useState<'running' | 'paused' | 'completed'>('running');
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [bellEnabled, setBellEnabled] = useState(true);
+    const [prefs, setPrefs] = useState<SatiPreferences>(DEFAULT_PREFERENCES);
     const [presentAlert] = useIonAlert();
 
     useIonViewWillEnter(() => {
@@ -44,12 +62,27 @@ const MantraPracticePage: React.FC = () => {
         } else {
             history.goBack();
         }
+        const p = await MalaService.getPreferences();
+        setPrefs(p);
+    };
+
+    const handleScriptChange = async (script: string) => {
+        const newPrefs = { ...prefs, paliScript: script };
+        setPrefs(newPrefs);
+        await MalaService.savePreferences(newPrefs);
+    };
+
+    const handleLanguageChange = async (language: string) => {
+        const newPrefs = { ...prefs, translationLanguage: language };
+        setPrefs(newPrefs);
+        await MalaService.savePreferences(newPrefs);
     };
 
     const handleComplete = async () => {
         setSessionState('completed');
         if (bellEnabled) {
             console.log('🔔 Ding!');
+            // Play sound?
         }
         await saveSession();
     };
@@ -91,6 +124,13 @@ const MantraPracticePage: React.FC = () => {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
+    // Helper to transliterate if script is not roman
+    const getDisplayText = (text: string) => {
+        if (!text) return '';
+        if (prefs.paliScript === 'roman') return text;
+        return PaliTransliterator.transliterate(text, prefs.paliScript as any);
+    };
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -105,9 +145,48 @@ const MantraPracticePage: React.FC = () => {
                         <IonButton onClick={() => setBellEnabled(!bellEnabled)}>
                             <IonIcon icon={bellEnabled ? volumeHigh : volumeMute} />
                         </IonButton>
+                        <IonButton id="mantra-practice-settings-btn">
+                            <IonIcon icon={settingsOutline} />
+                        </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
+
+            <IonPopover trigger="mantra-practice-settings-btn" dismissOnSelect={false}>
+                <IonContent class="ion-padding-vertical">
+                    <IonList lines="none">
+                        <IonListHeader>
+                            <IonLabel>Pali Script</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_SCRIPTS.map(script => (
+                            <IonItem
+                                key={script.code}
+                                button
+                                detail={false}
+                                onClick={() => handleScriptChange(script.code)}
+                            >
+                                <IonLabel>{script.label}</IonLabel>
+                                {prefs.paliScript === script.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+
+                        <IonListHeader>
+                            <IonLabel>Translation Language</IonLabel>
+                        </IonListHeader>
+                        {SUPPORTED_LANGUAGES.map(lang => (
+                            <IonItem
+                                key={lang.code}
+                                button
+                                detail={false}
+                                onClick={() => handleLanguageChange(lang.code)}
+                            >
+                                <IonLabel>{lang.label}</IonLabel>
+                                {prefs.translationLanguage === lang.code && <IonIcon icon={checkmark} slot="end" color="primary" />}
+                            </IonItem>
+                        ))}
+                    </IonList>
+                </IonContent>
+            </IonPopover>
 
             <IonContent fullscreen className="practice-content">
                 {!mantra ? (
@@ -124,9 +203,14 @@ const MantraPracticePage: React.FC = () => {
                         </div>
 
                         <div className="practice-mantra-text">
-                            <p className="primary">{mantra.text.primaryText}</p>
+                            <p className="primary" style={{
+                                fontFamily: prefs.paliScript === 'roman' ? 'inherit' : 'sans-serif',
+                                fontSize: prefs.paliScript === 'roman' ? '1.5rem' : '1.6rem'
+                            }}>
+                                {getDisplayText(mantra.text.primaryText)}
+                            </p>
                             {mantra.text.transliteration && (
-                                <p className="secondary">{mantra.text.transliteration}</p>
+                                <p className="secondary">{getDisplayText(mantra.text.transliteration)}</p>
                             )}
                         </div>
 
