@@ -233,15 +233,11 @@
                     "en": "Heart Sutra"
                 }
             },
-            "disclaimer": {
-                "en": "This text is NOT part of the Pali Canon. It is a Mahayana text included for educational purposes.",
-                "hi": "यह पाठ पाली कैनन का हिस्सा नहीं है। यह शैक्षिक उद्देश्यों के लिए शामिल एक महायान पाठ है।"
-            },
             "title": {
                 "sanskrit": "Prajñāpāramitāhṛdaya",
                 "en": "Heart Sutra"
             },
-            "icon": "💎",
+            "icon": "❤️",
             "color": "#EC4899",
             "steps": [
                 {

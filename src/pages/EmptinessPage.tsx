@@ -208,12 +208,7 @@ const EmptinessPage: React.FC = () => {
 
                         {expandedSections.includes(section.id) && (
                             <div className="card-body">
-                                {section.disclaimer && (
-                                    <div className="disclaimer-box">
-                                        <IonIcon icon={warningOutline} />
-                                        <p>{getLocalized(section.disclaimer)}</p>
-                                    </div>
-                                )}
+
                                 <div className="source-tag">Source: {section.source.reference}</div>
                                 {section.steps.map(step => (
                                     <div key={step.number} className="step-item">

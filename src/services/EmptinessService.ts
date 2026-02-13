@@ -23,6 +23,18 @@ export const EmptinessService = {
         await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
     },
 
+    deleteSession: async (id: string): Promise<void> => {
+        let sessions = await EmptinessService.getSessions();
+        sessions = sessions.filter(s => s.id !== id);
+        await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
+    },
+
+    updateSession: async (updatedSession: EmptinessSession): Promise<void> => {
+        let sessions = await EmptinessService.getSessions();
+        sessions = sessions.map(s => s.id === updatedSession.id ? updatedSession : s);
+        await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
+    },
+
     // Stats
     getStats: async (): Promise<EmptinessStats> => {
         const sessions = await EmptinessService.getSessions();

@@ -68,6 +68,18 @@ export const AnapanasatiService = {
         await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
     },
 
+    deleteSession: async (id: string): Promise<void> => {
+        let sessions = await AnapanasatiService.getSessions();
+        sessions = sessions.filter(s => s.id !== id);
+        await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
+    },
+
+    updateSession: async (updatedSession: AnapanasatiSession): Promise<void> => {
+        let sessions = await AnapanasatiService.getSessions();
+        sessions = sessions.map(s => s.id === updatedSession.id ? updatedSession : s);
+        await Preferences.set({ key: SESSION_KEY, value: JSON.stringify(sessions) });
+    },
+
     // Stats
     getStats: async (): Promise<AnapanasatiStats> => {
         const sessions = await AnapanasatiService.getSessions();

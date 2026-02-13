@@ -148,6 +148,74 @@ export const MantraService = {
         await this.updateMantraStats(session);
     },
 
+    async deleteSession(id: string): Promise<void> {
+        let sessions = await this.getSessions();
+        const sessionToDelete = sessions.find(s => s.id === id);
+        if (sessionToDelete) {
+            sessions = sessions.filter(s => s.id !== id);
+            await Preferences.set({
+                key: SESSION_STORAGE_KEY,
+                value: JSON.stringify(sessions)
+            });
+
+            await this.recalculateMantraStats(sessionToDelete.mantraId);
+        }
+    },
+
+    async updateSession(updatedSession: MantraSession): Promise<void> {
+        let sessions = await this.getSessions();
+        const index = sessions.findIndex(s => s.id === updatedSession.id);
+        if (index !== -1) {
+            sessions[index] = updatedSession;
+            await Preferences.set({
+                key: SESSION_STORAGE_KEY,
+                value: JSON.stringify(sessions)
+            });
+            await this.recalculateMantraStats(updatedSession.mantraId);
+        }
+    },
+
+    async recalculateMantraStats(mantraId: string): Promise<void> {
+        const allSessions = await this.getSessions();
+        const mantraSessions = allSessions.filter(s => s.mantraId === mantraId);
+
+        const mantras = await this.getMantras();
+        const mantraIndex = mantras.findIndex(m => m.id === mantraId);
+
+        if (mantraIndex !== -1) {
+            const m = mantras[mantraIndex];
+
+            m.stats.totalSessions = mantraSessions.length;
+            m.stats.totalReps = mantraSessions.reduce((acc, s) => acc + s.reps, 0);
+            m.stats.totalDurationMinutes = mantraSessions.reduce((acc, s) => acc + s.durationMinutes, 0);
+
+            const uniqueDates = Array.from(new Set(mantraSessions.map(s => s.timestamp.split('T')[0]))).sort().reverse();
+            m.stats.lastPracticeDate = uniqueDates.length > 0 ? uniqueDates[0] : undefined;
+
+            let currentStreak = 0;
+            if (uniqueDates.length > 0) {
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+                if (uniqueDates[0] === today || uniqueDates[0] === yesterday) {
+                    currentStreak = 1;
+                    for (let i = 0; i < uniqueDates.length - 1; i++) {
+                        const d1 = new Date(uniqueDates[i]);
+                        const d2 = new Date(uniqueDates[i + 1]);
+                        const diffTime = Math.abs(d1.getTime() - d2.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays === 1) currentStreak++;
+                        else break;
+                    }
+                }
+            }
+            m.stats.currentStreak = currentStreak;
+
+            mantras[mantraIndex] = m;
+            await this.saveMantras(mantras);
+        }
+    },
+
     async updateMantraStats(session: MantraSession) {
         const mantras = await this.getMantras();
         const mantra = mantras.find(m => m.id === session.mantraId);

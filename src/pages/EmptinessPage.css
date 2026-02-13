@@ -78,17 +78,7 @@
     font-weight: 600;
 }
 
-.disclaimer-box {
-    background: #FEF3C7;
-    color: #92400E;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    font-size: 0.9rem;
-}
+
 
 .step-item {
     margin-bottom: 24px;

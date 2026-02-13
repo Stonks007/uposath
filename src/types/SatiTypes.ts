@@ -84,7 +84,7 @@ export interface EmptinessSection {
         composed?: string;
         name: { [key: string]: string };
     };
-    disclaimer?: { [key: string]: string };
+
     title: { [key: string]: string };
     icon: string;
     color: string;
@@ -190,4 +190,22 @@ export interface MantraSession {
     completed: boolean;
     quality?: number; // 1-5
     notes?: string;
+}
+
+// --- Unified Stats Types ---
+
+export type PracticeCategory = 'mala' | 'anapanasati' | 'mantra' | 'emptiness';
+
+export interface UnifiedSession {
+    id: string;
+    timestamp: string;
+    category: PracticeCategory;
+    title: string;
+    detail: string; // e.g., "108 beads", "20 mins", "Green Tara"
+}
+
+export interface GlobalStats {
+    totalSessions: number;
+    currentStreak: number;
+    lastPracticeDate: string; // YYYY-MM-DD
 }
