@@ -35,6 +35,7 @@ export interface ChannelInfo {
 export class YouTubeService {
     private static binaryPath = path.resolve('./yt-dlp.exe');
     private static ytDlpWrap: any = null;
+    private static streamCache = new Map<string, { url: string, mimeType: string, expires: number }>();
 
     private static async getClient() {
         if (this.ytDlpWrap) return this.ytDlpWrap;
@@ -103,11 +104,59 @@ export class YouTubeService {
     }
 
     /**
-     * Get Audio Stream
+     * Get Direct Audio Stream URL (fast, no transcoding)
+     */
+    static async getStreamUrlDirect(videoId: string): Promise<{ url: string, mimeType: string } | null> {
+        try {
+            // Check cache first (Googlevideo URLs usually stay valid for 6h, we use 2h)
+            const cacheEntry = this.streamCache.get(videoId);
+            if (cacheEntry && cacheEntry.expires > Date.now()) {
+                console.log(`[YouTubeService] Using cached direct URL for: ${videoId}`);
+                return { url: cacheEntry.url, mimeType: cacheEntry.mimeType };
+            }
+
+            console.log(`[YouTubeService] Getting direct URL for: ${videoId} (Fresh lookup)`);
+            const url = `https://www.youtube.com/watch?v=${videoId}`;
+            const client = await this.getClient();
+
+            // Fetch the best audio URL directly
+            const result = await client.execPromise([
+                url,
+                '-f', 'bestaudio[ext=m4a]/bestaudio/best',
+                '-g'
+            ]);
+
+            const streamUrl = result.trim();
+            if (!streamUrl) return null;
+
+            // Simple mime detection
+            let mimeType = 'audio/mp4';
+            if (streamUrl.includes('mime=audio%2Fwebm')) mimeType = 'audio/webm';
+            if (streamUrl.includes('mime=audio%2Fogg')) mimeType = 'audio/ogg';
+
+            // Cache for 2 hours
+            this.streamCache.set(videoId, {
+                url: streamUrl,
+                mimeType,
+                expires: Date.now() + (2 * 60 * 60 * 1000)
+            });
+
+            return {
+                url: streamUrl,
+                mimeType
+            };
+        } catch (error) {
+            console.error('[YouTubeService] Error getting direct URL:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get Audio Stream (Legacy/Transcoded)
      */
     static async getStreamUrl(videoId: string, startTime: number = 0) {
         try {
-            console.log(`[YouTubeService] Generating stream for: ${videoId}`);
+            console.log(`[YouTubeService] Generating transcoded stream for: ${videoId}`);
             const url = `https://www.youtube.com/watch?v=${videoId}`;
 
             const client = await this.getClient();
@@ -223,6 +272,54 @@ export class YouTubeService {
 
         } catch (error) {
             console.error('[YouTubeService] Error getting channel info:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get captions/lyrics
+     */
+    static async getCaptions(videoId: string): Promise<string | null> {
+        try {
+            console.log(`[YouTubeService] Fetching captions for ${videoId}`);
+            const client = await this.getClient();
+            const metadata = await client.getVideoInfo(`https://www.youtube.com/watch?v=${videoId}`);
+
+            const captions = metadata.subtitles || metadata.automatic_captions;
+            if (!captions) return null;
+
+            // Find English track (or first available)
+            const code = Object.keys(captions).find(c => c.startsWith('en')) || Object.keys(captions)[0];
+            if (!code) return null;
+
+            const formats = captions[code];
+            // Prefer vtt
+            const format = formats.find((f: any) => f.ext === 'vtt') || formats[0];
+
+            if (!format || !format.url) return null;
+
+            const fetchFn = (globalThis as any).fetch;
+            if (!fetchFn) {
+                console.error('[YouTubeService] Fetch not available');
+                return null;
+            }
+
+            const response = await fetchFn(format.url);
+            if (!response.ok) return null;
+
+            const vttText = await response.text();
+
+            // Clean VTT
+            return vttText
+                .replace(/^WEBVTT.*\n+/g, '')
+                .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}.*\n/g, '')
+                .replace(/<[^>]+>/g, '')
+                .replace(/^\s*$/gm, '')
+                .replace(/&nbsp;/g, ' ')
+                .trim();
+
+        } catch (error) {
+            console.error('[YouTubeService] Error getting captions:', error);
             return null;
         }
     }

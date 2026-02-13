@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { Readable } from 'stream';
 import { YouTubeService } from './services/youtubeService.js';
 
 dotenv.config();
@@ -56,30 +57,68 @@ app.get('/api/audio/video/:id', async (req, res) => {
 });
 
 /**
- * Direct Audio Stream (Proxy)
+ * Optimized Audio Stream (Direct Proxy with Range Support)
  */
 app.get('/api/audio/stream/:id', async (req, res) => {
     const { id } = req.params;
-    const startTime = parseInt(req.query.t as string) || 0;
+    const range = req.headers.range;
+
     try {
-        const streamInfo = await YouTubeService.getStreamUrl(id, startTime);
-        if (!streamInfo) return res.status(404).json({ error: 'Stream not found' });
+        console.log(`[Proxy] Requesting stream for ${id} (Range: ${range || 'none'})`);
 
-        res.setHeader('Content-Type', streamInfo.mimeType || 'audio/webm');
-        res.setHeader('Cache-Control', 'public, max-age=3600');
+        // Step 1: Get the direct GoogleVideo URL
+        const streamInfo = await YouTubeService.getStreamUrlDirect(id);
 
-        console.log(`[Proxy] Streaming ${id} | MIME: ${streamInfo.mimeType}`);
+        if (!streamInfo) {
+            console.log(`[Proxy] Direct URL failed for ${id}, falling back to transcoded stream.`);
+            // Fallback to legacy transcoded stream if direct fails
+            const legacyStream = await YouTubeService.getStreamUrl(id);
+            if (!legacyStream) return res.status(404).json({ error: 'Stream not found' });
 
-        streamInfo.stream.pipe(res);
+            res.setHeader('Content-Type', 'audio/mpeg');
+            legacyStream.stream.pipe(res);
+            return;
+        }
 
-        streamInfo.stream.on('error', (err: any) => {
-            console.error(`[Proxy] Stream error for ${id}:`, err);
-            if (!res.headersSent) res.status(500).end();
-            else res.end();
+        // Step 2: Proxy the direct URL with Range support
+        const headers: Record<string, string> = {};
+        if (range) {
+            headers['Range'] = range;
+        }
+
+        const fetchFn = (globalThis as any).fetch;
+        if (!fetchFn) throw new Error('Native fetch not available');
+
+        const response = await fetchFn(streamInfo.url, { headers });
+
+        // Step 3: Forward appropriate headers back to client
+        res.status(response.status);
+
+        // Forward essential headers
+        const headersToForward = ['content-type', 'content-length', 'content-range', 'accept-ranges', 'cache-control'];
+        headersToForward.forEach(h => {
+            const val = response.headers.get(h);
+            if (val) res.setHeader(h, val);
         });
 
-        res.on('close', () => {
-            if (streamInfo.stream.destroy) streamInfo.stream.destroy();
+        // Ensure we have a mime type if YouTube didn't provide one or we guessed
+        if (!res.getHeader('content-type')) {
+            res.setHeader('Content-Type', streamInfo.mimeType);
+        }
+
+        if (!response.body) {
+            throw new Error('Response body is empty');
+        }
+
+        // Step 4: Pipe the web stream to Node response
+        const nodeStream = Readable.fromWeb(response.body as any);
+
+        nodeStream.pipe(res);
+
+        nodeStream.on('error', (err: any) => {
+            console.error(`[Proxy] Pipe error for ${id}:`, err);
+            if (!res.headersSent) res.status(500).end();
+            else res.end();
         });
 
     } catch (error: any) {
@@ -88,6 +127,16 @@ app.get('/api/audio/stream/:id', async (req, res) => {
             res.status(500).json({ error: 'Failed to stream audio', details: error.message });
         }
     }
+});
+
+/**
+ * Get Lyrics/Captions
+ */
+app.get('/api/audio/lyrics/:id', async (req, res) => {
+    const { id } = req.params;
+    const lyrics = await YouTubeService.getCaptions(id);
+    if (!lyrics) return res.json({ lyrics: '' });
+    res.json({ lyrics });
 });
 
 // Start server

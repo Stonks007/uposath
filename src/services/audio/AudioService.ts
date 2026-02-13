@@ -33,5 +33,12 @@ export const AudioService = {
 
     getStreamUrl(videoId: string, startTime: number = 0): string {
         return `${API_BASE_URL}/stream/${videoId}?t=${Math.floor(startTime)}`;
+    },
+
+    async getLyrics(videoId: string): Promise<string> {
+        const response = await fetch(`${API_BASE_URL}/lyrics/${videoId}`);
+        if (!response.ok) return '';
+        const data = await response.json();
+        return data.lyrics || '';
     }
 };
