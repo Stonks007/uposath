@@ -15,6 +15,7 @@ import {
 } from '@ionic/react';
 import { settingsOutline, statsChartOutline, leafOutline, calendarOutline } from 'ionicons/icons';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
+import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { MalaService } from '../services/MalaService';
 import './Home.css';
 
@@ -55,9 +56,7 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        <NextUposathaWidget />
-
-        <div style={{ marginTop: '32px' }}>
+        <div style={{ marginTop: '24px' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <IonIcon icon={statsChartOutline} color="primary" />
             Practice Summary
@@ -103,6 +102,13 @@ const Home: React.FC = () => {
               </IonCol>
             </IonRow>
           </IonGrid>
+        </div>
+
+        <DhammaAudioWidget />
+
+        <div style={{ marginTop: '32px' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '16px' }}>Upcoming Observance</h3>
+          <NextUposathaWidget />
         </div>
 
         <div style={{ marginTop: '32px' }}>
