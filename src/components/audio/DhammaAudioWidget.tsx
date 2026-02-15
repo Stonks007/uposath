@@ -1,100 +1,129 @@
 import React, { useState, useEffect } from 'react';
 import {
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
-    IonButton,
     IonIcon,
     IonText,
-    IonThumbnail,
-    IonItem,
-    IonLabel,
-    IonSkeletonText
+    IonButton,
+    IonProgressBar,
+    IonSpinner
 } from '@ionic/react';
-import { play, pause, musicalNotesOutline, chevronForwardOutline } from 'ionicons/icons';
-import { useAudio } from '../../context/useAudio';
-import { LocalAudioDataService } from '../../services/audio/LocalAudioDataService';
-import { AudioTrack } from '../../types/audio/AudioTypes';
+import {
+    play,
+    pause,
+    playSkipForward,
+    playSkipBack,
+    musicalNotes,
+    chevronForward,
+    alertCircle
+} from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import { DhammaAudio, VideoInfo, PlaybackState } from '../../plugins/dhamma-audio';
+import './DhammaAudioWidget.css';
 
 const DhammaAudioWidget: React.FC = () => {
-    const { currentTrack, isPlaying, togglePlay } = useAudio();
-    const [recentTrack, setRecentTrack] = useState<AudioTrack | null>(null);
+    const history = useHistory();
+    const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadRecent = async () => {
-            const history = await LocalAudioDataService.getHistory();
-            if (history.length > 0) {
-                setRecentTrack(history[0].track);
-            }
-            setLoading(false);
-        };
-        loadRecent();
-    }, [currentTrack]);
+        loadState();
 
-    const activeTrack = currentTrack || recentTrack;
+        const stateListener = DhammaAudio.addListener('playbackStateChanged', (state) => {
+            setPlaybackState(state);
+        });
+
+        const progressListener = DhammaAudio.addListener('progressUpdate', (data) => {
+            setPlaybackState(prev => prev ? { ...prev, position: data.position } : null);
+        });
+
+        return () => {
+            stateListener.then(l => l.remove());
+            progressListener.then(l => l.remove());
+        };
+    }, []);
+
+    const loadState = async () => {
+        try {
+            const state = await DhammaAudio.getPlaybackState();
+            setPlaybackState(state);
+            setLoading(false);
+        } catch (err) {
+            console.error('Failed to load playback state:', err);
+            // If plugin not found or error, it might be in an empty state
+            setLoading(false);
+        }
+    };
+
+    const togglePlay = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!playbackState) return;
+
+        if (playbackState.isPlaying) {
+            await DhammaAudio.pause();
+        } else {
+            await DhammaAudio.resume();
+        }
+    };
+
+    const openLibrary = () => {
+        history.push('/library');
+    };
+
+    const openPlayer = () => {
+        history.push('/player');
+    };
+
+    if (loading) {
+        return (
+            <div className="audio-widget-skeleton glass-card">
+                <IonSpinner name="crescent" color="primary" />
+                <IonText>Initializing Audio...</IonText>
+            </div>
+        );
+    }
+
+    if (playbackState?.currentVideo) {
+        const { currentVideo, isPlaying, position, duration } = playbackState;
+        const progress = duration > 0 ? position / duration : 0;
+
+        return (
+            <IonCard className="audio-widget playing glass-card" onClick={openPlayer}>
+                <div className="audio-widget__artwork" style={{ backgroundImage: `url(${currentVideo.thumbnailUrl})` }}>
+                    <div className="audio-widget__overlay"></div>
+                </div>
+                <IonCardContent>
+                    <div className="audio-widget__content">
+                        <div className="audio-widget__info">
+                            <IonText className="audio-widget__title">{currentVideo.title}</IonText>
+                            <IonText color="medium" className="audio-widget__subtitle">{currentVideo.channelName}</IonText>
+                        </div>
+                        <div className="audio-widget__controls">
+                            <IonButton fill="clear" onClick={togglePlay} className="play-button">
+                                <IonIcon icon={isPlaying ? pause : play} />
+                            </IonButton>
+                        </div>
+                    </div>
+                    <IonProgressBar value={progress} color="primary" className="audio-widget__progress" />
+                </IonCardContent>
+            </IonCard>
+        );
+    }
 
     return (
-        <IonCard className="dhamma-audio-widget" style={{ margin: '16px', borderRadius: '16px', overflow: 'hidden' }}>
-            <IonCardHeader style={{ padding: '12px 16px', borderBottom: '1px solid rgba(var(--ion-color-step-200-rgb), 0.3)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <IonCardTitle style={{ fontSize: '1rem', fontWeight: '600', display: 'flex', alignItems: 'center' }}>
-                        <IonIcon icon={musicalNotesOutline} style={{ marginRight: '8px', color: 'var(--ion-color-primary)' }} />
-                        DHAMMA AUDIO
-                    </IonCardTitle>
-                    <IonButton fill="clear" size="small" routerLink="/library" style={{ fontSize: '0.8rem', '--padding-end': '0' }}>
-                        See All
-                        <IonIcon icon={chevronForwardOutline} slot="end" />
-                    </IonButton>
-                </div>
-            </IonCardHeader>
-            <IonCardContent style={{ padding: '0' }}>
-                {loading ? (
-                    <IonItem lines="none" style={{ '--background': 'transparent' }}>
-                        <IonThumbnail slot="start">
-                            <IonSkeletonText animated style={{ borderRadius: '8px' }} />
-                        </IonThumbnail>
-                        <IonLabel>
-                            <IonSkeletonText animated style={{ width: '80%' }} />
-                            <IonSkeletonText animated style={{ width: '50%' }} />
-                        </IonLabel>
-                    </IonItem>
-                ) : activeTrack ? (
-                    <IonItem lines="none" style={{ '--background': 'transparent', padding: '8px 0' }}>
-                        <IonThumbnail slot="start" style={{ width: '60px', height: '60px', marginLeft: '16px' }}>
-                            {activeTrack.thumbnail ? (
-                                <img alt={activeTrack.title} src={activeTrack.thumbnail} style={{ borderRadius: '8px', objectFit: 'cover' }} />
-                            ) : (
-                                <div style={{ width: '100%', height: '100%', background: 'var(--ion-color-step-200)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <IonIcon icon={musicalNotesOutline} color="medium" />
-                                </div>
-                            )}
-                        </IonThumbnail>
-                        <IonLabel className="ion-text-wrap" style={{ margin: '0 8px' }}>
-                            <h2 style={{ fontSize: '0.95rem', fontWeight: '500', marginBottom: '4px' }}>{activeTrack.title}</h2>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>{activeTrack.channelTitle}</p>
-                        </IonLabel>
-                        <IonButton
-                            slot="end"
-                            fill="clear"
-                            size="large"
-                            onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                            style={{ '--padding-start': '0', '--padding-end': '16px' }}
-                        >
-                            <IonIcon icon={isPlaying && currentTrack?.id === activeTrack.id ? pause : play} style={{ fontSize: '2rem' }} />
-                        </IonButton>
-                    </IonItem>
-                ) : (
-                    <div style={{ padding: '24px', textAlign: 'center' }}>
-                        <IonText color="medium">
-                            <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem' }}>No recently played dhamma.</p>
-                        </IonText>
-                        <IonButton fill="outline" size="small" routerLink="/library" style={{ borderRadius: '8px' }}>
-                            Explore Library
-                        </IonButton>
+        <IonCard className="audio-widget empty glass-card" onClick={openLibrary}>
+            <IonCardContent>
+                <div className="audio-widget__empty-content">
+                    <div className="audio-widget__icon-wrapper">
+                        <IonIcon icon={musicalNotes} color="secondary" />
                     </div>
-                )}
+                    <div className="audio-widget__empty-info">
+                        <IonText className="audio-widget__title">DHAMMA AUDIO</IonText>
+                        <IonText color="medium" className="audio-widget__subtitle">Recent uploads from Pañcasikha</IonText>
+                    </div>
+                    <IonIcon icon={chevronForward} color="medium" className="audio-widget__arrow" />
+                </div>
             </IonCardContent>
         </IonCard>
     );

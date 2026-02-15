@@ -27,6 +27,9 @@ node_modules/
 .idea/
 *.iml
 *.iws
+.project
+.settings/
+.classpath
 
 # Logs
 npm-debug.log*
@@ -51,6 +54,8 @@ verify_*.test.ts
 /www
 /capacitor-cordova-android-plugins
 /capacitor-cordova-ios-plugins
+android/app/src/main/assets/public
+android/app/src/main/assets/capacitor.config.json
 
 # Android local properties
 **/local.properties
@@ -64,10 +69,22 @@ verify_*.test.ts
 **/*.aab
 **/*.dex
 **/*.class
+*.keystore
+*.jks
+google-services.json
+.externalNativeBuild
+.cxx
+local.properties
 
 # Server artifacts
 server/yt-dlp.exe
 server/dist/
+server/node_modules/
 server/output.txt
+server/*.log
+server/*.txt
 server/*-player-script.js
 server/src/services/*.js
+server/out/
+server/manifest.txt
+server/.env

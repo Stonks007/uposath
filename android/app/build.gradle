@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace = "com.buddhist.uposatha"
@@ -29,6 +31,7 @@ repositories {
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
@@ -41,10 +44,17 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
 
     // NewPipeExtractor
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:v0.24.6'
-    implementation 'com.github.TeamNewPipe:nanojson:1.7-np'
-    implementation 'org.jsoup:jsoup:1.15.3'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:v0.25.2'
+
+    // Room Database
+    implementation 'androidx.room:room-runtime:2.6.1'
+    kapt 'androidx.room:room-compiler:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+
+    // Media3 / ExoPlayer
+    implementation 'androidx.media3:media3-exoplayer:1.2.1'
+    implementation 'androidx.media3:media3-session:1.2.1'
+    implementation 'androidx.media3:media3-ui:1.2.1'
 }
 
 apply from: 'capacitor.build.gradle'

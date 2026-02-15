@@ -13,32 +13,40 @@ import {
   IonIcon,
   IonLabel
 } from '@ionic/react';
-import { settingsOutline, statsChartOutline, leafOutline, calendarOutline } from 'ionicons/icons';
+import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline } from 'ionicons/icons';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { MalaService } from '../services/MalaService';
 import './Home.css';
 
 const Home: React.FC = () => {
-  const [globalStats, setGlobalStats] = useState<{ totalSessions: number; currentStreak: number } | null>(null);
+  const [nextUposatha, setNextUposatha] = useState<any>(null);
+  const [stats, setStats] = useState({
+    chantingStreak: 0,
+    meditationMinutes: 0,
+    malaCount: 0
+  });
 
   useEffect(() => {
     loadStats();
   }, []);
 
   const loadStats = async () => {
-    const stats = await MalaService.getStats();
-    setGlobalStats({
-      totalSessions: stats.overall.totalSessions,
-      currentStreak: stats.overall.currentStreak
-    });
+    try {
+      // Assuming MalaService.getEntries() exists based on lint feedback
+      const entries = await MalaService.getEntries();
+      const count = entries.reduce((acc: number, s: any) => acc + (s.beads || 0), 0);
+      setStats(prev => ({ ...prev, malaCount: count }));
+    } catch (err) {
+      console.error('Failed to load mala stats:', err);
+    }
   };
 
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
         <IonToolbar>
-          <IonTitle>DHAMMA PATH</IonTitle>
+          <IonTitle>Abhaya</IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings">
               <IonIcon icon={settingsOutline} />
@@ -65,6 +73,15 @@ const Home: React.FC = () => {
             <NextUposathaWidget />
           </section>
 
+          {/* New Audio Section */}
+          <section>
+            <div className="home-section-header">
+              <IonIcon icon={musicalNotesOutline} color="tertiary" />
+              <h3 className="home-section-title">Dhamma Inspiration</h3>
+            </div>
+            <DhammaAudioWidget />
+          </section>
+
           {/* Stats Section */}
           <section>
             <div className="home-section-header">
@@ -74,22 +91,14 @@ const Home: React.FC = () => {
 
             <div className="stats-grid">
               <div className="glass-card stat-card">
-                <div className="stat-value">{globalStats?.totalSessions || 0}</div>
-                <div className="stat-label">Total Sessions</div>
+                <div className="stat-value">{stats.malaCount}</div>
+                <div className="stat-label">Total Beads</div>
               </div>
               <div className="glass-card stat-card">
-                <div className="stat-value">{globalStats?.currentStreak || 0}</div>
+                <div className="stat-value">{stats.chantingStreak}</div>
                 <div className="stat-label">Day Streak</div>
               </div>
             </div>
-          </section>
-
-          {/* Audio Section */}
-          <section>
-            <div className="home-section-header">
-              <h3 className="home-section-title">Daily Inspiration</h3>
-            </div>
-            <DhammaAudioWidget />
           </section>
 
           {/* Quick Actions */}

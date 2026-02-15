@@ -1,0 +1,123 @@
+.audio-widget {
+  margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.audio-widget:active {
+  transform: scale(0.98);
+}
+
+.audio-widget.playing {
+  position: relative;
+  min-height: 100px;
+}
+
+.audio-widget__artwork {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.7);
+  opacity: 0.3;
+}
+
+.audio-widget__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(var(--ion-color-step-50-rgb), 0.8));
+}
+
+.audio-widget__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.audio-widget__info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.audio-widget__title {
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.audio-widget__subtitle {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.audio-widget__controls {
+  display: flex;
+  align-items: center;
+}
+
+.play-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.audio-widget__progress {
+  margin-top: 12px;
+  height: 3px;
+  border-radius: 2px;
+  --buffer-background: rgba(var(--ion-color-primary-rgb), 0.1);
+}
+
+.audio-widget__empty-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.audio-widget__icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-secondary-rgb), 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.2);
+}
+
+.audio-widget__empty-info {
+  flex: 1;
+}
+
+.audio-widget__arrow {
+  font-size: 1.2rem;
+}
+
+.audio-widget-skeleton {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 16px;
+}

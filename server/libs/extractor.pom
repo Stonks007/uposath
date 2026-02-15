@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- do_not_remove: published-with-gradle-metadata -->
+<modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.TeamNewPipe.NewPipeExtractor</groupId>
+  <artifactId>extractor</artifactId>
+  <version>v0.24.6</version>
+  <name>TeamNewPipe/NewPipeExtractor</name>
+  <description>NewPipe's core library for extracting data from streaming sites</description>
+  <url>https://github.com/TeamNewPipe/NewPipeExtractor</url>
+  <inceptionYear>2017</inceptionYear>
+  <licenses>
+    <license>
+      <name>GNU General Public License v3.0</name>
+      <url>https://api.github.com/licenses/gpl-3.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>TeamNewPipe</id>
+      <name>Team NewPipe</name>
+      <email></email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git://github.com/TeamNewPipe/NewPipeExtractor.git</connection>
+    <developerConnection>scm:git://github.com/TeamNewPipe/NewPipeExtractor.git</developerConnection>
+    <url>git://github.com/TeamNewPipe/NewPipeExtractor.git</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.TeamNewPipe.NewPipeExtractor</groupId>
+      <artifactId>timeago-parser</artifactId>
+      <version>v0.24.6</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.TeamNewPipe</groupId>
+      <artifactId>nanojson</artifactId>
+      <version>1d9e1aea9049fc9f85e68b43ba39fe7be1c1f751</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.19.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.8.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino-engine</artifactId>
+      <version>1.8.0</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>
