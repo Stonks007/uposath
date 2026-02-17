@@ -36,6 +36,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
+android/build_log*.txt
+.gemini/
+.agent/
+.antigravity/
 
 # Optional eslint cache
 .eslintcache
@@ -87,4 +91,7 @@ server/*-player-script.js
 server/src/services/*.js
 server/out/
 server/manifest.txt
-server/.env
+# Temporary cloned repositories
+temp_outertune/
+OuterTune/
+android/for reference only/

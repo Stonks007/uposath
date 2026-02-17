@@ -11,7 +11,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { calendar, rose, settings, leaf, home } from 'ionicons/icons';
+import { calendar, rose, settings, leaf, home, library } from 'ionicons/icons';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 /* Core CSS */
@@ -48,6 +48,7 @@ import TripleGemPage from './pages/TripleGemPage';
 import AnapanasatiPage from './pages/AnapanasatiPage';
 import AudioLibraryPage from './pages/AudioLibraryPage';
 import AudioPlayerPage from './pages/AudioPlayerPage';
+import SatiStatsPage from './pages/SatiStatsPage';
 
 const FocusManager: React.FC = () => {
   const history = useHistory();
@@ -97,6 +98,7 @@ const App: React.FC = () => (
           <Route exact path="/sati" component={SatiPage} />
           <Route exact path="/sati/triple-gem" component={TripleGemPage} />
           <Route exact path="/sati/anapanasati" component={AnapanasatiPage} />
+          <Route exact path="/sati/stats" component={SatiStatsPage} />
           <Route exact path="/library" component={AudioLibraryPage} />
           <Route exact path="/player" component={AudioPlayerPage} />
           <Route exact path="/festivals" component={FestivalsPage} />
@@ -116,8 +118,12 @@ const App: React.FC = () => (
             <IonIcon aria-hidden="true" icon={calendar} />
             <IonLabel>Calendar</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="library" href="/library">
+          <IonTabButton tab="sati" href="/sati">
             <IonIcon aria-hidden="true" icon={leaf} />
+            <IonLabel>Sati</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="library" href="/library">
+            <IonIcon aria-hidden="true" icon={library} />
             <IonLabel>Library</IonLabel>
           </IonTabButton>
           <IonTabButton tab="festivals" href="/festivals">

@@ -9,6 +9,6 @@ data class Channel(
     val name: String,
     val avatarUrl: String,
     val subscriberCount: Long,
-    val description: String?,
+    val description: String,
     val lastFetched: Long
 )

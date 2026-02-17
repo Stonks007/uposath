@@ -25,8 +25,8 @@ const AudioLibraryPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
 
-    // Pañcasikha Channel ID URL
-    const PANCASIKHA_CHANNEL_URL = 'https://www.youtube.com/@Pañcasikha-358';
+    // Pañcasikha Channel ID URL (Encoded for character safety)
+    const PANCASIKHA_CHANNEL_URL = 'https://www.youtube.com/@Pa%C3%B1casikha-358';
 
     useEffect(() => {
         loadVideos();
@@ -47,6 +47,23 @@ const AudioLibraryPage: React.FC = () => {
         }
     };
 
+    const handleSearch = async (query: string) => {
+        setSearchText(query);
+        if (query.length > 2) {
+            try {
+                setLoading(true);
+                const result = await DhammaAudio.search({ query });
+                setVideos(result.videos);
+                setLoading(false);
+            } catch (err) {
+                console.error('Search failed:', err);
+                setLoading(false);
+            }
+        } else if (query.length === 0) {
+            loadVideos();
+        }
+    };
+
     const playVideo = (video: VideoInfo) => {
         DhammaAudio.playVideo({ videoId: video.id });
         history.push('/player');
@@ -64,8 +81,9 @@ const AudioLibraryPage: React.FC = () => {
                 <IonToolbar>
                     <IonSearchbar
                         value={searchText}
-                        onIonInput={(e: any) => setSearchText(e.target.value)}
+                        onIonInput={(e: any) => handleSearch(e.target.value)}
                         placeholder="Search chants..."
+                        debounce={1000}
                     />
                 </IonToolbar>
             </IonHeader>
@@ -77,7 +95,7 @@ const AudioLibraryPage: React.FC = () => {
                     </div>
                 ) : (
                     <IonList>
-                        {videos.filter(v => v.title.toLowerCase().includes(searchText.toLowerCase())).map(video => (
+                        {videos.map(video => (
                             <IonItem key={video.id} button onClick={() => playVideo(video)} detail={false}>
                                 <IonThumbnail slot="start" style={{ '--border-radius': '8px' }}>
                                     <IonImg src={video.thumbnailUrl} />

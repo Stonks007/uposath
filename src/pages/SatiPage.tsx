@@ -101,6 +101,43 @@ const SatiPage: React.FC = () => {
                 {/* Anapanasati Card */}
                 <AnapanasatiCard />
 
+                {/* Statistics Card */}
+                <IonCard routerLink="/sati/stats" style={{
+                    borderRadius: '16px',
+                    margin: '16px 0',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    background: 'var(--color-bg-card, #ffffff)',
+                    overflow: 'hidden'
+                }}>
+                    <IonCardContent style={{ padding: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <div style={{
+                                    fontSize: '1.8rem',
+                                    width: '48px',
+                                    height: '48px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'var(--ion-color-primary-tint, #e0f2fe)',
+                                    borderRadius: '50%'
+                                }}>
+                                    📈
+                                </div>
+                                <div>
+                                    <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: 'var(--color-text-primary, #111827)' }}>
+                                        View Statistics
+                                    </h2>
+                                    <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: 'var(--color-text-secondary, #6b7280)' }}>
+                                        Track your practice progress
+                                    </p>
+                                </div>
+                            </div>
+                            <IonIcon icon={chevronForward} color="medium" />
+                        </div>
+                    </IonCardContent>
+                </IonCard>
+
                 {/* Placeholder for future features */}
                 {/* <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af', fontStyle: 'italic' }}>
                      More mindfulness tools coming soon...

@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+## Rules for Gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+## Rules for Room
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+## Rules for ExoPlayer
+-keep class com.google.android.exoplayer2.** { *; }
+-keep class androidx.media3.** { *; }

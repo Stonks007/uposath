@@ -93,18 +93,6 @@
   gap: 16px;
 }
 
-.audio-widget__icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: rgba(var(--ion-color-secondary-rgb), 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.2);
-}
-
 .audio-widget__empty-info {
   flex: 1;
 }

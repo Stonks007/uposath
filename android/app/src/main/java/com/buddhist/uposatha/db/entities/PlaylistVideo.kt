@@ -24,5 +24,6 @@ import androidx.room.ForeignKey
 data class PlaylistVideo(
     val playlistId: String,
     val videoId: String,
-    val position: Int
+    val position: Int,
+    val addedAt: Long
 )

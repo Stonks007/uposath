@@ -183,7 +183,7 @@ const CalendarPage: React.FC = () => {
                     return (
                         <div
                             key={i}
-                            className={`day-cell ${isToday ? 'today' : ''} ${isUpcomingUposatha ? 'uposatha-day' : ''}`}
+                            className={`day-cell ${isToday ? 'today' : ''} ${isUpcomingUposatha ? 'uposatha-day' : ''} ${isToday && day.uposatha.isUposatha ? 'today-uposatha' : ''}`}
                             onClick={() => handleDayClick(day.date)}
                         >
                             <span className="day-number">{day.date.getDate()}</span>

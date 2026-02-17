@@ -13,36 +13,36 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     private mockVideos: VideoInfo[] = [
         {
             id: 'mock-1',
-            title: 'Buddhist Chant - Mangala Sutta',
-            channelId: 'UC-panc-358',
+            title: 'Pañcasikha - Morning Chant',
+            channelId: 'UC0ypu1lL-Srd4O7XHjtIQrg',
             channelName: 'Pañcasikha',
-            duration: 300,
+            duration: 360,
             thumbnailUrl: 'https://images.unsplash.com/photo-1544413647-ad3482594cc1?auto=format&fit=crop&q=80&w=400',
             uploadDate: Date.now() - 86400000,
             viewCount: 1500,
-            description: 'The Mangala Sutta, a protective chant of blessings.'
+            description: 'A beautiful morning chant.'
         },
         {
             id: 'mock-2',
-            title: 'The Four Noble Truths - Guided Meditation',
-            channelId: 'UC-panc-358',
+            title: 'Dhamma Talk on Mindfulness',
+            channelId: 'UC0ypu1lL-Srd4O7XHjtIQrg',
             channelName: 'Pañcasikha',
-            duration: 1200,
+            duration: 1800,
             thumbnailUrl: 'https://images.unsplash.com/photo-1512102438733-bfa4ed29aef7?auto=format&fit=crop&q=80&w=400',
             uploadDate: Date.now() - 604800000,
             viewCount: 5000,
-            description: 'Understanding the core of Buddhist philosophy.'
+            description: 'Guided meditation and talk.'
         }
     ];
 
     private isPlaying = false;
     private currentVideo: VideoInfo | null = null;
     private position = 0;
+    private playbackInterval: any = null;
 
     async getChannelInfo(options: { channelId: string }): Promise<ChannelInfo> {
-        console.log('Web: getChannelInfo', options);
         return {
-            id: options.channelId,
+            id: 'UC0ypu1lL-Srd4O7XHjtIQrg',
             name: 'Pañcasikha',
             avatarUrl: 'https://via.placeholder.com/150?text=PS',
             subscriberCount: 12500,
@@ -51,7 +51,6 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     }
 
     async getChannelVideos(options: { channelId: string; page: number }): Promise<VideoListResult> {
-        console.log('Web: getChannelVideos', options);
         return {
             videos: this.mockVideos,
             hasMore: false
@@ -59,7 +58,13 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     }
 
     async searchChannel(options: { channelId: string; query: string }): Promise<VideoListResult> {
-        console.log('Web: searchChannel', options);
+        return {
+            videos: this.mockVideos.filter(v => v.title.toLowerCase().includes(options.query.toLowerCase())),
+            hasMore: false
+        };
+    }
+
+    async search(options: { query: string }): Promise<VideoListResult> {
         return {
             videos: this.mockVideos.filter(v => v.title.toLowerCase().includes(options.query.toLowerCase())),
             hasMore: false
@@ -67,22 +72,24 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     }
 
     async playVideo(options: { videoId: string }): Promise<{ success: boolean }> {
-        console.log('Web: playVideo', options);
         this.currentVideo = this.mockVideos.find(v => v.id === options.videoId) || null;
         this.isPlaying = true;
         this.position = 0;
+        this.startMockPlayback();
         this.notifyPlaybackState();
         return { success: true };
     }
 
     async pause(): Promise<{ success: boolean }> {
         this.isPlaying = false;
+        this.stopMockPlayback();
         this.notifyPlaybackState();
         return { success: true };
     }
 
     async resume(): Promise<{ success: boolean }> {
         this.isPlaying = true;
+        this.startMockPlayback();
         this.notifyPlaybackState();
         return { success: true };
     }
@@ -90,6 +97,7 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     async stop(): Promise<{ success: boolean }> {
         this.isPlaying = false;
         this.currentVideo = null;
+        this.stopMockPlayback();
         this.notifyPlaybackState();
         return { success: true };
     }
@@ -149,7 +157,7 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     }
 
     async getPlaylists(): Promise<{ playlists: PlaylistInfo[] }> {
-        return { playlists: [] };
+        return { playlists: [{ id: 'p1', name: 'Favorites', videoCount: 2, createdAt: Date.now(), updatedAt: Date.now() }] };
     }
 
     async createPlaylist(options: { name: string; videoIds?: string[] }): Promise<{ playlist: PlaylistInfo }> {
@@ -169,7 +177,27 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
     }
 
     async getPlaylistVideos(options: { playlistId: string }): Promise<{ videos: VideoInfo[] }> {
-        return { videos: [] };
+        return { videos: this.mockVideos };
+    }
+
+    private startMockPlayback() {
+        this.stopMockPlayback();
+        this.playbackInterval = setInterval(() => {
+            if (this.isPlaying && this.currentVideo) {
+                this.position += 1000;
+                this.notifyListeners('progressUpdate', { position: this.position });
+                if (this.position >= this.currentVideo.duration * 1000) {
+                    this.stop();
+                }
+            }
+        }, 1000);
+    }
+
+    private stopMockPlayback() {
+        if (this.playbackInterval) {
+            clearInterval(this.playbackInterval);
+            this.playbackInterval = null;
+        }
     }
 
     private async notifyPlaybackState() {

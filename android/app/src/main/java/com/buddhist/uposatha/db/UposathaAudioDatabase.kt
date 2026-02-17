@@ -28,6 +28,7 @@ abstract class UposathaAudioDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: UposathaAudioDatabase? = null
 
+        @JvmStatic
         fun getDatabase(context: Context): UposathaAudioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(

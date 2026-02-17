@@ -115,8 +115,8 @@ const DhammaAudioWidget: React.FC = () => {
         <IonCard className="audio-widget empty glass-card" onClick={openLibrary}>
             <IonCardContent>
                 <div className="audio-widget__empty-content">
-                    <div className="audio-widget__icon-wrapper">
-                        <IonIcon icon={musicalNotes} color="secondary" />
+                    <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
+                        <IonIcon icon={musicalNotes} color="primary" />
                     </div>
                     <div className="audio-widget__empty-info">
                         <IonText className="audio-widget__title">DHAMMA AUDIO</IonText>

@@ -15,5 +15,6 @@ data class Video(
     val viewCount: Long,
     val description: String?,
     val audioStreamUrl: String?,
+    val audioStreamQuality: String?,
     val lastUpdated: Long
 )

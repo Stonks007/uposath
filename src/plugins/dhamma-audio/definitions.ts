@@ -2,6 +2,7 @@ export interface DhammaAudioPlugin {
     getChannelInfo(options: { channelId: string }): Promise<ChannelInfo>;
     getChannelVideos(options: { channelId: string; page: number }): Promise<VideoListResult>;
     searchChannel(options: { channelId: string; query: string }): Promise<VideoListResult>;
+    search(options: { query: string }): Promise<VideoListResult>;
 
     playVideo(options: { videoId: string }): Promise<{ success: boolean }>;
     pause(): Promise<{ success: boolean }>;

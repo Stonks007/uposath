@@ -98,34 +98,66 @@
 }
 
 .day-cell.today {
-    border-color: var(--color-accent-primary);
-    box-shadow: 0 0 10px rgba(255, 198, 112, 0.2);
-    background: rgba(255, 198, 112, 0.05);
+    border: 2px solid var(--color-accent-primary);
+    box-shadow: 0 0 15px rgba(255, 198, 112, 0.3);
+    background: rgba(255, 198, 112, 0.1);
+    font-weight: 800;
+}
+
+.day-cell.today::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--color-accent-primary);
 }
 
 .day-cell.uposatha-day {
-    border: 1px solid rgba(255, 198, 112, 0.5);
+    border: 1px solid rgba(255, 198, 112, 0.4);
     background: rgba(255, 198, 112, 0.08);
     position: relative;
     z-index: 1;
     animation: uposathaGlow 3s ease-in-out infinite;
 }
 
-@keyframes uposathaGlow {
-    0% {
-        box-shadow: 0 0 5px rgba(255, 198, 112, 0.2), inset 0 0 0px rgba(255, 198, 112, 0);
-        border-color: rgba(255, 198, 112, 0.3);
+/* Today + Uposatha Combined State */
+.day-cell.today-uposatha {
+    border: 2px solid var(--color-accent-primary);
+    background: linear-gradient(135deg, rgba(255, 198, 112, 0.15) 0%, rgba(255, 198, 112, 0.05) 100%);
+    animation: todayUposathaGlow 4s ease-in-out infinite;
+}
+
+@keyframes todayUposathaGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 15px rgba(255, 198, 112, 0.4), inset 0 0 8px rgba(255, 198, 112, 0.2);
     }
 
     50% {
-        box-shadow: 0 0 25px rgba(255, 198, 112, 0.4), inset 0 0 10px rgba(255, 198, 112, 0.2);
-        border-color: rgba(255, 198, 112, 0.8);
-        background: rgba(255, 198, 112, 0.12);
+        box-shadow: 0 0 35px rgba(255, 198, 112, 0.8), inset 0 0 20px rgba(255, 198, 112, 0.4);
+    }
+}
+
+@keyframes uposathaGlow {
+    0% {
+        box-shadow: 0 0 8px rgba(255, 198, 112, 0.2), inset 0 0 0px rgba(255, 198, 112, 0);
+        border-color: rgba(255, 198, 112, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(255, 198, 112, 0.6), inset 0 0 12px rgba(255, 198, 112, 0.3);
+        border-color: rgba(255, 198, 112, 0.9);
+        background: rgba(255, 198, 112, 0.15);
     }
 
     100% {
-        box-shadow: 0 0 5px rgba(255, 198, 112, 0.2), inset 0 0 0px rgba(255, 198, 112, 0);
-        border-color: rgba(255, 198, 112, 0.3);
+        box-shadow: 0 0 8px rgba(255, 198, 112, 0.2), inset 0 0 0px rgba(255, 198, 112, 0);
+        border-color: rgba(255, 198, 112, 0.4);
     }
 }
 

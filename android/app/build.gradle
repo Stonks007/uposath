@@ -1,17 +1,29 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+}
 
 android {
     namespace = "com.buddhist.uposatha"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
-        applicationId "com.buddhist.uposatha"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "com.buddhist.uposatha"
+        minSdkVersion = rootProject.ext.minSdkVersion
+        targetSdkVersion = rootProject.ext.targetSdkVersion
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -20,41 +32,83 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
-
-repositories {
-    flatDir{
-        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility = rootProject.ext.javaVersion
+        targetCompatibility = rootProject.ext.javaVersion
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.aar'], dir: 'libs')
+    implementation fileTree(include: ['*.aar'], dir: '../capacitor-cordova-android-plugins/src/main/libs')
+
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.robolectric:robolectric:4.11.1"
+    testImplementation "org.mockito:mockito-core:5.8.0"
+    testImplementation "androidx.test:core:1.5.0"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 
-    // NewPipeExtractor
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:v0.25.2'
+    // coreLibraryDesugaring
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.0.4'
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Ktor
+    implementation "io.ktor:ktor-client-core:2.3.7"
+    implementation "io.ktor:ktor-client-okhttp:2.3.7"
+    implementation "io.ktor:ktor-client-content-negotiation:2.3.7"
+    implementation "io.ktor:ktor-client-encoding:2.3.7"
+    implementation "io.ktor:ktor-serialization-kotlinx-json:2.3.7"
 
     // Room Database
     implementation 'androidx.room:room-runtime:2.6.1'
-    kapt 'androidx.room:room-compiler:2.6.1'
+    ksp 'androidx.room:room-compiler:2.6.1'
     implementation 'androidx.room:room-ktx:2.6.1'
 
     // Media3 / ExoPlayer
     implementation 'androidx.media3:media3-exoplayer:1.2.1'
+    implementation 'androidx.media3:media3-exoplayer-dash:1.2.1'
     implementation 'androidx.media3:media3-session:1.2.1'
     implementation 'androidx.media3:media3-ui:1.2.1'
+
+    // OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // kotlinx-serialization
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
+
+    // Okio (for base64)
+    implementation "com.squareup.okio:okio:3.6.0"
+
+    // NewPipeExtractor (used as a utility for InnerTube signature deciphering)
+    implementation 'com.github.teamnewpipe:NewPipeExtractor:0.24.8'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'androidx.webkit:webkit:1.10.0'
 }
 
 apply from: 'capacitor.build.gradle'

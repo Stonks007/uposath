@@ -11,9 +11,9 @@ interface ChannelDao {
     @Query("SELECT * FROM channels WHERE channelId = :channelId")
     suspend fun getChannelById(channelId: String): Channel?
 
-    @Update
-    suspend fun updateChannel(channel: Channel)
+    @Query("SELECT * FROM channels ORDER BY lastFetched DESC")
+    suspend fun getAllChannels(): List<Channel>
 
-    @Query("DELETE FROM channels WHERE channelId = :channelId")
-    suspend fun deleteChannel(channelId: String)
+    @Delete
+    suspend fun deleteChannel(channel: Channel)
 }

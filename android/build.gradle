@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
     repositories {
         google()
         mavenCentral()
@@ -11,6 +10,8 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.9.1'
         classpath 'com.google.gms:google-services:4.4.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:2.1.0"
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.1.0-1.0.29"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -18,12 +19,49 @@ buildscript {
 }
 
 apply from: "variables.gradle"
+rootProject.ext.javaVersion = JavaVersion.toVersion(rootProject.ext.javaVersion)
+rootProject.ext.javaVersionNumber = Integer.parseInt(rootProject.ext.javaVersionNumber.toString())
 
 allprojects {
     repositories {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        sourceCompatibility = rootProject.ext.javaVersion
+        targetCompatibility = rootProject.ext.javaVersion
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = rootProject.ext.jvmTarget
+        }
+    }
+
+    // Force all projects to use the current JVM for toolchains to avoid "JDK not found" errors
+    // while still enforcing Java 17 compatibility for the output bytecode
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileOptions {
+                    sourceCompatibility = rootProject.ext.javaVersion
+                    targetCompatibility = rootProject.ext.javaVersion
+                }
+            }
+        }
+        if (project.extensions.findByName('kotlin')) {
+            try {
+                // Use the version of the JVM running the build
+                def currentVersion = Integer.parseInt(JavaVersion.current().majorVersion)
+                project.kotlin.jvmToolchain(currentVersion)
+            } catch (Exception e) {
+                // Extension might not have jvmToolchain or other issues
+            }
+        }
     }
 }
 

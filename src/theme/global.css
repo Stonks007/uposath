@@ -286,8 +286,97 @@ ion-toolbar {
 .premium-button:active ion-icon {
     color: var(--color-bg-primary) !important;
 }
+
 /* Celestial Animations */
-@keyframes amberGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 198, 112, 0.4)); opacity: 0.9; } 50% { filter: drop-shadow(0 0 16px rgba(255, 198, 112, 0.8)); opacity: 1; } }
-@keyframes silverGlow { 0%, 100% { filter: drop-shadow(0 0 3px rgba(200, 210, 255, 0.3)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 12px rgba(200, 210, 255, 0.7)); opacity: 1; } }
-.celestial-amber { animation: amberGlow 4s infinite ease-in-out; }
-.celestial-silver { animation: silverGlow 4s infinite ease-in-out; }
+@keyframes amberGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px rgba(255, 198, 112, 0.4));
+        opacity: 0.9;
+    }
+
+    50% {
+        filter: drop-shadow(0 0 16px rgba(255, 198, 112, 0.8));
+        opacity: 1;
+    }
+}
+
+@keyframes silverGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 3px rgba(200, 210, 255, 0.3));
+        opacity: 0.8;
+    }
+
+    50% {
+        filter: drop-shadow(0 0 12px rgba(200, 210, 255, 0.7));
+        opacity: 1;
+    }
+}
+
+.celestial-amber {
+    animation: amberGlow 4s infinite ease-in-out;
+}
+
+.celestial-silver {
+    animation: silverGlow 4s infinite ease-in-out;
+}
+
+/* --- Global Premium Icon Wrapper --- */
+.icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    /* 12px default */
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.icon-wrapper--large {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+}
+
+.icon-wrapper--medium {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+}
+
+.icon-wrapper--small {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+}
+
+.icon-wrapper--primary {
+    border-color: rgba(var(--ion-color-primary-rgb), 0.3);
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    color: var(--ion-color-primary);
+}
+
+.icon-wrapper--secondary {
+    border-color: rgba(var(--ion-color-secondary-rgb), 0.3);
+    background: rgba(var(--ion-color-secondary-rgb), 0.1);
+    color: var(--ion-color-secondary);
+}
+
+.icon-wrapper--tertiary {
+    border-color: rgba(var(--ion-color-tertiary-rgb), 0.3);
+    background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+    color: var(--color-accent-tertiary);
+}
+
+.icon-wrapper:hover {
+    border-color: rgba(var(--ion-color-primary-rgb), 0.5);
+    box-shadow: 0 0 15px rgba(var(--ion-color-primary-rgb), 0.15);
+    background: rgba(var(--ion-color-primary-rgb), 0.05);
+}

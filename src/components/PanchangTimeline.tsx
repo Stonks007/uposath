@@ -82,7 +82,9 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
             <div className="panchang-timeline">
                 <div className="timeline-header">
                     <div className="header-left">
-                        <span className="timeline-icon">🌒</span>
+                        <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
+                            <span className="timeline-icon">🌒</span>
+                        </div>
                         <h3 className="timeline-title">Panchang Timeline</h3>
                     </div>
                     <div className="timeline-legend">
@@ -110,7 +112,7 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
                                 <div className="time-gradient-bar"></div>
                                 <div className="coordinate-system">
                                     <div className="sun-marker sunrise-marker" style={{ left: '0%' }}>
-                                        <div className="sun-icon-wrapper">
+                                        <div className="icon-wrapper icon-wrapper--small icon-wrapper--tertiary">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><circle cx="12" cy="12" r="4"></circle><path d="M12 16v4"></path><path d="M8 20h8"></path></svg>
                                         </div>
                                         <span className="sun-time">{localFormatTime(dayStart)}</span>
@@ -125,7 +127,7 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
 
                                     {sunsetPercent && (
                                         <div className="sun-marker sunset-marker" style={{ left: `${sunsetPercent}%` }}>
-                                            <div className="sun-icon-wrapper sunset-glow">
+                                            <div className="icon-wrapper icon-wrapper--small icon-wrapper--tertiary sunset-glow">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><circle cx="12" cy="12" r="4"></circle><path d="M12 16v4"></path><path d="M8 20h8"></path></svg>
                                             </div>
                                             <span className="sun-time">{localFormatTime(data.sunset)}</span>
@@ -133,7 +135,7 @@ const PanchangTimeline: React.FC<PanchangTimelineProps> = ({
                                     )}
 
                                     <div className="sun-marker sunrise-marker" style={{ left: '100%' }}>
-                                        <div className="sun-icon-wrapper">
+                                        <div className="icon-wrapper icon-wrapper--small icon-wrapper--tertiary">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><circle cx="12" cy="12" r="4"></circle><path d="M12 16v4"></path><path d="M8 20h8"></path></svg>
                                         </div>
                                         <span className="sun-time">{localFormatTime(nextSunrise)}</span>

@@ -20,5 +20,6 @@ data class PlaybackHistory(
     val videoId: String,
     val playedAt: Long,
     val position: Long, // in milliseconds
+    val duration: Long, // in milliseconds
     val completed: Boolean
 )

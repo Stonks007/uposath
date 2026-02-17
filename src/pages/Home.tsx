@@ -14,12 +14,14 @@ import {
   IonLabel
 } from '@ionic/react';
 import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { MalaService } from '../services/MalaService';
 import './Home.css';
 
 const Home: React.FC = () => {
+  const history = useHistory();
   const [nextUposatha, setNextUposatha] = useState<any>(null);
   const [stats, setStats] = useState({
     chantingStreak: 0,
@@ -67,7 +69,9 @@ const Home: React.FC = () => {
           {/* Primary Feature: Upcoming Uposatha */}
           <section>
             <div className="home-section-header">
-              <IonIcon icon={leafOutline} color="secondary" />
+              <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
+                <IonIcon icon={leafOutline} color="primary" />
+              </div>
               <h3 className="home-section-title">Current Observance</h3>
             </div>
             <NextUposathaWidget />
@@ -76,7 +80,9 @@ const Home: React.FC = () => {
           {/* New Audio Section */}
           <section>
             <div className="home-section-header">
-              <IonIcon icon={musicalNotesOutline} color="tertiary" />
+              <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
+                <IonIcon icon={musicalNotesOutline} color="primary" />
+              </div>
               <h3 className="home-section-title">Dhamma Inspiration</h3>
             </div>
             <DhammaAudioWidget />
@@ -85,16 +91,18 @@ const Home: React.FC = () => {
           {/* Stats Section */}
           <section>
             <div className="home-section-header">
-              <IonIcon icon={statsChartOutline} color="primary" />
+              <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
+                <IonIcon icon={statsChartOutline} color="primary" />
+              </div>
               <h3 className="home-section-title">Practice Summary</h3>
             </div>
 
             <div className="stats-grid">
-              <div className="glass-card stat-card">
+              <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')}>
                 <div className="stat-value">{stats.malaCount}</div>
                 <div className="stat-label">Total Beads</div>
               </div>
-              <div className="glass-card stat-card">
+              <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')}>
                 <div className="stat-value">{stats.chantingStreak}</div>
                 <div className="stat-label">Day Streak</div>
               </div>
@@ -107,17 +115,17 @@ const Home: React.FC = () => {
               <h3 className="home-section-title">Quick Actions</h3>
             </div>
             <div className="action-grid">
-              <div className="glass-card action-card-button" onClick={() => document.querySelector('ion-router-outlet')?.componentOnReady().then((el: any) => el.push('/sati'))}>
-                <div className="action-icon-wrapper" style={{ background: 'rgba(var(--ion-color-primary-rgb), 0.1)', borderColor: 'rgba(var(--ion-color-primary-rgb), 0.3)' }}>
+              <div className="glass-card action-card-button" onClick={() => history.push('/sati')}>
+                <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
                   <IonIcon icon={leafOutline} color="primary" />
                 </div>
                 <div className="action-label">Practice</div>
                 <div className="action-sublabel">Start Session</div>
               </div>
 
-              <div className="glass-card action-card-button" onClick={() => document.querySelector('ion-router-outlet')?.componentOnReady().then((el: any) => el.push('/calendar'))}>
-                <div className="action-icon-wrapper" style={{ background: 'rgba(var(--ion-color-secondary-rgb), 0.1)', borderColor: 'rgba(var(--ion-color-secondary-rgb), 0.3)' }}>
-                  <IonIcon icon={calendarOutline} color="secondary" />
+              <div className="glass-card action-card-button" onClick={() => history.push('/calendar')}>
+                <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
+                  <IonIcon icon={calendarOutline} color="primary" />
                 </div>
                 <div className="action-label">Calendar</div>
                 <div className="action-sublabel">View Dates</div>

@@ -27,7 +27,7 @@
 }
 
 .timeline-icon {
-    animation: silverGlow 4s infinite ease-in-out;
+    font-size: 1.2rem;
 }
 
 .timeline-title {
