@@ -53,6 +53,9 @@ debug_*.test.ts
 diagnose_*.ts
 verify_*.ts
 verify_*.test.ts
+android/build_output*.txt
+android/log_check.txt
+android/log_raw.txt
 
 # Capacitor/Cordova artifacts
 /www
