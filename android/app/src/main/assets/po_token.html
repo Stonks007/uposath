@@ -198,24 +198,13 @@
                 if (mintResult && typeof mintResult.then === 'function') {
                     console.log('[obtainPoToken] mintCallback returned a Promise, awaiting...');
                     result = await mintResult;
+                    console.log('[obtainPoToken] Promise resolved, result type: ' + typeof result);
                 } else {
                     result = mintResult;
                 }
             } catch (e) {
+                console.log('[obtainPoToken] mintCallback EXCEPTION: ' + e.message);
                 throw new Error('MNT:Failed - mintCallback() threw: ' + e.message);
-            }
-
-            if (!result) {
-                throw new Error('YNJ:Undefined - mint result is undefined');
-            }
-
-            if (!(result instanceof Uint8Array)) {
-                throw new Error('ODM:Invalid - result is not Uint8Array, got: ' + Object.prototype.toString.call(result));
-            }
-
-            // Validate token size (expected 110-128 bytes per BgUtils documentation)
-            if (result.length < 100 || result.length > 140) {
-                console.warn('[obtainPoToken] Token size ' + result.length + ' bytes may be outside expected range (110-128)');
             }
 
             return result;
@@ -223,6 +212,7 @@
     </script>
 </head>
 
-<body></body>
+<body>
+</body>
 
 </html>

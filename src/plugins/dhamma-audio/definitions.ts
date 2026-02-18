@@ -4,7 +4,7 @@ export interface DhammaAudioPlugin {
     searchChannel(options: { channelId: string; query: string }): Promise<VideoListResult>;
     search(options: { query: string }): Promise<VideoListResult>;
 
-    playVideo(options: { videoId: string }): Promise<{ success: boolean }>;
+    playVideo(options: { video: VideoInfo }): Promise<{ success: boolean }>;
     pause(): Promise<{ success: boolean }>;
     resume(): Promise<{ success: boolean }>;
     stop(): Promise<{ success: boolean }>;
@@ -30,7 +30,7 @@ export interface DhammaAudioPlugin {
     getPlaylistVideos(options: { playlistId: string }): Promise<{ videos: VideoInfo[] }>;
 
     addListener(eventName: 'playbackStateChanged', listenerFunc: (state: PlaybackState) => void): Promise<any>;
-    addListener(eventName: 'progressUpdate', listenerFunc: (data: { position: number }) => void): Promise<any>;
+    addListener(eventName: 'progressUpdate', listenerFunc: (data: { position: number, duration: number }) => void): Promise<any>;
 }
 
 export interface VideoInfo {

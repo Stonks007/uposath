@@ -79,19 +79,29 @@ class InnerTube {
 
     private fun HttpRequestBuilder.ytClient(client: YouTubeClient, setLogin: Boolean = false) {
         contentType(ContentType.Application.Json)
+        val isWeb = client.clientName.startsWith("WEB")
+        val isMusic = client.clientName == "WEB_REMIX" || client.clientName == "WEB"
+        
+        val origin = if (isMusic) YouTubeClient.ORIGIN_YOUTUBE_MUSIC else "https://www.youtube.com"
+        val referer = if (isMusic) YouTubeClient.REFERER_YOUTUBE_MUSIC else "https://www.youtube.com/"
+
         headers {
             append("X-Goog-Api-Format-Version", "1")
-            append("X-YouTube-Client-Name", client.clientId /* Not a typo. The Client-Name header does contain the client id. */)
+            append("X-YouTube-Client-Name", client.clientId)
             append("X-YouTube-Client-Version", client.clientVersion)
-            append("X-Origin", YouTubeClient.ORIGIN_YOUTUBE_MUSIC)
-            append("Referer", YouTubeClient.REFERER_YOUTUBE_MUSIC)
+            
+            if (isWeb) {
+                append("Origin", origin)
+                append("Referer", referer)
+            }
+            
             if (setLogin && client.loginSupported) {
                 cookie?.let { cookie ->
                     append("cookie", cookie)
                     if ("SAPISID" !in cookieMap) return@let
                     val currentTime = System.currentTimeMillis() / 1000
-                    val sapisidHash = sha1("$currentTime ${cookieMap["SAPISID"]} ${YouTubeClient.ORIGIN_YOUTUBE_MUSIC}")
-                    append("Authorization", "SAPISIDHASH ${currentTime}_${sapisidHash} SAPISID1PHASH ${currentTime}_${sapisidHash} SAPISID3PHASH ${currentTime}_${sapisidHash}")
+                    val sapisidHash = sha1("$currentTime ${cookieMap["SAPISID"]} $origin")
+                    append("Authorization", "SAPISIDHASH ${currentTime}_${sapisidHash}")
                 }
             }
         }
@@ -127,7 +137,7 @@ class InnerTube {
         playlistId: String?,
         signatureTimestamp: Int?,
         webPlayerPot: String?,
-    ) = httpClient.post("player") {
+    ) = httpClient.post(if (client.clientName.contains("ANDROID")) "https://www.youtube.com/youtubei/v1/player" else "player") {
         ytClient(client, setLogin = true)
         setBody(
             PlayerBody(

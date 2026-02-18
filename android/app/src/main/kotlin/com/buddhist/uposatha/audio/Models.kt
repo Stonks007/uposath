@@ -15,9 +15,9 @@ data class VideoInfo(
 )
 
 @Serializable
-data class ChannelResult(
+data class ChannelVideosResult(
     val videos: List<VideoInfo>,
-    val continuation: String? = null
+    val continuation: String?
 )
 
 @Serializable

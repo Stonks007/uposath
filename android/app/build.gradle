@@ -1,3 +1,4 @@
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -8,15 +9,6 @@ plugins {
 android {
     namespace = "com.buddhist.uposatha"
     compileSdk = rootProject.ext.compileSdkVersion
-
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-
-    buildFeatures {
-        buildConfig = true
-    }
-
     defaultConfig {
         applicationId = "com.buddhist.uposatha"
         minSdkVersion = rootProject.ext.minSdkVersion
@@ -35,6 +27,9 @@ android {
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true
@@ -79,8 +74,17 @@ dependencies {
     implementation "io.ktor:ktor-client-core:2.3.7"
     implementation "io.ktor:ktor-client-okhttp:2.3.7"
     implementation "io.ktor:ktor-client-content-negotiation:2.3.7"
-    implementation "io.ktor:ktor-client-encoding:2.3.7"
     implementation "io.ktor:ktor-serialization-kotlinx-json:2.3.7"
+    implementation "io.ktor:ktor-client-encoding:2.3.7"
+
+    // WebKit (for PoTokenWebView)
+    implementation "androidx.webkit:webkit:1.9.0"
+
+    // Ktor Encoding
+    implementation "io.ktor:ktor-client-encoding:2.3.7"
+
+    // NewPipe Extractor
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:v0.25.1'
 
     // Room Database
     implementation 'androidx.room:room-runtime:2.6.1'
@@ -88,10 +92,11 @@ dependencies {
     implementation 'androidx.room:room-ktx:2.6.1'
 
     // Media3 / ExoPlayer
-    implementation 'androidx.media3:media3-exoplayer:1.2.1'
-    implementation 'androidx.media3:media3-exoplayer-dash:1.2.1'
-    implementation 'androidx.media3:media3-session:1.2.1'
-    implementation 'androidx.media3:media3-ui:1.2.1'
+    implementation 'androidx.media3:media3-exoplayer:1.3.1'
+    implementation 'androidx.media3:media3-exoplayer-dash:1.3.1'
+    implementation 'androidx.media3:media3-datasource-okhttp:1.3.1'
+    implementation 'androidx.media3:media3-session:1.3.1'
+    implementation 'androidx.media3:media3-ui:1.3.1'
 
     // OkHttp
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -105,10 +110,8 @@ dependencies {
     // Okio (for base64)
     implementation "com.squareup.okio:okio:3.6.0"
 
-    // NewPipeExtractor (used as a utility for InnerTube signature deciphering)
-    implementation 'com.github.teamnewpipe:NewPipeExtractor:0.24.8'
+    // Annotations (needed for NewPipeExtractor)
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'androidx.webkit:webkit:1.10.0'
 }
 
 apply from: 'capacitor.build.gradle'

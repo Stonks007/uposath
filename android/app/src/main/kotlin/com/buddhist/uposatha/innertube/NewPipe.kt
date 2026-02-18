@@ -1,5 +1,6 @@
 package com.buddhist.uposatha.innertube
 
+import android.util.Log
 import com.buddhist.uposatha.innertube.models.YouTubeClient
 import com.buddhist.uposatha.innertube.models.response.PlayerResponse
 import io.ktor.http.URLBuilder
@@ -29,6 +30,8 @@ private class NewPipeDownloaderImpl(proxy: Proxy?) : Downloader() {
         val headers = request.headers()
         val dataToSend = request.dataToSend()
 
+        Log.d("NewPipeDownloader", "Fetching ($httpMethod): $url")
+
         val requestBuilder = okhttp3.Request.Builder()
             .method(httpMethod, dataToSend?.toRequestBody())
             .url(url)
@@ -46,6 +49,7 @@ private class NewPipeDownloaderImpl(proxy: Proxy?) : Downloader() {
         }
 
         val response = client.newCall(requestBuilder.build()).execute()
+        Log.d("NewPipeDownloader", "Response [${response.code}] for $url")
 
         if (response.code == 429) {
             response.close()
@@ -89,10 +93,15 @@ object NewPipeUtils {
                 url.toString()
             } ?: throw ParsingException("Could not find format url")
 
-            return@runCatching YoutubeJavaScriptPlayerManager.getUrlWithThrottlingParameterDeobfuscated(
-                videoId,
-                url
-            )
+            try {
+                return@runCatching YoutubeJavaScriptPlayerManager.getUrlWithThrottlingParameterDeobfuscated(
+                    videoId,
+                    url
+                )
+            } catch (e: Exception) {
+                Log.w("NewPipeUtils", "Throttling deobfuscation failed for $videoId, using original URL", e)
+                return@runCatching url
+            }
         }
 
 }

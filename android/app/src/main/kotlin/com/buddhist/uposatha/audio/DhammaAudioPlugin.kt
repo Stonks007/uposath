@@ -17,10 +17,11 @@ class DhammaAudioPlugin : Plugin() {
     @PluginMethod
     fun search(call: PluginCall) {
         val query = call.getString("query") ?: return call.reject("Missing query")
+        Log.d("DhammaAudio", "Plugin Search called for query: $query")
         scope.launch {
-            youtube.search(query).onSuccess { items ->
+            youtube.search(query).onSuccess { items: List<VideoInfo> ->
                 val ret = JSArray()
-                items.forEach { video ->
+                items.forEach { video: VideoInfo ->
                     ret.put(JSObject().apply {
                         put("id", video.videoId)
                         put("title", video.title)
@@ -60,9 +61,9 @@ class DhammaAudioPlugin : Plugin() {
                     }
                 }
                 notifyListeners("playbackStateChanged", ret)
-                notifyListeners("positionChanged", JSObject().apply {
-                    put("position", state.position / 1000)
-                    put("duration", state.duration / 1000)
+                notifyListeners("progressUpdate", JSObject().apply {
+                    put("position", state.position)
+                    put("duration", state.duration)
                 })
             }
             .launchIn(scope)
@@ -72,10 +73,11 @@ class DhammaAudioPlugin : Plugin() {
     fun getChannelVideos(call: PluginCall) {
         val channelId = call.getString("channelId") ?: return call.reject("Missing channelId")
         val continuation = call.getString("continuation")
+        Log.d("DhammaAudio", "Plugin getChannelVideos called for channelId: $channelId, continuation: $continuation")
         scope.launch {
-            youtube.getChannelVideos(channelId, continuation).onSuccess { result ->
+            youtube.getChannelVideos(channelId, continuation).onSuccess { result: ChannelVideosResult ->
                 val videos = JSArray()
-                result.videos.forEach { video ->
+                result.videos.forEach { video: VideoInfo ->
                     videos.put(JSObject().apply {
                         put("id", video.videoId)
                         put("title", video.title)
@@ -98,15 +100,29 @@ class DhammaAudioPlugin : Plugin() {
 
     @PluginMethod
     fun playVideo(call: PluginCall) {
-        val videoId = call.getString("videoId") ?: return call.reject("Missing videoId")
+        val videoObj = call.getObject("video") ?: return call.reject("Missing video object")
+        Log.d("DhammaAudio", "Plugin playVideo called: $videoObj")
+        val videoId = videoObj.getString("id") ?: return call.reject("Missing video id")
+        val title = videoObj.getString("title") ?: ""
+        val channelName = videoObj.getString("channelName") ?: ""
+        val channelId = videoObj.getString("channelId") ?: ""
+        val duration = videoObj.getString("duration") ?: "0"
+        val thumbnailUrl = videoObj.getString("thumbnailUrl") ?: ""
+        
+        val videoIn = VideoInfo(
+            videoId = videoId,
+            title = title,
+            channelName = channelName,
+            channelId = channelId,
+            duration = duration,
+            thumbnailUrl = thumbnailUrl
+        )
+
         val startPosition = call.getLong("startPosition") ?: 0L
         
-        scope.launch {
-            youtube.getAudioStream(videoId).onSuccess { url ->
-                playerManager.play(videoId, startPosition * 1000, url) // Assuming play takes url now?
-                call.resolve()
-            }.onFailure { call.reject(it.message) }
-        }
+        playerManager.prepare(videoIn)
+        playerManager.play(videoIn, startPosition, "urn:youtube:$videoId")
+        call.resolve()
     }
 
     @PluginMethod
@@ -124,7 +140,7 @@ class DhammaAudioPlugin : Plugin() {
     @PluginMethod
     fun seekTo(call: PluginCall) {
         val position = call.getLong("position") ?: return call.reject("Missing position")
-        playerManager.seekTo(position * 1000)
+        playerManager.seekTo(position)
         call.resolve()
     }
 
@@ -136,13 +152,24 @@ class DhammaAudioPlugin : Plugin() {
     }
 
     @PluginMethod
-    fun getPlayerState(call: PluginCall) {
+    fun getPlaybackState(call: PluginCall) {
         val state = playerManager.getPlayerState()
         call.resolve(JSObject().apply {
-            put("state", state.state.name)
-            put("position", state.position / 1000)
-            put("duration", state.duration / 1000)
-            put("speed", state.speed)
+            put("isPlaying", state.state == PlayerState.PLAYING)
+            put("isPaused", state.state == PlayerState.PAUSED)
+            put("position", state.position)
+            put("duration", state.duration)
+            state.currentVideo?.let { video ->
+                put("currentVideo", JSObject().apply {
+                    put("id", video.videoId)
+                    put("title", video.title)
+                    put("channelName", video.channelName)
+                    put("channelId", video.channelId)
+                    put("thumbnailUrl", video.thumbnailUrl)
+                })
+            }
+            put("queue", JSArray()) // Simplified for now
+            put("currentIndex", 0)
         })
     }
 }

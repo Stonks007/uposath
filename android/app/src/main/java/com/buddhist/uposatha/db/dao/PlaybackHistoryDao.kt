@@ -10,6 +10,7 @@ interface PlaybackHistoryDao {
     fun insertHistory(history: PlaybackHistory)
 
     @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query("SELECT h.*, v.* FROM playback_history h INNER JOIN videos v ON h.videoId = v.videoId ORDER BY h.playedAt DESC LIMIT :limit")
     fun getRecentHistory(limit: Int): List<PlaybackHistoryWithVideo>
 

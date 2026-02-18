@@ -71,8 +71,8 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
         };
     }
 
-    async playVideo(options: { videoId: string }): Promise<{ success: boolean }> {
-        this.currentVideo = this.mockVideos.find(v => v.id === options.videoId) || null;
+    async playVideo(options: { video: VideoInfo }): Promise<{ success: boolean }> {
+        this.currentVideo = options.video;
         this.isPlaying = true;
         this.position = 0;
         this.startMockPlayback();

@@ -20,6 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+## Rules for NewPipeExtractor (REQUIRED)
+-keep class org.mozilla.javascript.** { *; }
+-keep class org.mozilla.classfile.ClassFileWriter
+-dontwarn org.mozilla.javascript.tools.**
+
 ## Rules for Gson
 -keepattributes Signature
 -keepattributes *Annotation*

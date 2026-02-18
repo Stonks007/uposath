@@ -224,6 +224,7 @@ object YouTube {
 
     suspend fun artist(browseId: String): Result<ArtistPage> = runCatching {
         val response = innerTube.browse(WEB_REMIX, browseId).body<BrowseResponse>()
+        response.responseContext?.visitorData?.let { visitorData = it }
 
         ArtistPage(
             artist = ArtistItem(
@@ -664,7 +665,7 @@ object YouTube {
 
     suspend fun player(videoId: String, playlistId: String? = null, client: YouTubeClient, signatureTimestamp: Int? = null, webPlayerPot: String? = null): Result<PlayerResponse> = runCatching {
         innerTube.player(client, videoId, playlistId, signatureTimestamp, webPlayerPot).body<PlayerResponse>()
-    }
+    }.onSuccess { it.responseContext?.visitorData?.let { visitorData = it } }
 
     suspend fun registerPlayback(playlistId: String? = null, playbackTracking: String) = runCatching {
         val cpn = (1..16).map {

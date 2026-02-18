@@ -35,7 +35,7 @@ const DhammaAudioWidget: React.FC = () => {
         });
 
         const progressListener = DhammaAudio.addListener('progressUpdate', (data) => {
-            setPlaybackState(prev => prev ? { ...prev, position: data.position } : null);
+            setPlaybackState(prev => prev ? { ...prev, position: data.position, duration: data.duration } : null);
         });
 
         return () => {

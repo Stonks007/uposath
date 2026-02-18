@@ -11,7 +11,9 @@ import com.buddhist.uposatha.innertube.models.YTItem
 import com.buddhist.uposatha.innertube.models.oddElements
 import com.buddhist.uposatha.innertube.models.splitBySeparator
 import com.buddhist.uposatha.innertube.utils.parseTime
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ArtistItemsPage(
     val title: String,
     val items: List<YTItem>,

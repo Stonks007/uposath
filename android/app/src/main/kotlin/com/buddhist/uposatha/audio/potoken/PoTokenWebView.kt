@@ -53,6 +53,7 @@ class PoTokenWebView private constructor(
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(m: ConsoleMessage): Boolean {
+                Log.d("PoTokenWebViewJS", "[${m.messageLevel()}] ${m.message()} (${m.sourceId()}:${m.lineNumber()})")
                 if (m.message().contains("Uncaught")) {
                     val fmt = "\"${m.message()}\", source: ${m.sourceId()} (${m.lineNumber()})"
                     val exception = BadWebViewException(fmt)
@@ -61,7 +62,7 @@ class PoTokenWebView private constructor(
                     onInitializationErrorCloseAndCancel(exception)
                     popAllPoTokenContinuations().forEach { (_, cont) -> cont.resumeWithException(exception) }
                 }
-                return super.onConsoleMessage(m)
+                return true
             }
         }
     }
@@ -82,19 +83,22 @@ class PoTokenWebView private constructor(
 
     @JavascriptInterface
     fun downloadAndRunBotguard() {
-        Log.d(TAG, "downloadAndRunBotguard() called")
+        Log.i(TAG, "downloadAndRunBotguard() called")
 
         makeBotguardServiceRequest(
             "https://www.youtube.com/api/jnn/v1/Create",
             "[ \"$REQUEST_KEY\" ]",
         ) { responseBody ->
+            Log.i(TAG, "Create response received")
             val parsedChallengeData = parseChallengeData(responseBody)
+            Log.d(TAG, "Evaluating runBotGuard JS...")
             webView.post {
+               Log.d(TAG, "Posting evaluateJavascript to Main thread...")
                webView.evaluateJavascript(
                 """try {
                     data = $parsedChallengeData
                     runBotGuard(data).then(function (result) {
-                        this.webPoSignalOutput = result.webPoSignalOutput
+                        window.webPoSignalOutput = result.webPoSignalOutput
                         $JS_INTERFACE.onRunBotguardResult(result.botguardResponse)
                     }, function (error) {
                         $JS_INTERFACE.onJsInitializationError(error + "\n" + error.stack)
@@ -118,41 +122,56 @@ class PoTokenWebView private constructor(
 
     @JavascriptInterface
     fun onRunBotguardResult(botguardResponse: String) {
-        Log.d(TAG, "botguardResponse: $botguardResponse")
+        Log.i(TAG, "onRunBotguardResult received")
         makeBotguardServiceRequest(
             "https://www.youtube.com/api/jnn/v1/GenerateIT",
             "[ \"$REQUEST_KEY\", \"$botguardResponse\" ]",
         ) { responseBody ->
-            Log.d(TAG, "GenerateIT response: $responseBody")
+            Log.i(TAG, "GenerateIT response received")
             val (integrityToken, expirationTimeInSeconds) = parseIntegrityTokenData(responseBody)
 
             // leave 10 minutes of margin just to be sure
             expirationInstant = Instant.now().plusSeconds(expirationTimeInSeconds).minus(10, ChronoUnit.MINUTES)
 
             webView.post {
-                webView.evaluateJavascript("this.integrityToken = $integrityToken") {
-                    Log.d(TAG, "initialization finished, expiration=${expirationTimeInSeconds}s")
-                    continuation.resume(this)
-                }
+                webView.evaluateJavascript(
+                    """(async () => {
+                        try {
+                            window.integrityToken = $integrityToken
+                            await createPoTokenMinter(window.webPoSignalOutput, window.integrityToken)
+                            $JS_INTERFACE.onMinterCreated()
+                        } catch (error) {
+                            $JS_INTERFACE.onJsInitializationError(error + "\n" + error.stack)
+                        }
+                    })()"""
+                , null)
             }
         }
+    }
+
+    @JavascriptInterface
+    fun onMinterCreated() {
+        Log.i(TAG, "initialization finished")
+        continuation.resume(this)
     }
 
     suspend fun generatePoToken(identifier: String): String {
         return withContext(Dispatchers.Main) {
             suspendCancellableCoroutine { cont ->
-                Log.d(TAG, "generatePoToken() called with identifier $identifier")
+                Log.i(TAG, "generatePoToken() called with identifier $identifier")
                 addPoTokenEmitter(identifier, cont)
                 webView.evaluateJavascript(
-                    """try {
-                        identifier = "$identifier"
-                        u8Identifier = ${stringToU8(identifier)}
-                        poTokenU8 = obtainPoToken(webPoSignalOutput, integrityToken, u8Identifier)
-                        poTokenU8String = poTokenU8.join(",")
-                        $JS_INTERFACE.onObtainPoTokenResult(identifier, poTokenU8String)
-                    } catch (error) {
-                        $JS_INTERFACE.onObtainPoTokenError(identifier, error + "\n" + error.stack)
-                    }""",
+                    """(async () => {
+                        try {
+                            identifier = "$identifier"
+                            u8Identifier = ${stringToU8(identifier)}
+                            poTokenU8 = await obtainPoToken(u8Identifier)
+                            poTokenU8String = poTokenU8.join(",")
+                            $JS_INTERFACE.onObtainPoTokenResult(identifier, poTokenU8String)
+                        } catch (error) {
+                            $JS_INTERFACE.onObtainPoTokenError(identifier, error + "\n" + error.stack)
+                        }
+                    })()""",
                     null
                 )
             }
@@ -203,6 +222,7 @@ class PoTokenWebView private constructor(
         data: String,
         handleResponseBody: (String) -> Unit,
     ) {
+        Log.i(TAG, "Requesting: $url")
         scope.launch(exceptionHandler) {
             val requestBuilder = okhttp3.Request.Builder()
                 .post(data.toRequestBody())
@@ -218,6 +238,7 @@ class PoTokenWebView private constructor(
                 httpClient.newCall(requestBuilder.build()).execute()
             }
             val httpCode = response.code
+            Log.i(TAG, "Response from $url: $httpCode")
             if (httpCode != 200) {
                 onInitializationErrorCloseAndCancel(PoTokenException("Invalid response code: $httpCode"))
             } else {
@@ -256,6 +277,8 @@ class PoTokenWebView private constructor(
         private const val JS_INTERFACE = "PoTokenWebView"
 
         private val httpClient = OkHttpClient().newBuilder()
+            .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
             .proxy(YouTube.proxy)
             .build()
 

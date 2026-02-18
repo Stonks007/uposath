@@ -25,8 +25,8 @@ const AudioLibraryPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
 
-    // Pañcasikha Channel ID URL (Encoded for character safety)
-    const PANCASIKHA_CHANNEL_URL = 'https://www.youtube.com/@Pa%C3%B1casikha-358';
+    // Pañcasikha Channel ID (browseId)
+    const PANCASIKHA_CHANNEL_ID = 'UC0ypu1lL-Srd4O7XHjtIQrg';
 
     useEffect(() => {
         loadVideos();
@@ -36,10 +36,11 @@ const AudioLibraryPage: React.FC = () => {
         try {
             setLoading(true);
             const result = await DhammaAudio.getChannelVideos({
-                channelId: PANCASIKHA_CHANNEL_URL,
+                channelId: PANCASIKHA_CHANNEL_ID,
                 page: 1
             });
             setVideos(result.videos);
+            console.log(`Successfully loaded ${result.videos.length} videos from channel`);
             setLoading(false);
         } catch (err) {
             console.error('Failed to load videos:', err);
@@ -65,7 +66,7 @@ const AudioLibraryPage: React.FC = () => {
     };
 
     const playVideo = (video: VideoInfo) => {
-        DhammaAudio.playVideo({ videoId: video.id });
+        DhammaAudio.playVideo({ video });
         history.push('/player');
     };
 

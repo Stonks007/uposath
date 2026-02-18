@@ -24,12 +24,29 @@ import { DhammaAudio, PlaybackState } from '../plugins/dhamma-audio';
 
 const AudioPlayerPage: React.FC = () => {
     const [playerState, setPlayerState] = useState<PlaybackState | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragPosition, setDragPosition] = useState(0);
 
     useEffect(() => {
         loadState();
-        const interval = setInterval(loadState, 1000);
-        return () => clearInterval(interval);
-    }, []);
+
+        // Listen for overall state changes
+        const stateListener = DhammaAudio.addListener('playbackStateChanged', (state) => {
+            setPlayerState(prev => prev ? { ...state, position: prev.position } : state);
+        });
+
+        // Listen for granular progress updates (ms)
+        const progressListener = DhammaAudio.addListener('progressUpdate', (data) => {
+            if (!isDragging) {
+                setPlayerState(prev => prev ? { ...prev, position: data.position, duration: data.duration } : null);
+            }
+        });
+
+        return () => {
+            stateListener.then(l => l.remove());
+            progressListener.then(l => l.remove());
+        };
+    }, [isDragging]);
 
     const loadState = async () => {
         try {
@@ -40,6 +57,13 @@ const AudioPlayerPage: React.FC = () => {
         }
     };
 
+    const handleSeek = async (value: number) => {
+        setPlayerState(prev => prev ? { ...prev, position: value } : null);
+        await DhammaAudio.seekTo({ position: value });
+        // Briefly keep isDragging true to avoid immediate snap-back from native state sync
+        setTimeout(() => setIsDragging(false), 500);
+    };
+
     const togglePlay = async () => {
         if (!playerState) return;
         if (playerState.isPlaying) {
@@ -47,7 +71,6 @@ const AudioPlayerPage: React.FC = () => {
         } else {
             await DhammaAudio.resume();
         }
-        loadState();
     };
 
     const formatTime = (ms: number) => {
@@ -102,13 +125,15 @@ const AudioPlayerPage: React.FC = () => {
 
                     <div style={{ marginTop: '30px' }}>
                         <IonRange
-                            value={position}
+                            value={isDragging ? dragPosition : position}
                             max={duration}
-                            onIonChange={(e: any) => DhammaAudio.seekTo({ position: e.detail.value as number })}
+                            onIonKnobMoveStart={() => setIsDragging(true)}
+                            onIonInput={(e: any) => setDragPosition(e.detail.value as number)}
+                            onIonKnobMoveEnd={(e: any) => handleSeek(e.detail.value as number)}
                             className="player-range"
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 15px' }}>
-                            <IonText color="medium">{formatTime(position)}</IonText>
+                            <IonText color="medium">{formatTime(isDragging ? dragPosition : position)}</IonText>
                             <IonText color="medium">{formatTime(duration)}</IonText>
                         </div>
                     </div>

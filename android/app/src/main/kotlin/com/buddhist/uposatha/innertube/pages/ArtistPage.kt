@@ -13,15 +13,20 @@ import com.buddhist.uposatha.innertube.models.PlaylistItem
 import com.buddhist.uposatha.innertube.models.SectionListRenderer
 import com.buddhist.uposatha.innertube.models.SongItem
 import com.buddhist.uposatha.innertube.models.YTItem
+import com.buddhist.uposatha.innertube.models.getContinuation
 import com.buddhist.uposatha.innertube.models.getItems
 import com.buddhist.uposatha.innertube.models.oddElements
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ArtistSection(
     val title: String,
     val items: List<YTItem>,
     val moreEndpoint: BrowseEndpoint?,
+    val continuation: String? = null
 )
 
+@Serializable
 data class ArtistPage(
     val artist: ArtistItem,
     val sections: List<ArtistSection>,
@@ -42,7 +47,8 @@ data class ArtistPage(
                 items = renderer.contents?.getItems()?.mapNotNull {
                     fromMusicResponsiveListItemRenderer(it)
                 }?.ifEmpty { null } ?: return null,
-                moreEndpoint = renderer.title?.runs?.firstOrNull()?.navigationEndpoint?.browseEndpoint
+                moreEndpoint = renderer.title?.runs?.firstOrNull()?.navigationEndpoint?.browseEndpoint,
+                continuation = renderer.continuations?.getContinuation()
             )
         }
 
@@ -54,7 +60,8 @@ data class ArtistPage(
                         fromMusicTwoRowItemRenderer(renderer)
                     }
                 }.ifEmpty { null } ?: return null,
-                moreEndpoint = renderer.header.musicCarouselShelfBasicHeaderRenderer.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
+                moreEndpoint = renderer.header.musicCarouselShelfBasicHeaderRenderer.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint,
+                continuation = null
             )
         }
 
