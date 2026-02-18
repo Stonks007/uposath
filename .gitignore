@@ -68,7 +68,9 @@ android/app/src/main/assets/capacitor.config.json
 **/local.properties
 **/build/
 **/.gradle/
+**/.gradle_home/
 .gradle/
+.gradle_home/
 build/
 bin/
 gen/
