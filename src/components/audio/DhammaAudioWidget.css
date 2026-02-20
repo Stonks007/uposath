@@ -1,19 +1,17 @@
 .audio-widget {
   margin: 0;
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.2s ease;
-  user-select: none;
-}
-
-.audio-widget:active {
-  transform: scale(0.98);
-}
-
-.audio-widget.playing,
-.audio-widget.empty.has-featured {
+  border: none;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  min-height: 100px;
+  overflow: hidden;
+  /* Inherits glass-card: background, backdrop-filter, border-radius, border, box-shadow */
+}
+
+/* Playing or Featured state refinements */
+.audio-widget.playing,
+.audio-widget.has-featured {
+  min-height: 120px;
 }
 
 .audio-widget__artwork {
@@ -24,8 +22,15 @@
   bottom: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(20px) brightness(0.7);
-  opacity: 0.3;
+  filter: blur(15px) saturate(1.4) brightness(0.4);
+  opacity: 0.35;
+  transition: opacity 0.5s ease, transform 0.5s var(--transition-base);
+  z-index: 0;
+}
+
+.audio-widget:hover .audio-widget__artwork {
+  transform: scale(1.08);
+  opacity: 0.45;
 }
 
 .audio-widget__overlay {
@@ -34,81 +39,167 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, transparent, rgba(var(--ion-color-step-50-rgb), 0.8));
+  background: linear-gradient(135deg, rgba(var(--ion-background-color-rgb), 0.2) 0%, rgba(var(--ion-background-color-rgb), 0.85) 100%);
+  z-index: 1;
+}
+
+.audio-widget ion-card-content {
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+  height: 100%;
 }
 
 .audio-widget__content {
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
+  gap: 16px;
 }
 
 .audio-widget__info {
   flex: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .audio-widget__title {
   display: block;
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-family-display);
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  letter-spacing: -0.01em;
 }
 
 .audio-widget__subtitle {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-primary);
+  filter: brightness(0.9);
 }
 
 .audio-widget__controls {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
 }
 
+/* 
+   SURGICAL OVERRIDE FOR PLAY BUTTON
+   We target the native part directly to kill the black artifact.
+*/
 .play-button {
-  --padding-start: 0;
-  --padding-end: 0;
-  width: 44px;
-  height: 44px;
+  --padding-start: 0 !important;
+  --padding-end: 0 !important;
+  --border-radius: 50% !important;
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  color: var(--color-accent-primary);
+}
+
+.play-button.primary-button {
+  color: var(--color-bg-primary);
+}
+
+.play-button::part(native) {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: inherit;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--transition-spring);
+}
+
+.play-button.primary-button::part(native) {
+  background: var(--color-accent-primary);
+  border: none;
+  color: inherit;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Remove the hover background artifact from Ionic */
+.play-button::part(native)::after {
+  display: none !important;
+}
+
+.play-button ion-icon {
+  font-size: 2.2rem !important;
   margin: 0;
-  font-size: 1.5rem;
+}
+
+.play-button:active {
+  transform: scale(0.92);
+}
+
+.audio-widget__footer {
+  margin-top: 16px;
+  position: relative;
 }
 
 .audio-widget__progress {
-  margin-top: 12px;
-  height: 3px;
-  border-radius: 2px;
-  --buffer-background: rgba(var(--ion-color-primary-rgb), 0.1);
-}
-
-.audio-widget__empty-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
-}
-
-.audio-widget__empty-info {
-  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  --progress-background: var(--color-accent-primary);
+  --buffer-background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .audio-widget__arrow {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.audio-widget:hover .audio-widget__arrow {
+  transform: translateX(4px);
+  color: var(--color-text-secondary);
 }
 
 .audio-widget-skeleton {
-  height: 80px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border-radius: 16px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-backdrop);
+}
+
+.spinner-small {
+  width: 28px;
+  height: 28px;
+  --color: currentColor !important;
+}
+
+/* Empty state info tweak */
+.audio-widget.empty:not(.has-featured) {
+  padding: 12px 0;
+}
+
+.audio-widget.empty:not(.has-featured) .audio-widget__content {
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
 }

@@ -11,11 +11,8 @@ import {
 import {
     play,
     pause,
-    playSkipForward,
-    playSkipBack,
     musicalNotes,
-    chevronForward,
-    alertCircle
+    chevronForward
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { DhammaAudio, VideoInfo, PlaybackState } from '../../plugins/dhamma-audio';
@@ -46,13 +43,14 @@ const DhammaAudioWidget: React.FC = () => {
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
     const [featuredVideo, setFeaturedVideo] = useState<VideoInfo | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isToggling, setIsToggling] = useState(false);
 
     useEffect(() => {
         loadState();
 
         const stateListener = DhammaAudio.addListener('playbackStateChanged', (state) => {
             setPlaybackState(state);
+            setIsToggling(false);
         });
 
         const progressListener = DhammaAudio.addListener('progressUpdate', (data) => {
@@ -75,7 +73,6 @@ const DhammaAudioWidget: React.FC = () => {
                 const defChannel = await getDefaultChannel();
                 if (defChannel) {
                     const result = await DhammaAudio.getChannelPage({ channelId: defChannel.id });
-                    // Try to find the first video in the first section (usually Home or Videos)
                     const firstVideo = result.sections?.[0]?.videos?.[0];
                     if (firstVideo) {
                         setFeaturedVideo(firstVideo);
@@ -92,6 +89,7 @@ const DhammaAudioWidget: React.FC = () => {
     const startFeaturedPlay = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (featuredVideo) {
+            setIsToggling(true);
             await DhammaAudio.playVideo({ video: featuredVideo });
             history.push('/player');
         }
@@ -99,8 +97,9 @@ const DhammaAudioWidget: React.FC = () => {
 
     const togglePlay = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!playbackState) return;
+        if (!playbackState || isToggling) return;
 
+        setIsToggling(true);
         if (playbackState.isPlaying) {
             await DhammaAudio.pause();
         } else {
@@ -142,37 +141,50 @@ const DhammaAudioWidget: React.FC = () => {
                         </div>
                         <div className="audio-widget__controls">
                             <IonButton fill="clear" onClick={togglePlay} className="play-button">
-                                <IonIcon icon={isPlaying ? pause : play} />
+                                {isToggling ? (
+                                    <IonSpinner name="crescent" className="spinner-small" />
+                                ) : (
+                                    <IonIcon icon={isPlaying ? pause : play} />
+                                )}
                             </IonButton>
                         </div>
                     </div>
-                    <IonProgressBar value={progress} color="primary" className="audio-widget__progress" />
+                    <div className="audio-widget__footer">
+                        <IonProgressBar value={progress} color="primary" className="audio-widget__progress" />
+                    </div>
                 </IonCardContent>
             </IonCard>
         );
     }
 
     return (
-        <IonCard className={`audio-widget empty glass-card ${featuredVideo ? 'has-featured' : ''}`} onClick={openLibrary}>
+        <IonCard className={`audio-widget empty glass-card ${featuredVideo ? 'has-featured' : ''}`} onClick={featuredVideo ? openPlayer : openLibrary}>
             {featuredVideo && (
                 <div className="audio-widget__artwork" style={{ backgroundImage: `url(${featuredVideo.thumbnailUrl})` }}>
                     <div className="audio-widget__overlay"></div>
                 </div>
             )}
             <IonCardContent>
-                <div className="audio-widget__empty-content">
-                    {!featuredVideo ? (
-                        <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
-                            <IonIcon icon={musicalNotes} color="primary" />
-                        </div>
-                    ) : (
+                <div className="audio-widget__content">
+                    {featuredVideo && (
                         <div className="audio-widget__controls">
-                            <IonButton fill="clear" onClick={startFeaturedPlay} className="play-button">
-                                <IonIcon icon={play} />
+                            <IonButton fill="clear" onClick={startFeaturedPlay} className="play-button primary-button">
+                                {isToggling ? (
+                                    <IonSpinner name="crescent" className="spinner-small" />
+                                ) : (
+                                    <IonIcon icon={play} />
+                                )}
                             </IonButton>
                         </div>
                     )}
-                    <div className="audio-widget__empty-info">
+
+                    {!featuredVideo && (
+                        <div className="icon-wrapper icon-wrapper--medium icon-wrapper--primary">
+                            <IonIcon icon={musicalNotes} color="primary" />
+                        </div>
+                    )}
+
+                    <div className="audio-widget__info">
                         <IonText className="audio-widget__title">
                             {featuredVideo ? decodeTitle(featuredVideo.title) : 'DHAMMA AUDIO'}
                         </IonText>
@@ -180,6 +192,7 @@ const DhammaAudioWidget: React.FC = () => {
                             {featuredVideo ? featuredVideo.channelName : 'Recent uploads from Pañcasikha'}
                         </IonText>
                     </div>
+
                     <IonIcon icon={chevronForward} color="medium" className="audio-widget__arrow" />
                 </div>
             </IonCardContent>
