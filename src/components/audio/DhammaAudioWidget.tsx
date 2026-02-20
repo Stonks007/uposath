@@ -19,11 +19,32 @@ import {
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { DhammaAudio, VideoInfo, PlaybackState } from '../../plugins/dhamma-audio';
+import { getDefaultChannel } from '../../services/channelManager';
 import './DhammaAudioWidget.css';
+
+const decodeTitle = (text: string): string => {
+    if (!text) return '';
+    try {
+        return text
+            .replace(/\\u0026/g, '&')
+            .replace(/\\u003c/g, '<')
+            .replace(/\\u003e/g, '>')
+            .replace(/\\u0022/g, '"')
+            .replace(/\\u0027/g, "'")
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+    } catch {
+        return text;
+    }
+};
 
 const DhammaAudioWidget: React.FC = () => {
     const history = useHistory();
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
+    const [featuredVideo, setFeaturedVideo] = useState<VideoInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -48,11 +69,31 @@ const DhammaAudioWidget: React.FC = () => {
         try {
             const state = await DhammaAudio.getPlaybackState();
             setPlaybackState(state);
+
+            // If nothing is playing, find a featured video from default channel
+            if (!state.currentVideo) {
+                const defChannel = await getDefaultChannel();
+                if (defChannel) {
+                    const result = await DhammaAudio.getChannelPage({ channelId: defChannel.id });
+                    // Try to find the first video in the first section (usually Home or Videos)
+                    const firstVideo = result.sections?.[0]?.videos?.[0];
+                    if (firstVideo) {
+                        setFeaturedVideo(firstVideo);
+                    }
+                }
+            }
             setLoading(false);
         } catch (err) {
-            console.error('Failed to load playback state:', err);
-            // If plugin not found or error, it might be in an empty state
+            console.error('Failed to load playback state or featured content:', err);
             setLoading(false);
+        }
+    };
+
+    const startFeaturedPlay = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (featuredVideo) {
+            await DhammaAudio.playVideo({ video: featuredVideo });
+            history.push('/player');
         }
     };
 
@@ -112,15 +153,32 @@ const DhammaAudioWidget: React.FC = () => {
     }
 
     return (
-        <IonCard className="audio-widget empty glass-card" onClick={openLibrary}>
+        <IonCard className={`audio-widget empty glass-card ${featuredVideo ? 'has-featured' : ''}`} onClick={openLibrary}>
+            {featuredVideo && (
+                <div className="audio-widget__artwork" style={{ backgroundImage: `url(${featuredVideo.thumbnailUrl})` }}>
+                    <div className="audio-widget__overlay"></div>
+                </div>
+            )}
             <IonCardContent>
                 <div className="audio-widget__empty-content">
-                    <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
-                        <IonIcon icon={musicalNotes} color="primary" />
-                    </div>
+                    {!featuredVideo ? (
+                        <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
+                            <IonIcon icon={musicalNotes} color="primary" />
+                        </div>
+                    ) : (
+                        <div className="audio-widget__controls">
+                            <IonButton fill="clear" onClick={startFeaturedPlay} className="play-button">
+                                <IonIcon icon={play} />
+                            </IonButton>
+                        </div>
+                    )}
                     <div className="audio-widget__empty-info">
-                        <IonText className="audio-widget__title">DHAMMA AUDIO</IonText>
-                        <IonText color="medium" className="audio-widget__subtitle">Recent uploads from Pañcasikha</IonText>
+                        <IonText className="audio-widget__title">
+                            {featuredVideo ? decodeTitle(featuredVideo.title) : 'DHAMMA AUDIO'}
+                        </IonText>
+                        <IonText color="medium" className="audio-widget__subtitle">
+                            {featuredVideo ? featuredVideo.channelName : 'Recent uploads from Pañcasikha'}
+                        </IonText>
                     </div>
                     <IonIcon icon={chevronForward} color="medium" className="audio-widget__arrow" />
                 </div>

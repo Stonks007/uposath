@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonButtons, IonButton,
     IonTitle, IonContent, IonIcon, useIonAlert,
@@ -100,17 +100,11 @@ const MantraPracticePage: React.FC = () => {
         await loadData(); // Refresh stats and history
     };
 
-    const handleComplete = async () => {
-        setSessionState('completed');
-        if (bellEnabled) {
-            console.log('🔔 Ding!');
-            // Play sound?
-        }
-        await saveSession();
-    };
-
-    const saveSession = async () => {
-        if (!mantra) return;
+    const isCompletedRef = useRef(false);
+    const isSaving = useRef(false);
+    const saveSessionInternal = useCallback(async () => {
+        if (!mantra || isSaving.current) return;
+        isSaving.current = true;
 
         const durationMinutes = Math.ceil(elapsedSeconds / 60);
         const session: MantraSession = {
@@ -122,25 +116,50 @@ const MantraPracticePage: React.FC = () => {
             completed: count >= mantra.practice.defaultReps
         };
 
-        await MantraService.saveSession(session);
+        try {
+            await MantraService.saveSession(session);
+            await loadData(); // Refresh stats
 
-        await loadData(); // Refresh stats
-
-        presentAlert({
-            header: 'Session Complete',
-            subHeader: `${count} repetitions`,
-            message: `Duration: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`,
-            buttons: [
-                {
-                    text: 'Done',
-                    role: 'confirm',
-                    handler: () => {
-                        history.goBack();
+            presentAlert({
+                header: 'Session Complete',
+                subHeader: `${count} repetitions`,
+                message: `Duration: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`,
+                buttons: [
+                    {
+                        text: 'Done',
+                        role: 'confirm',
+                        handler: () => {
+                            history.goBack();
+                        }
                     }
-                }
-            ]
-        });
-    };
+                ]
+            });
+        } catch (err) {
+            console.error('Failed to save session:', err);
+            isSaving.current = false;
+            isCompletedRef.current = false; // Allow retry
+        } finally {
+            isSaving.current = false;
+        }
+    }, [mantra, elapsedSeconds, count, history, presentAlert, loadData]);
+
+    const handleComplete = useCallback(async () => {
+        if (sessionState === 'completed' || isCompletedRef.current) return;
+        isCompletedRef.current = true;
+
+        setSessionState('completed');
+        if (bellEnabled) {
+            console.log('🔔 Ding!');
+        }
+        await saveSessionInternal();
+    }, [sessionState, bellEnabled, saveSessionInternal]);
+
+    const handleIncrement = useCallback(() => {
+        if (sessionState !== 'completed') {
+            setCount(c => c + 1);
+            if (sessionState === 'paused') setSessionState('running');
+        }
+    }, [sessionState]);
 
     const formatTime = (totalSeconds: number) => {
         const m = Math.floor(totalSeconds / 60);
@@ -218,12 +237,7 @@ const MantraPracticePage: React.FC = () => {
                                         mode="active"
                                         count={count}
                                         target={mantra.practice.defaultReps}
-                                        onIncrement={() => {
-                                            if (sessionState !== 'completed') {
-                                                setCount(c => c + 1);
-                                                if (sessionState === 'paused') setSessionState('running');
-                                            }
-                                        }}
+                                        onIncrement={handleIncrement}
                                         onComplete={handleComplete}
                                         haptic={true}
                                         bell={bellEnabled}
@@ -247,7 +261,7 @@ const MantraPracticePage: React.FC = () => {
                                         <IonButton disabled>Completed</IonButton>
                                     )}
 
-                                    <IonButton color="medium" fill="clear" onClick={saveSession}>
+                                    <IonButton color="medium" fill="clear" onClick={saveSessionInternal}>
                                         End Session
                                     </IonButton>
                                 </div>

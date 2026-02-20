@@ -18,6 +18,8 @@ import { useHistory } from 'react-router-dom';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { MalaService } from '../services/MalaService';
+import { getSavedLocation, getObserver } from '../services/locationManager';
+import { warmUpFestivalCache } from '../services/festivalCacheService';
 import './Home.css';
 
 const Home: React.FC = () => {
@@ -31,6 +33,10 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     loadStats();
+    // Warm up festival cache in background
+    getSavedLocation().then(loc => {
+      warmUpFestivalCache(getObserver(loc));
+    });
   }, []);
 
   const loadStats = async () => {

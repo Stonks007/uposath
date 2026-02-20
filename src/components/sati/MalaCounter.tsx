@@ -38,7 +38,12 @@ const MalaCounter: React.FC<MalaCounterProps> = ({
         if (mode === 'active' && count > 0 && haptic) {
             if (navigator.vibrate) navigator.vibrate(10);
         }
-        if (mode === 'active' && count === target && onComplete) {
+
+        // Completion check with guard
+        if (mode === 'active' && count >= target && onComplete) {
+            // We rely on the parent (MantraPracticePage) to handle the 
+            // state transition to 'completed' which will prevent 
+            // multiple triggers via props change.
             onComplete();
         }
     }, [count, mode, haptic, target, onComplete]);

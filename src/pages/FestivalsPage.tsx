@@ -9,20 +9,17 @@ import {
     IonSegment,
     IonSegmentButton,
     useIonViewWillEnter,
-    IonButtons,
-    IonBackButton,
     IonIcon
 } from '@ionic/react';
 import { Observer } from '@ishubhamx/panchangam-js';
 import {
-    getUpcomingFestivals,
-    initMahayanaCalendar,
     type FestivalMatch,
     type FestivalEvent,
     type BuddhistTradition,
     getTraditionColors
 } from '../services/buddhistFestivalService';
-import { getSavedLocation } from '../services/locationManager';
+import { getSavedLocation, getObserver } from '../services/locationManager';
+import { getPersistentFestivals } from '../services/festivalCacheService';
 import {
     calendarOutline,
     locationOutline,
@@ -51,18 +48,13 @@ const FestivalsPage: React.FC = () => {
     });
 
     const loadData = async () => {
-        // Initialize Mahayana calendar module
-        await initMahayanaCalendar();
-
         const loc = await getSavedLocation();
-        let currentObserver = observer;
-        if (loc) {
-            currentObserver = new Observer(loc.latitude, loc.longitude, loc.altitude);
-            setObserver(currentObserver);
-            setLocationName(loc.name);
-        }
+        const currentObserver = getObserver(loc);
+        setObserver(currentObserver);
+        setLocationName(loc.name);
 
-        const upcoming = getUpcomingFestivals(new Date(), currentObserver, 365);
+        // Fetch using persistent cache (includes fresh scan if invalid)
+        const upcoming = await getPersistentFestivals(currentObserver);
         setFestivals(upcoming);
         setFilteredFestivals(upcoming);
     };
@@ -173,9 +165,7 @@ const FestivalsPage: React.FC = () => {
         <IonPage>
             <IonHeader className="ion-no-border">
                 <IonToolbar>
-                    <IonButtons slot="start">
-                        <IonBackButton defaultHref="/today" />
-                    </IonButtons>
+
                     <IonTitle>Dharma Calendar</IonTitle>
                 </IonToolbar>
                 <IonToolbar color="translucent" style={{ '--background': 'transparent' }}>

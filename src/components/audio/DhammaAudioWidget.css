@@ -10,7 +10,8 @@
   transform: scale(0.98);
 }
 
-.audio-widget.playing {
+.audio-widget.playing,
+.audio-widget.empty.has-featured {
   position: relative;
   min-height: 100px;
 }
@@ -91,6 +92,8 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .audio-widget__empty-info {
