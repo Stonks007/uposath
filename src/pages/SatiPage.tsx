@@ -89,19 +89,7 @@ const SatiPage: React.FC = () => {
                     </div>
                 )}
 
-                {/* Triple Gem Recollection Card */}
-                <TripleGemNavCard />
-
-                {/* Emptiness Contemplation Card */}
-                <EmptinessNavCard />
-
-                {/* Custom Mantras Card */}
-                <MantraNavCard />
-
-                {/* Anapanasati Card */}
-                <AnapanasatiCard />
-
-                {/* Statistics Card */}
+                {/* Statistics Card — top of page */}
                 <IonCard routerLink="/sati/stats" style={{
                     borderRadius: '16px',
                     margin: '16px 0',
@@ -137,6 +125,18 @@ const SatiPage: React.FC = () => {
                         </div>
                     </IonCardContent>
                 </IonCard>
+
+                {/* Triple Gem Recollection Card */}
+                <TripleGemNavCard />
+
+                {/* Emptiness Contemplation Card */}
+                <EmptinessNavCard />
+
+                {/* Custom Mantras Card */}
+                <MantraNavCard />
+
+                {/* Anapanasati Card */}
+                <AnapanasatiCard />
 
                 {/* Placeholder for future features */}
                 {/* <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af', fontStyle: 'italic' }}>

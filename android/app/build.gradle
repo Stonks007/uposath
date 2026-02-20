@@ -9,6 +9,7 @@ plugins {
 android {
     namespace = "com.buddhist.uposatha"
     compileSdk = rootProject.ext.compileSdkVersion
+    buildToolsVersion = rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId = "com.buddhist.uposatha"
         minSdkVersion = rootProject.ext.minSdkVersion

@@ -5,31 +5,66 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonThumbnail,
-    IonImg,
     IonButtons,
     IonBackButton,
     IonSearchbar,
-    IonSpinner,
-    IonText
+    IonIcon,
+    IonSpinner
 } from '@ionic/react';
-import { DhammaAudio, VideoInfo } from '../plugins/dhamma-audio';
+import { musicalNotes, search as searchIcon } from 'ionicons/icons';
+import { DhammaAudio, VideoInfo, PlaybackState } from '../plugins/dhamma-audio';
 import { useHistory } from 'react-router-dom';
+import './AudioLibraryPage.css';
+
+const formatDuration = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+};
+
+const SkeletonLoader: React.FC = () => (
+    <div className="library-skeleton">
+        {[...Array(6)].map((_, i) => (
+            <div key={i} className="library-skeleton-card">
+                <div className="library-skeleton-thumb" />
+                <div className="library-skeleton-lines">
+                    <div className="library-skeleton-line" />
+                    <div className="library-skeleton-line library-skeleton-line--short" />
+                    <div className="library-skeleton-line library-skeleton-line--shorter" />
+                </div>
+            </div>
+        ))}
+    </div>
+);
 
 const AudioLibraryPage: React.FC = () => {
     const history = useHistory();
     const [videos, setVideos] = useState<VideoInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
+    const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
 
-    // Pañcasikha Channel ID (browseId)
     const PANCASIKHA_CHANNEL_ID = 'UC0ypu1lL-Srd4O7XHjtIQrg';
 
     useEffect(() => {
         loadVideos();
+
+        // Track currently playing video
+        const listener = DhammaAudio.addListener('playbackStateChanged', (state: PlaybackState) => {
+            setCurrentVideoId(state.currentVideo?.id || null);
+        });
+
+        // Load initial playing state
+        DhammaAudio.getPlaybackState().then(state => {
+            setCurrentVideoId(state.currentVideo?.id || null);
+        }).catch(() => { });
+
+        return () => {
+            listener.then(l => l.remove());
+        };
     }, []);
 
     const loadVideos = async () => {
@@ -40,7 +75,6 @@ const AudioLibraryPage: React.FC = () => {
                 page: 1
             });
             setVideos(result.videos);
-            console.log(`Successfully loaded ${result.videos.length} videos from channel`);
             setLoading(false);
         } catch (err) {
             console.error('Failed to load videos:', err);
@@ -79,37 +113,66 @@ const AudioLibraryPage: React.FC = () => {
                     </IonButtons>
                     <IonTitle>Dhamma Library</IonTitle>
                 </IonToolbar>
-                <IonToolbar>
-                    <IonSearchbar
-                        value={searchText}
-                        onIonInput={(e: any) => handleSearch(e.target.value)}
-                        placeholder="Search chants..."
-                        debounce={1000}
-                    />
-                </IonToolbar>
             </IonHeader>
             <IonContent>
+                <IonSearchbar
+                    value={searchText}
+                    onIonInput={(e: any) => handleSearch(e.target.value)}
+                    placeholder="Search chants & talks..."
+                    debounce={1000}
+                    className="library-searchbar"
+                />
+
                 {loading ? (
-                    <div className="ion-text-center ion-padding">
-                        <IonSpinner name="crescent" />
-                        <p>Gathering Dhamma...</p>
+                    <SkeletonLoader />
+                ) : videos.length === 0 ? (
+                    <div className="library-empty">
+                        <IonIcon icon={musicalNotes} className="library-empty-icon" />
+                        <span className="library-empty-text">No tracks found</span>
                     </div>
                 ) : (
-                    <IonList>
-                        {videos.map(video => (
-                            <IonItem key={video.id} button onClick={() => playVideo(video)} detail={false}>
-                                <IonThumbnail slot="start" style={{ '--border-radius': '8px' }}>
-                                    <IonImg src={video.thumbnailUrl} />
-                                </IonThumbnail>
-                                <IonLabel>
-                                    <IonText className="ion-text-wrap">
-                                        <h2 style={{ fontWeight: 600 }}>{video.title}</h2>
-                                    </IonText>
-                                    <p>{video.channelName} • {Math.floor(video.duration / 60)}m</p>
-                                </IonLabel>
-                            </IonItem>
-                        ))}
-                    </IonList>
+                    <div className="library-list">
+                        {videos.map(video => {
+                            const isPlaying = currentVideoId === video.id;
+                            return (
+                                <div
+                                    key={video.id}
+                                    className={`library-card ${isPlaying ? 'library-card--playing' : ''}`}
+                                    onClick={() => playVideo(video)}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', padding: '10px 0' }}>
+                                        {/* Now playing dot */}
+                                        {isPlaying && <div className="library-now-playing-dot" />}
+
+                                        {/* Thumbnail */}
+                                        <div className="library-thumb-wrapper">
+                                            {video.thumbnailUrl ? (
+                                                <img src={video.thumbnailUrl} alt="" className="library-thumb" />
+                                            ) : (
+                                                <div className="library-thumb-placeholder">
+                                                    <IonIcon icon={musicalNotes} />
+                                                </div>
+                                            )}
+                                            {video.duration > 0 && (
+                                                <span className="library-duration-badge">
+                                                    {formatDuration(video.duration)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Text */}
+                                        <div className="library-card-content">
+                                            <h3 className="library-card-title">{video.title}</h3>
+                                            <p className="library-card-meta">
+                                                {video.channelName}
+                                                {video.duration > 0 && ` · ${Math.floor(video.duration / 60)} min`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </IonContent>
         </IonPage>

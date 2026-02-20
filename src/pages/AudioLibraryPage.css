@@ -1,0 +1,255 @@
+/* === AudioLibraryPage — Premium Dark Glass Library === */
+
+/* --- Search Bar Override --- */
+.library-searchbar {
+    --background: rgba(255, 255, 255, 0.04);
+    --border-radius: 16px;
+    --box-shadow: none;
+    --placeholder-color: rgba(255, 255, 255, 0.3);
+    --color: var(--color-text-primary, #f5f0e8);
+    --icon-color: rgba(255, 198, 112, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin: 0 8px 8px;
+    transition: border-color 0.2s ease;
+}
+
+.library-searchbar.searchbar-has-focus {
+    border-color: rgba(255, 198, 112, 0.2);
+}
+
+/* --- Video List --- */
+.library-list {
+    background: transparent;
+    padding: 0 8px;
+}
+
+/* --- Video Card --- */
+.library-card {
+    --background: rgba(255, 255, 255, 0.03);
+    --border-color: rgba(255, 255, 255, 0.05);
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --inner-padding-end: 0;
+    --inner-border-width: 0;
+    border-radius: 16px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.library-card:active {
+    transform: scale(0.98);
+    background: rgba(255, 198, 112, 0.04);
+    border-color: rgba(255, 198, 112, 0.12);
+}
+
+/* --- Thumbnail --- */
+.library-thumb-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-right: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.library-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.library-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 198, 112, 0.06), rgba(255, 198, 112, 0.02));
+    color: rgba(255, 198, 112, 0.2);
+    font-size: 1.6rem;
+}
+
+.library-duration-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.78);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.62rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    padding: 2px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+/* --- Card Text --- */
+.library-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    flex: 1;
+    padding: 10px 0;
+}
+
+.library-card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #f5f0e8);
+    margin: 0;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.library-card-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 4px 0 0;
+    font-weight: 400;
+}
+
+/* --- Now Playing Indicator --- */
+.library-card--playing {
+    border-color: rgba(255, 198, 112, 0.18);
+    background: rgba(255, 198, 112, 0.04);
+}
+
+.library-card--playing .library-card-title {
+    color: var(--color-accent-primary, #ffc670);
+}
+
+.library-now-playing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent-primary, #ffc670);
+    box-shadow: 0 0 8px rgba(255, 198, 112, 0.5);
+    animation: nowPlayingPulse 1.5s infinite ease-in-out;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+@keyframes nowPlayingPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.85);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* --- Loading State --- */
+.library-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.library-loading-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(255, 198, 112, 0.5);
+    font-weight: 500;
+}
+
+/* --- Skeleton Loader --- */
+.library-skeleton {
+    padding: 0 8px;
+}
+
+.library-skeleton-card {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.library-skeleton-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.03) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+    flex-shrink: 0;
+    margin-right: 14px;
+}
+
+.library-skeleton-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.library-skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.03) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.library-skeleton-line--short {
+    width: 60%;
+}
+
+.library-skeleton-line--shorter {
+    width: 40%;
+    height: 10px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* --- Empty State --- */
+.library-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 12px;
+}
+
+.library-empty-icon {
+    font-size: 3rem;
+    color: rgba(255, 198, 112, 0.15);
+}
+
+.library-empty-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.25);
+    font-weight: 500;
+}

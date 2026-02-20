@@ -45,6 +45,9 @@ const SettingsPage: React.FC = () => {
     const [paliScript, setPaliScript] = useState('roman');
     const [trackingEnabled, setTrackingEnabled] = useState(true);
     const [presentAlert] = useIonAlert();
+    const [citySearch, setCitySearch] = useState('');
+    const [showCityDropdown, setShowCityDropdown] = useState(false);
+    const [filteredCities, setFilteredCities] = useState<SavedLocation[]>([]);
 
     useIonViewWillEnter(() => {
         loadSettings();
@@ -122,6 +125,26 @@ const SettingsPage: React.FC = () => {
         }
     };
 
+    const handleCitySearch = (query: string) => {
+        setCitySearch(query);
+        if (query.length > 0) {
+            const q = query.toLowerCase();
+            const matches = MAJOR_CITIES.filter(c => c.name.toLowerCase().includes(q)).slice(0, 8);
+            setFilteredCities(matches);
+            setShowCityDropdown(matches.length > 0);
+        } else {
+            setFilteredCities([]);
+            setShowCityDropdown(false);
+        }
+    };
+
+    const selectCity = async (city: SavedLocation) => {
+        setCitySearch('');
+        setShowCityDropdown(false);
+        setFilteredCities([]);
+        await handlePresetCityChange(city);
+    };
+
     const handlePresetCityChange = async (city: SavedLocation) => {
         setLocation(city);
         await saveLocation(city);
@@ -150,12 +173,30 @@ const SettingsPage: React.FC = () => {
     };
 
     const toggleUposatha = async (enabled: boolean) => {
+        if (enabled) {
+            const granted = await requestDailyVersePermissionIfNeeded();
+            if (!granted) {
+                setNotificationsEnabled(false);
+                await Preferences.set({ key: 'notifications_uposatha', value: 'false' });
+                alert('Notification permission is required. Please enable it in system settings.');
+                return;
+            }
+        }
         setNotificationsEnabled(enabled);
         await Preferences.set({ key: 'notifications_uposatha', value: String(enabled) });
         updateSchedules(enabled, festivalsEnabled);
     };
 
     const toggleFestivals = async (enabled: boolean) => {
+        if (enabled) {
+            const granted = await requestDailyVersePermissionIfNeeded();
+            if (!granted) {
+                setFestivalsEnabled(false);
+                await Preferences.set({ key: 'notifications_festivals', value: 'false' });
+                alert('Notification permission is required. Please enable it in system settings.');
+                return;
+            }
+        }
         setFestivalsEnabled(enabled);
         await Preferences.set({ key: 'notifications_festivals', value: String(enabled) });
         updateSchedules(notificationsEnabled, enabled);
@@ -253,53 +294,78 @@ const SettingsPage: React.FC = () => {
                         </IonButton>
                     </IonItem>
 
-                    <IonItem>
-                        <IonIcon icon={globeOutline} slot="start" color="secondary" />
-                        <IonLabel className="ion-text-wrap" style={{ flex: '1 1 auto' }}>
-                            <h2>Preset City</h2>
-                            <p style={{ color: 'var(--ion-color-secondary)', fontWeight: 'bold' }}>
-                                {MAJOR_CITIES.find(c => c.name === location?.name)?.name || 'Custom/GPS'}
-                            </p>
-                        </IonLabel>
-                        <IonSelect
-                            slot="end"
-                            interface="action-sheet"
-                            placeholder="Select"
-                            style={{ maxWidth: '40%' }}
-                            value={location?.name}
-                            onIonChange={e => {
-                                const city = MAJOR_CITIES.find(c => c.name === e.detail.value);
-                                if (city) handlePresetCityChange(city);
+                    <div style={{ position: 'relative', padding: '0 16px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                            <IonIcon icon={globeOutline} color="secondary" style={{ fontSize: '1.2rem' }} />
+                            <span style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--color-text-primary, #f5f0e8)' }}>Search City</span>
+                        </div>
+                        <input
+                            type="text"
+                            value={citySearch}
+                            onChange={e => handleCitySearch(e.target.value)}
+                            onFocus={() => { if (citySearch.length > 0) setShowCityDropdown(filteredCities.length > 0); }}
+                            placeholder="Type a city name..."
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: 'rgba(255, 255, 255, 0.04)',
+                                color: 'var(--color-text-primary, #f5f0e8)',
+                                fontSize: '0.95rem',
+                                fontFamily: 'Inter, sans-serif',
+                                outline: 'none',
+                                boxSizing: 'border-box' as any,
+                                transition: 'border-color 0.2s ease',
                             }}
-                        >
-                            {MAJOR_CITIES.map(city => (
-                                <IonSelectOption key={city.name} value={city.name}>
-                                    {city.name}
-                                </IonSelectOption>
-                            ))}
-                        </IonSelect>
-                    </IonItem>
+                            onBlur={() => setTimeout(() => setShowCityDropdown(false), 200)}
+                        />
+                        {showCityDropdown && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: '16px',
+                                right: '16px',
+                                zIndex: 999,
+                                background: 'rgba(20, 18, 14, 0.97)',
+                                border: '1px solid rgba(255, 198, 112, 0.15)',
+                                borderRadius: '12px',
+                                maxHeight: '240px',
+                                overflowY: 'auto',
+                                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6)',
+                                backdropFilter: 'blur(12px)',
+                            }}>
+                                {filteredCities.map(city => (
+                                    <div
+                                        key={city.name}
+                                        onMouseDown={() => selectCity(city)}
+                                        style={{
+                                            padding: '12px 16px',
+                                            cursor: 'pointer',
+                                            borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                                            transition: 'background 0.15s',
+                                            fontSize: '0.9rem',
+                                            color: 'var(--color-text-primary, #f5f0e8)',
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: '600' }}>{city.name}</div>
+                                        <div style={{ fontSize: '0.72rem', color: 'rgba(255, 198, 112, 0.5)', marginTop: '2px' }}>
+                                            {city.timezone}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     <IonItem>
                         <IonIcon icon={timeOutline} slot="start" color="tertiary" />
-                        <IonLabel className="ion-text-wrap" style={{ flex: '1 1 auto' }}>
+                        <IonLabel className="ion-text-wrap">
                             <h2>Timezone</h2>
                             <p style={{ color: 'var(--ion-color-tertiary)', fontWeight: 'bold' }}>
-                                {location?.timezone || 'Detecting...'}
+                                {location?.timezone || 'Select a city above'}
                             </p>
                         </IonLabel>
-                        <IonSelect
-                            slot="end"
-                            interface="action-sheet"
-                            placeholder="Change"
-                            style={{ maxWidth: '40%' }}
-                            value={location?.timezone}
-                            onIonChange={e => handleTimezoneChange(e.detail.value)}
-                        >
-                            {timezones.map(tz => (
-                                <IonSelectOption key={tz} value={tz}>{tz}</IonSelectOption>
-                            ))}
-                        </IonSelect>
                     </IonItem>
                 </IonList>
 

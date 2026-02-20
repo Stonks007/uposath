@@ -1,0 +1,210 @@
+/* === AudioPlayerPage — Premium Immersive Player === */
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px 24px;
+    justify-content: space-between;
+    background: linear-gradient(175deg,
+            rgba(20, 16, 8, 0.95) 0%,
+            rgba(8, 6, 4, 1) 50%,
+            rgba(30, 22, 10, 0.9) 100%);
+}
+
+/* --- Artwork Section --- */
+.player-artwork-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    padding: 16px 0;
+}
+
+.player-artwork {
+    width: 85%;
+    max-width: 360px;
+    max-height: 240px;
+    border-radius: 20px;
+    object-fit: contain;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 198, 112, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: box-shadow 0.6s ease;
+}
+
+.player-artwork-placeholder {
+    width: 85%;
+    max-width: 340px;
+    aspect-ratio: 16/9;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255, 198, 112, 0.08), rgba(255, 198, 112, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: rgba(255, 198, 112, 0.2);
+}
+
+/* --- Track Info --- */
+.player-info {
+    text-align: center;
+    padding: 16px 8px 8px;
+}
+
+.player-title {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--color-text-primary, #f5f0e8);
+    margin: 0;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.player-artist {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 198, 112, 0.6);
+    margin: 6px 0 0;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* --- Progress / Seek Bar --- */
+.player-progress-section {
+    padding: 8px 4px 0;
+}
+
+.player-progress-bar {
+    --bar-background: rgba(255, 255, 255, 0.08);
+    --bar-background-active: rgba(255, 198, 112, 0.85);
+    --knob-background: var(--color-accent-primary, #ffc670);
+    --knob-size: 16px;
+    --bar-height: 4px;
+    --bar-border-radius: 4px;
+    --height: 24px;
+    padding: 0;
+}
+
+.player-time-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+    margin-top: -2px;
+}
+
+.player-time {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Controls --- */
+.player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 0 24px;
+}
+
+.player-control-btn {
+    --color: rgba(255, 255, 255, 0.45);
+    --background: transparent;
+    --background-hover: transparent;
+    --padding-start: 0;
+    --padding-end: 0;
+    font-size: 1.5rem;
+    min-height: 48px;
+    transition: all 0.2s ease;
+}
+
+.player-control-btn:active {
+    transform: scale(0.88);
+    --color: rgba(255, 198, 112, 0.8);
+}
+
+.player-control-btn--secondary {
+    --color: rgba(255, 255, 255, 0.3);
+    font-size: 1.2rem;
+}
+
+.player-play-btn {
+    --background: transparent;
+    --background-hover: transparent;
+    --background-activated: transparent;
+    --box-shadow: none;
+    --padding-start: 0;
+    --padding-end: 0;
+    --border-radius: 50%;
+    --color: var(--color-accent-primary, #ffc670);
+    width: 72px;
+    height: 72px;
+    min-height: 72px;
+    font-size: 2rem;
+    background: rgba(255, 198, 112, 0.12);
+    border: 1px solid rgba(255, 198, 112, 0.2);
+    border-radius: 50%;
+    box-shadow:
+        0 4px 20px rgba(255, 198, 112, 0.1),
+        inset 0 0 20px rgba(255, 198, 112, 0.03);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-play-btn:active {
+    transform: scale(0.9);
+    box-shadow:
+        0 0 30px rgba(255, 198, 112, 0.3),
+        inset 0 0 20px rgba(255, 198, 112, 0.08);
+}
+
+/* --- Loading State --- */
+.player-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+    color: rgba(255, 198, 112, 0.5);
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Empty State --- */
+.player-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.25);
+    font-family: 'Inter', sans-serif;
+}
+
+.player-empty-icon {
+    font-size: 3rem;
+    color: rgba(255, 198, 112, 0.15);
+}
+
+.player-empty-text {
+    font-size: 1rem;
+    font-weight: 500;
+}

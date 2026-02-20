@@ -11,7 +11,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { calendar, rose, settings, leaf, home, library } from 'ionicons/icons';
+import { calendar, rose, settings, leaf, home, library, musicalNotes } from 'ionicons/icons';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 /* Core CSS */
@@ -46,6 +46,11 @@ import DayDetailPage from './pages/DayDetailPage';
 import SatiPage from './pages/SatiPage';
 import TripleGemPage from './pages/TripleGemPage';
 import AnapanasatiPage from './pages/AnapanasatiPage';
+import AnapanasatiSessionPage from './pages/AnapanasatiSessionPage';
+import EmptinessPage from './pages/EmptinessPage';
+import MantraListPage from './pages/MantraListPage';
+import MantraEditPage from './pages/MantraEditPage';
+import MantraPracticePage from './pages/MantraPracticePage';
 import AudioLibraryPage from './pages/AudioLibraryPage';
 import AudioPlayerPage from './pages/AudioPlayerPage';
 import SatiStatsPage from './pages/SatiStatsPage';
@@ -86,58 +91,74 @@ const NotificationRouterBridge: React.FC = () => {
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <NotificationRouterBridge />
-      <FocusManager />
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/calendar" component={CalendarPage} />
-          <Route exact path="/home" component={Home} />
-          <Route exact path="/sati" component={SatiPage} />
-          <Route exact path="/sati/triple-gem" component={TripleGemPage} />
-          <Route exact path="/sati/anapanasati" component={AnapanasatiPage} />
-          <Route exact path="/sati/stats" component={SatiStatsPage} />
-          <Route exact path="/library" component={AudioLibraryPage} />
-          <Route exact path="/player" component={AudioPlayerPage} />
-          <Route exact path="/festivals" component={FestivalsPage} />
-          <Route path="/day/:dateStr" component={DayDetailPage} />
-          <Route exact path="/settings" component={SettingsPage} />
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-        </IonRouterOutlet>
+const App: React.FC = () => {
+  useEffect(() => {
+    // Request notification permissions on first launch
+    LocalNotifications.requestPermissions().catch(() => { });
+  }, []);
 
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="home" href="/home">
-            <IonIcon aria-hidden="true" icon={home} />
-            <IonLabel>Home</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="calendar" href="/calendar">
-            <IonIcon aria-hidden="true" icon={calendar} />
-            <IonLabel>Calendar</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="sati" href="/sati">
-            <IonIcon aria-hidden="true" icon={leaf} />
-            <IonLabel>Sati</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="library" href="/library">
-            <IonIcon aria-hidden="true" icon={library} />
-            <IonLabel>Library</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="festivals" href="/festivals">
-            <IonIcon aria-hidden="true" icon={rose} />
-            <IonLabel>Festivals</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="settings" href="/settings">
-            <IonIcon aria-hidden="true" icon={settings} />
-            <IonLabel>Settings</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <NotificationRouterBridge />
+        <FocusManager />
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/calendar" component={CalendarPage} />
+            <Route exact path="/home" component={Home} />
+            <Route exact path="/sati" component={SatiPage} />
+            <Route exact path="/sati/triple-gem" component={TripleGemPage} />
+            <Route exact path="/sati/anapanasati" component={AnapanasatiPage} />
+            <Route exact path="/sati/anapanasati/session" component={AnapanasatiSessionPage} />
+            <Route exact path="/sati/emptiness" component={EmptinessPage} />
+            <Route exact path="/sati/mantras" component={MantraListPage} />
+            <Route exact path="/sati/mantras/edit/:id" component={MantraEditPage} />
+            <Route exact path="/sati/mantras/practice/:id" component={MantraPracticePage} />
+            <Route exact path="/sati/stats" component={SatiStatsPage} />
+            <Route exact path="/library" component={AudioLibraryPage} />
+            <Route exact path="/player" component={AudioPlayerPage} />
+            <Route exact path="/festivals" component={FestivalsPage} />
+            <Route path="/day/:dateStr" component={DayDetailPage} />
+            <Route exact path="/settings" component={SettingsPage} />
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="home" href="/home">
+              <IonIcon aria-hidden="true" icon={home} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="calendar" href="/calendar">
+              <IonIcon aria-hidden="true" icon={calendar} />
+              <IonLabel>Calendar</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="sati" href="/sati">
+              <IonIcon aria-hidden="true" icon={leaf} />
+              <IonLabel>Sati</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="player" href="/player">
+              <IonIcon aria-hidden="true" icon={musicalNotes} />
+              <IonLabel>Player</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="library" href="/library">
+              <IonIcon aria-hidden="true" icon={library} />
+              <IonLabel>Library</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="festivals" href="/festivals">
+              <IonIcon aria-hidden="true" icon={rose} />
+              <IonLabel>Festivals</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="settings" href="/settings">
+              <IonIcon aria-hidden="true" icon={settings} />
+              <IonLabel>Settings</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

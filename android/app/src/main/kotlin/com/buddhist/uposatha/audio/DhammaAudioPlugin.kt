@@ -57,6 +57,9 @@ class DhammaAudioPlugin : Plugin() {
                         put("currentVideo", JSObject().apply {
                             put("id", video.videoId)
                             put("title", video.title)
+                            put("channelName", video.channelName)
+                            put("channelId", video.channelId)
+                            put("thumbnailUrl", video.thumbnailUrl)
                         })
                     }
                 }

@@ -3,14 +3,13 @@ import {
     IonContent,
     IonHeader,
     IonPage,
-    IonTitle,
     IonToolbar,
     IonButtons,
     IonBackButton,
     IonButton,
     IonIcon,
     IonRange,
-    IonText
+    IonSpinner
 } from '@ionic/react';
 import {
     play,
@@ -18,9 +17,11 @@ import {
     playSkipBack,
     playSkipForward,
     repeat,
-    shuffle
+    shuffle,
+    musicalNotes
 } from 'ionicons/icons';
 import { DhammaAudio, PlaybackState } from '../plugins/dhamma-audio';
+import './AudioPlayerPage.css';
 
 const AudioPlayerPage: React.FC = () => {
     const [playerState, setPlayerState] = useState<PlaybackState | null>(null);
@@ -30,12 +31,22 @@ const AudioPlayerPage: React.FC = () => {
     useEffect(() => {
         loadState();
 
-        // Listen for overall state changes
-        const stateListener = DhammaAudio.addListener('playbackStateChanged', (state) => {
-            setPlayerState(prev => prev ? { ...state, position: prev.position } : state);
+        const stateListener = DhammaAudio.addListener('playbackStateChanged', (stateEvt: any) => {
+            const isPlaying = stateEvt.state === 'PLAYING' || stateEvt.isPlaying === true;
+            const isPaused = stateEvt.state === 'PAUSED' || stateEvt.isPaused === true;
+            setPlayerState(prev => {
+                const merged = {
+                    ...(prev || {}),
+                    ...stateEvt,
+                    isPlaying,
+                    isPaused,
+                    position: prev?.position ?? 0,
+                    duration: prev?.duration ?? stateEvt.duration ?? 0
+                };
+                return merged;
+            });
         });
 
-        // Listen for granular progress updates (ms)
         const progressListener = DhammaAudio.addListener('progressUpdate', (data) => {
             if (!isDragging) {
                 setPlayerState(prev => prev ? { ...prev, position: data.position, duration: data.duration } : null);
@@ -60,7 +71,6 @@ const AudioPlayerPage: React.FC = () => {
     const handleSeek = async (value: number) => {
         setPlayerState(prev => prev ? { ...prev, position: value } : null);
         await DhammaAudio.seekTo({ position: value });
-        // Briefly keep isDragging true to avoid immediate snap-back from native state sync
         setTimeout(() => setIsDragging(false), 500);
     };
 
@@ -80,17 +90,20 @@ const AudioPlayerPage: React.FC = () => {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
+    // Empty state
     if (!playerState?.currentVideo) {
         return (
             <IonPage>
-                <IonHeader>
+                <IonHeader className="ion-no-border">
                     <IonToolbar>
-                        <IonButtons slot="start"><IonBackButton /></IonButtons>
-                        <IonTitle>Player</IonTitle>
+                        <IonButtons slot="start"><IonBackButton defaultHref="/library" /></IonButtons>
                     </IonToolbar>
                 </IonHeader>
-                <IonContent className="ion-padding ion-text-center">
-                    <IonText color="medium">No track playing</IonText>
+                <IonContent fullscreen>
+                    <div className="player-empty">
+                        <IonIcon icon={musicalNotes} className="player-empty-icon" />
+                        <span className="player-empty-text">No track playing</span>
+                    </div>
                 </IonContent>
             </IonPage>
         );
@@ -101,56 +114,74 @@ const AudioPlayerPage: React.FC = () => {
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
-                <IonToolbar>
+                <IonToolbar style={{ '--background': 'transparent' }}>
                     <IonButtons slot="start">
                         <IonBackButton defaultHref="/library" />
                     </IonButtons>
-                    <IonTitle>Now Playing</IonTitle>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-around' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <img
-                            src={currentVideo.thumbnailUrl}
-                            alt="Art"
-                            style={{ width: '85%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}
-                        />
+            <IonContent fullscreen scrollY={false}>
+                <div className="player-container">
+                    {/* Artwork */}
+                    <div className="player-artwork-wrapper">
+                        {currentVideo.thumbnailUrl ? (
+                            <img
+                                src={currentVideo.thumbnailUrl}
+                                alt={currentVideo.title}
+                                className="player-artwork"
+                            />
+                        ) : (
+                            <div className="player-artwork-placeholder">
+                                <IonIcon icon={musicalNotes} />
+                            </div>
+                        )}
                     </div>
 
-                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                        <h1 style={{ fontWeight: 700, margin: 0, fontSize: '1.5rem' }}>{currentVideo.title}</h1>
-                        <p style={{ color: 'var(--ion-color-medium)', marginTop: '8px', fontSize: '1.1rem' }}>{currentVideo.channelName}</p>
+                    {/* Track Info */}
+                    <div className="player-info">
+                        <h1 className="player-title">{currentVideo.title}</h1>
+                        {currentVideo.channelName && (
+                            <p className="player-artist">{currentVideo.channelName}</p>
+                        )}
                     </div>
 
-                    <div style={{ marginTop: '30px' }}>
+                    {/* Progress */}
+                    <div className="player-progress-section">
                         <IonRange
                             value={isDragging ? dragPosition : position}
-                            max={duration}
+                            max={duration || 1}
                             onIonKnobMoveStart={() => setIsDragging(true)}
                             onIonInput={(e: any) => setDragPosition(e.detail.value as number)}
                             onIonKnobMoveEnd={(e: any) => handleSeek(e.detail.value as number)}
-                            className="player-range"
+                            className="player-progress-bar"
                         />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 15px' }}>
-                            <IonText color="medium">{formatTime(isDragging ? dragPosition : position)}</IonText>
-                            <IonText color="medium">{formatTime(duration)}</IonText>
+                        <div className="player-time-row">
+                            <span className="player-time">{formatTime(isDragging ? dragPosition : position)}</span>
+                            <span className="player-time">{formatTime(duration)}</span>
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px', marginTop: '20px' }}>
-                        <IonButton fill="clear" color="medium"><IonIcon icon={shuffle} /></IonButton>
-                        <IonButton fill="clear" color="dark" style={{ fontSize: '1.8rem' }}><IonIcon icon={playSkipBack} /></IonButton>
+                    {/* Controls */}
+                    <div className="player-controls">
+                        <IonButton fill="clear" className="player-control-btn player-control-btn--secondary">
+                            <IonIcon icon={shuffle} />
+                        </IonButton>
+                        <IonButton fill="clear" className="player-control-btn">
+                            <IonIcon icon={playSkipBack} />
+                        </IonButton>
                         <IonButton
-                            fill="solid"
-                            color="primary"
-                            style={{ width: '80px', height: '80px', '--border-radius': '50%', fontSize: '2rem' }}
+                            fill="clear"
+                            className="player-play-btn"
                             onClick={togglePlay}
                         >
                             <IonIcon icon={isPlaying ? pause : play} />
                         </IonButton>
-                        <IonButton fill="clear" color="dark" style={{ fontSize: '1.8rem' }}><IonIcon icon={playSkipForward} /></IonButton>
-                        <IonButton fill="clear" color="medium"><IonIcon icon={repeat} /></IonButton>
+                        <IonButton fill="clear" className="player-control-btn">
+                            <IonIcon icon={playSkipForward} />
+                        </IonButton>
+                        <IonButton fill="clear" className="player-control-btn player-control-btn--secondary">
+                            <IonIcon icon={repeat} />
+                        </IonButton>
                     </div>
                 </div>
             </IonContent>

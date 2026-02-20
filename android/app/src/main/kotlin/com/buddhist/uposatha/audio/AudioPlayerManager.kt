@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class AudioPlayerManager(private val context: Context) {
     private var mediaController: MediaController? = null
     private val scope = CoroutineScope(Dispatchers.Main + Job())
