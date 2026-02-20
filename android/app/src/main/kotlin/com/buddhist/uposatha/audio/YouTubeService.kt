@@ -110,4 +110,114 @@ class YouTubeService {
             viewCount = null
         )
     }
+
+    /**
+     * Resolve a YouTube URL to channel metadata.
+     * Supports @handle, /c/name, /channel/UCxxx, or just a channel ID.
+     */
+    suspend fun resolveChannel(url: String): Result<ResolvedChannel> = withContext(Dispatchers.IO) {
+        Log.d("YouTubeService", "resolveChannel() called with url: $url")
+        runCatching {
+            // Extract channel ID or browse ID from URL
+            val channelId = extractChannelId(url)
+            Log.d("YouTubeService", "Resolved URL to channelId/browseId: $channelId")
+
+            // Fetch the artist/channel page to get metadata
+            val artistPage = YouTube.artist(channelId).getOrThrow()
+            ResolvedChannel(
+                channelId = artistPage.artist.channelId ?: channelId,
+                name = artistPage.artist.title,
+                avatarUrl = artistPage.artist.thumbnail ?: ""
+            )
+        }.onFailure {
+            Log.e("YouTubeService", "resolveChannel() failed", it)
+        }
+    }
+
+    /**
+     * Get all sections/tabs from a channel page for dynamic tab rendering.
+     */
+    suspend fun getChannelPage(channelId: String): Result<ChannelPageResult> = withContext(Dispatchers.IO) {
+        Log.d("YouTubeService", "getChannelPage() called for channelId: $channelId")
+        runCatching {
+            val artistPage = YouTube.artist(channelId).getOrThrow()
+            Log.d("YouTubeService", "Artist page: ${artistPage.artist.title}, sections: ${artistPage.sections.size}")
+
+            val sections = artistPage.sections.map { section ->
+                Log.d("YouTubeService", "Section: '${section.title}' items=${section.items.size} cont=${section.continuation != null}")
+                ChannelSection(
+                    title = section.title,
+                    items = section.items.map { toVideoInfo(it) },
+                    continuation = section.continuation,
+                    browseId = section.moreEndpoint?.browseId,
+                    params = section.moreEndpoint?.params
+                )
+            }
+
+            ChannelPageResult(
+                channelName = artistPage.artist.title,
+                channelAvatar = artistPage.artist.thumbnail,
+                sections = sections
+            )
+        }.onFailure {
+            Log.e("YouTubeService", "getChannelPage() failed", it)
+        }
+    }
+
+    /**
+     * Get videos from a playlist.
+     */
+    suspend fun getPlaylistVideos(playlistId: String): Result<List<VideoInfo>> = withContext(Dispatchers.IO) {
+        Log.d("YouTubeService", "getPlaylistVideos() called for playlistId: $playlistId")
+        runCatching {
+            val playlistPage = YouTube.playlist(playlistId).getOrThrow()
+            Log.d("YouTubeService", "Playlist: ${playlistPage.playlist.title}, items: ${playlistPage.songs.size}")
+            playlistPage.songs.map { song ->
+                VideoInfo(
+                    videoId = song.id,
+                    title = song.title,
+                    channelName = song.artists.firstOrNull()?.name ?: "",
+                    channelId = song.artists.firstOrNull()?.id ?: "",
+                    duration = song.duration?.toString() ?: "0",
+                    thumbnailUrl = song.thumbnail ?: ""
+                )
+            }
+        }.onFailure {
+            Log.e("YouTubeService", "getPlaylistVideos() failed", it)
+        }
+    }
+
+    /**
+     * Extract a channel ID or browse ID from various YouTube URL formats.
+     */
+    private fun extractChannelId(input: String): String {
+        val trimmed = input.trim()
+
+        // Already a channel/browse ID
+        if (trimmed.startsWith("UC") && !trimmed.contains("/")) return trimmed
+
+        // /channel/UCxxx
+        val channelRegex = Regex("""youtube\.com/channel/(UC[a-zA-Z0-9_-]+)""")
+        channelRegex.find(trimmed)?.let { return it.groupValues[1] }
+
+        // @handle
+        val handleRegex = Regex("""youtube\.com/@([a-zA-Z0-9_.-]+)""")
+        handleRegex.find(trimmed)?.let {
+            val handle = it.groupValues[1]
+            // For handles, we use the browse endpoint with the handle
+            return "@$handle"
+        }
+
+        // /c/name or /user/name
+        val customRegex = Regex("""youtube\.com/(?:c|user)/([a-zA-Z0-9_.-]+)""")
+        customRegex.find(trimmed)?.let {
+            return it.groupValues[1]
+        }
+
+        // If just a handle without URL
+        if (trimmed.startsWith("@")) return trimmed
+
+        // Return as-is (might be a browse ID)
+        return trimmed
+    }
 }

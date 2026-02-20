@@ -40,3 +40,26 @@ data class PlaybackState(
 enum class PlayerState {
     IDLE, LOADING, PLAYING, PAUSED, ENDED, ERROR
 }
+
+@Serializable
+data class ResolvedChannel(
+    val channelId: String,
+    val name: String,
+    val avatarUrl: String
+)
+
+@Serializable
+data class ChannelSection(
+    val title: String,
+    val items: List<VideoInfo>,
+    val continuation: String?,
+    val browseId: String? = null,
+    val params: String? = null
+)
+
+@Serializable
+data class ChannelPageResult(
+    val channelName: String,
+    val channelAvatar: String?,
+    val sections: List<ChannelSection>
+)

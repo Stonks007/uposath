@@ -6,7 +6,8 @@ import type {
     VideoInfo,
     PlaybackState,
     QueueResult,
-    PlaylistInfo
+    PlaylistInfo,
+    ChannelPageResult
 } from './definitions';
 
 export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
@@ -69,6 +70,26 @@ export class DhammaAudioWeb extends WebPlugin implements DhammaAudioPlugin {
             videos: this.mockVideos.filter(v => v.title.toLowerCase().includes(options.query.toLowerCase())),
             hasMore: false
         };
+    }
+
+    async resolveChannelUrl(options: { url: string }): Promise<ChannelInfo> {
+        return {
+            id: 'UC0ypu1lL-Srd4O7XHjtIQrg',
+            name: 'Mock Channel',
+            avatarUrl: '',
+        };
+    }
+
+    async getChannelPage(options: { channelId: string }): Promise<ChannelPageResult> {
+        return {
+            channelName: 'Mock Channel',
+            channelAvatar: null,
+            sections: [{ title: 'Videos', videos: this.mockVideos, continuation: null }]
+        };
+    }
+
+    async setPlaybackSpeed(options: { speed: number }): Promise<{ success: boolean }> {
+        return { success: true };
     }
 
     async playVideo(options: { video: VideoInfo }): Promise<{ success: boolean }> {

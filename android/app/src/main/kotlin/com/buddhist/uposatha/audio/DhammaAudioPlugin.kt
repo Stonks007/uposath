@@ -175,4 +175,79 @@ class DhammaAudioPlugin : Plugin() {
             put("currentIndex", 0)
         })
     }
+
+    @PluginMethod
+    fun resolveChannelUrl(call: PluginCall) {
+        val url = call.getString("url") ?: return call.reject("Missing url")
+        Log.d("DhammaAudio", "resolveChannelUrl called for: $url")
+        scope.launch {
+            youtube.resolveChannel(url).onSuccess { channel ->
+                call.resolve(JSObject().apply {
+                    put("id", channel.channelId)
+                    put("name", channel.name)
+                    put("avatarUrl", channel.avatarUrl)
+                })
+            }.onFailure { call.reject(it.message) }
+        }
+    }
+
+    @PluginMethod
+    fun getChannelPage(call: PluginCall) {
+        val channelId = call.getString("channelId") ?: return call.reject("Missing channelId")
+        Log.d("DhammaAudio", "getChannelPage called for: $channelId")
+        scope.launch {
+            youtube.getChannelPage(channelId).onSuccess { result ->
+                val sectionsArr = JSArray()
+                result.sections.forEach { section ->
+                    val videosArr = JSArray()
+                    section.items.forEach { video ->
+                        videosArr.put(JSObject().apply {
+                            put("id", video.videoId)
+                            put("title", video.title)
+                            put("channelName", video.channelName)
+                            put("channelId", video.channelId)
+                            put("duration", video.duration)
+                            put("thumbnailUrl", video.thumbnailUrl)
+                        })
+                    }
+                    sectionsArr.put(JSObject().apply {
+                        put("title", section.title)
+                        put("videos", videosArr)
+                        put("continuation", section.continuation)
+                        put("browseId", section.browseId)
+                        put("params", section.params)
+                    })
+                }
+                call.resolve(JSObject().apply {
+                    put("channelName", result.channelName)
+                    put("channelAvatar", result.channelAvatar)
+                    put("sections", sectionsArr)
+                })
+            }.onFailure { call.reject(it.message) }
+        }
+    }
+
+    @PluginMethod
+    fun getPlaylistVideos(call: PluginCall) {
+        val playlistId = call.getString("playlistId") ?: return call.reject("Missing playlistId")
+        Log.d("DhammaAudio", "getPlaylistVideos called for: $playlistId")
+        scope.launch {
+            youtube.getPlaylistVideos(playlistId).onSuccess { videos ->
+                val arr = JSArray()
+                videos.forEach { video ->
+                    arr.put(JSObject().apply {
+                        put("id", video.videoId)
+                        put("title", video.title)
+                        put("channelName", video.channelName)
+                        put("channelId", video.channelId)
+                        put("duration", video.duration)
+                        put("thumbnailUrl", video.thumbnailUrl)
+                    })
+                }
+                call.resolve(JSObject().apply {
+                    put("videos", arr)
+                })
+            }.onFailure { call.reject(it.message) }
+        }
+    }
 }
