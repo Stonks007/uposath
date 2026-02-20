@@ -64,8 +64,6 @@ android/log_raw.txt
 /capacitor-cordova-ios-plugins
 android/app/src/main/assets/public
 android/app/src/main/assets/capacitor.config.json
-android/capacitor.settings.gradle
-android/app/capacitor.build.gradle
 
 # Android local properties
 **/local.properties
