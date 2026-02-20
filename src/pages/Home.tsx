@@ -19,6 +19,7 @@ import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { MalaService } from '../services/MalaService';
 import { getSavedLocation, getObserver } from '../services/locationManager';
+import { getDefaultChannel } from '../services/channelManager';
 import { warmUpFestivalCache } from '../services/festivalCacheService';
 import './Home.css';
 
@@ -30,6 +31,7 @@ const Home: React.FC = () => {
     meditationMinutes: 0,
     malaCount: 0
   });
+  const [channelName, setChannelName] = useState('Dhamma Inspiration');
 
   useEffect(() => {
     loadStats();
@@ -37,7 +39,19 @@ const Home: React.FC = () => {
     getSavedLocation().then(loc => {
       warmUpFestivalCache(getObserver(loc));
     });
+    loadChannel();
   }, []);
+
+  const loadChannel = async () => {
+    try {
+      const def = await getDefaultChannel();
+      if (def) {
+        setChannelName(def.name);
+      }
+    } catch (err) {
+      console.error('Failed to load default channel:', err);
+    }
+  };
 
   const loadStats = async () => {
     try {
@@ -89,7 +103,7 @@ const Home: React.FC = () => {
               <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
                 <IonIcon icon={musicalNotesOutline} color="primary" />
               </div>
-              <h3 className="home-section-title">Dhamma Inspiration</h3>
+              <h3 className="home-section-title">Latest from {channelName}</h3>
             </div>
             <DhammaAudioWidget />
           </section>
