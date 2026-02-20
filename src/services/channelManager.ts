@@ -7,7 +7,7 @@
 import { Preferences } from '@capacitor/preferences';
 
 const CHANNELS_KEY = 'dhamma_library_channels';
-const SEEDED_KEY = 'dhamma_library_seeded';
+const SEEDED_KEY = 'dhamma_library_seeded_v3';
 
 export interface SavedChannel {
     id: string;          // YouTube channel ID (UCxxx or browse ID)
@@ -17,6 +17,7 @@ export interface SavedChannel {
 }
 
 // Pre-seeded channels for first launch
+// Using YouTube @handle format — resolved by direct YouTube scrape
 const SEED_CHANNELS: SavedChannel[] = [
     {
         id: 'UC0ypu1lL-Srd4O7XHjtIQrg',
@@ -25,13 +26,13 @@ const SEED_CHANNELS: SavedChannel[] = [
         isDefault: true,
     },
     {
-        id: 'UCAHMOyFb4gCMuIMnNOGacfQ',
+        id: '@DhammatalksOrg',
         name: 'dhammatalks.org',
         avatarUrl: '',
         isDefault: false,
     },
     {
-        id: 'UC9aktCHGbnM2CnGB9dQfSfA',
+        id: '@BuddhaRashmi',
         name: 'Buddha Rashmi',
         avatarUrl: '',
         isDefault: false,

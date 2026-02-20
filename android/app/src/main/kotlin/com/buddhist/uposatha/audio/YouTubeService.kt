@@ -113,21 +113,45 @@ class YouTubeService {
 
     /**
      * Resolve a YouTube URL to channel metadata.
-     * Supports @handle, /c/name, /channel/UCxxx, or just a channel ID.
+     * Uses direct HTTP to www.youtube.com to scrape channel info,
+     * because the YouTube Music (WEB_REMIX) API doesn't support regular channels.
      */
     suspend fun resolveChannel(url: String): Result<ResolvedChannel> = withContext(Dispatchers.IO) {
         Log.d("YouTubeService", "resolveChannel() called with url: $url")
         runCatching {
-            // Extract channel ID or browse ID from URL
-            val channelId = extractChannelId(url)
-            Log.d("YouTubeService", "Resolved URL to channelId/browseId: $channelId")
+            val channelUrl = normalizeChannelUrl(url)
+            Log.d("YouTubeService", "Normalized URL: $channelUrl")
 
-            // Fetch the artist/channel page to get metadata
-            val artistPage = YouTube.artist(channelId).getOrThrow()
+            val client = okhttp3.OkHttpClient.Builder()
+                .followRedirects(true)
+                .build()
+            val request = okhttp3.Request.Builder()
+                .url(channelUrl)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .header("Accept-Language", "en-US,en;q=0.9")
+                .build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string() ?: throw Exception("Empty response from YouTube")
+            
+            // Extract channel ID from page
+            val channelId = extractFromHtml(body, """"channelId"\s*:\s*"(UC[a-zA-Z0-9_-]+)"""")
+                ?: extractFromHtml(body, """"externalId"\s*:\s*"(UC[a-zA-Z0-9_-]+)"""")
+                ?: throw Exception("Could not find channel ID in page")
+            
+            // Extract channel name
+            val name = extractFromHtml(body, """"title"\s*:\s*"([^"]+)"""")
+                ?: extractFromHtml(body, """<title>([^<]+)</title>""")?.replace(" - YouTube", "")
+                ?: "Unknown"
+            
+            // Extract avatar
+            val avatar = extractFromHtml(body, """"avatar"\s*:\s*\{[^}]*"url"\s*:\s*"([^"]+)"""")
+                ?: ""
+
+            Log.d("YouTubeService", "Resolved: id=$channelId, name=$name")
             ResolvedChannel(
-                channelId = artistPage.artist.channelId ?: channelId,
-                name = artistPage.artist.title,
-                avatarUrl = artistPage.artist.thumbnail ?: ""
+                channelId = channelId,
+                name = name,
+                avatarUrl = avatar
             )
         }.onFailure {
             Log.e("YouTubeService", "resolveChannel() failed", it)
@@ -135,32 +159,114 @@ class YouTubeService {
     }
 
     /**
-     * Get all sections/tabs from a channel page for dynamic tab rendering.
+     * Get channel page content.
+     * Regular YouTube scrape is primary (highest priority).
+     * YouTube Music artist API is secondary fallback.
      */
     suspend fun getChannelPage(channelId: String): Result<ChannelPageResult> = withContext(Dispatchers.IO) {
         Log.d("YouTubeService", "getChannelPage() called for channelId: $channelId")
         runCatching {
-            val artistPage = YouTube.artist(channelId).getOrThrow()
-            Log.d("YouTubeService", "Artist page: ${artistPage.artist.title}, sections: ${artistPage.sections.size}")
+            // PRIMARY: scrape the regular YouTube channel page
+            try {
+                Log.d("YouTubeService", "Trying regular YouTube scrape for $channelId")
+                val channelUrl = if (channelId.startsWith("UC")) {
+                    "https://www.youtube.com/channel/$channelId/videos"
+                } else {
+                    "https://www.youtube.com/$channelId/videos"
+                }
+                
+                val client = okhttp3.OkHttpClient.Builder()
+                    .followRedirects(true)
+                    .build()
+                val request = okhttp3.Request.Builder()
+                    .url(channelUrl)
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .header("Accept-Language", "en-US,en;q=0.9")
+                    .build()
+                val response = client.newCall(request).execute()
+                val body = response.body?.string() ?: throw Exception("Empty response")
+                
+                // Extract channel name
+                val channelName = extractFromHtml(body, """"title"\s*:\s*"([^"]+)"""")
+                    ?: extractFromHtml(body, """<title>([^<]+)</title>""")?.replace(" - YouTube", "")
+                    ?: channelId
+                
+                // Extract avatar URL
+                val avatarUrl = extractFromHtml(body, """"avatar"\s*:\s*\{[^}]*"url"\s*:\s*"([^"]+)"""")
+                
+                // Extract video renderers with titles
+                val videos = mutableListOf<VideoInfo>()
+                val rendererRegex = Regex(""""videoRenderer"\s*:\s*\{""")
+                val rendererStarts = rendererRegex.findAll(body).map { it.range.first }.toList()
+                
+                for (start in rendererStarts.take(30)) {
+                    try {
+                        val subBody = body.substring(start, minOf(start + 3000, body.length))
+                        val vid = Regex(""""videoId"\s*:\s*"([a-zA-Z0-9_-]{11})"""").find(subBody)?.groupValues?.get(1) ?: continue
+                        val title = Regex(""""title"\s*:\s*\{\s*"runs"\s*:\s*\[\s*\{\s*"text"\s*:\s*"([^"]+)"""").find(subBody)?.groupValues?.get(1) ?: continue
+                        val thumbnail = "https://i.ytimg.com/vi/$vid/hqdefault.jpg"
+                        val lengthText = Regex(""""lengthText"\s*:\s*\{\s*"[^"]*"\s*:\s*"([^"]+)"""").find(subBody)?.groupValues?.get(1) ?: "0"
+                        val durationSec = parseDuration(lengthText)
 
-            val sections = artistPage.sections.map { section ->
-                Log.d("YouTubeService", "Section: '${section.title}' items=${section.items.size} cont=${section.continuation != null}")
-                ChannelSection(
-                    title = section.title,
-                    items = section.items.map { toVideoInfo(it) },
-                    continuation = section.continuation,
-                    browseId = section.moreEndpoint?.browseId,
-                    params = section.moreEndpoint?.params
-                )
+                        videos.add(VideoInfo(
+                            videoId = vid,
+                            title = title,
+                            channelName = channelName,
+                            channelId = channelId,
+                            duration = durationSec.toString(),
+                            thumbnailUrl = thumbnail
+                        ))
+                    } catch (e: Exception) {
+                        // Skip malformed renderers
+                    }
+                }
+
+                Log.d("YouTubeService", "Scraped ${videos.size} videos from regular YouTube")
+                
+                if (videos.isNotEmpty()) {
+                    return@runCatching ChannelPageResult(
+                        channelName = channelName,
+                        channelAvatar = avatarUrl,
+                        sections = listOf(
+                            ChannelSection(
+                                title = "Videos",
+                                items = videos,
+                                continuation = null
+                            )
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Log.w("YouTubeService", "Regular YouTube scrape failed for $channelId", e)
             }
 
-            ChannelPageResult(
-                channelName = artistPage.artist.title,
-                channelAvatar = artistPage.artist.thumbnail,
-                sections = sections
-            )
+            // SECONDARY: try YouTube Music artist API (works for music/chanting channels)
+            try {
+                val artistPage = YouTube.artist(channelId).getOrThrow()
+                if (artistPage.sections.isNotEmpty()) {
+                    Log.d("YouTubeService", "YT Music artist page loaded: ${artistPage.artist.title}, sections: ${artistPage.sections.size}")
+                    val sections = artistPage.sections.map { section ->
+                        ChannelSection(
+                            title = section.title,
+                            items = section.items.map { toVideoInfo(it) },
+                            continuation = section.continuation,
+                            browseId = section.moreEndpoint?.browseId,
+                            params = section.moreEndpoint?.params
+                        )
+                    }
+                    return@runCatching ChannelPageResult(
+                        channelName = artistPage.artist.title,
+                        channelAvatar = artistPage.artist.thumbnail,
+                        sections = sections
+                    )
+                }
+            } catch (e: Exception) {
+                Log.w("YouTubeService", "YouTube Music artist API also failed for $channelId", e)
+            }
+
+            throw Exception("Could not load channel content for $channelId from any source")
         }.onFailure {
-            Log.e("YouTubeService", "getChannelPage() failed", it)
+            Log.e("YouTubeService", "getChannelPage() failed completely", it)
         }
     }
 
@@ -188,12 +294,31 @@ class YouTubeService {
     }
 
     /**
-     * Extract a channel ID or browse ID from various YouTube URL formats.
+     * Normalize various YouTube URL formats to a full channel URL.
+     */
+    private fun normalizeChannelUrl(input: String): String {
+        val trimmed = input.trim()
+        
+        // Already a full URL
+        if (trimmed.startsWith("http")) return trimmed
+        
+        // @handle
+        if (trimmed.startsWith("@")) return "https://www.youtube.com/$trimmed"
+        
+        // UC channel ID
+        if (trimmed.startsWith("UC")) return "https://www.youtube.com/channel/$trimmed"
+        
+        // Must be a custom URL slug
+        return "https://www.youtube.com/$trimmed"
+    }
+
+    /**
+     * Extract channel ID or path from various URL formats for browsing.
      */
     private fun extractChannelId(input: String): String {
         val trimmed = input.trim()
 
-        // Already a channel/browse ID
+        // Already a channel ID
         if (trimmed.startsWith("UC") && !trimmed.contains("/")) return trimmed
 
         // /channel/UCxxx
@@ -202,22 +327,39 @@ class YouTubeService {
 
         // @handle
         val handleRegex = Regex("""youtube\.com/@([a-zA-Z0-9_.-]+)""")
-        handleRegex.find(trimmed)?.let {
-            val handle = it.groupValues[1]
-            // For handles, we use the browse endpoint with the handle
-            return "@$handle"
-        }
+        handleRegex.find(trimmed)?.let { return "@${it.groupValues[1]}" }
 
         // /c/name or /user/name
         val customRegex = Regex("""youtube\.com/(?:c|user)/([a-zA-Z0-9_.-]+)""")
-        customRegex.find(trimmed)?.let {
-            return it.groupValues[1]
-        }
+        customRegex.find(trimmed)?.let { return it.groupValues[1] }
 
         // If just a handle without URL
         if (trimmed.startsWith("@")) return trimmed
 
-        // Return as-is (might be a browse ID)
         return trimmed
+    }
+
+    /**
+     * Extract a regex match from HTML content.
+     */
+    private fun extractFromHtml(html: String, pattern: String): String? {
+        return try {
+            Regex(pattern).find(html)?.groupValues?.get(1)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Parse duration string like "12:34" or "1:02:03" to seconds.
+     */
+    private fun parseDuration(text: String): Int {
+        val parts = text.split(":").mapNotNull { it.trim().toIntOrNull() }
+        return when (parts.size) {
+            3 -> parts[0] * 3600 + parts[1] * 60 + parts[2]
+            2 -> parts[0] * 60 + parts[1]
+            1 -> parts[0]
+            else -> 0
+        }
     }
 }
