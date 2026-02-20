@@ -145,8 +145,12 @@ class YouTubeService {
                 ?: "Unknown"
             
             // Extract avatar
-            val avatar = extractFromHtml(body, """"avatar"\s*:\s*\{\s*"thumbnails"\s*:\s*\[\s*\{\s*"url"\s*:\s*"([^"]+)"""")
+            var avatar = extractFromHtml(body, """"avatar"\s*:\s*\{\s*"thumbnails"\s*:\s*\[\s*\{\s*"url"\s*:\s*"([^"]+)"""")
                 ?: ""
+                
+            if (avatar.startsWith("//")) {
+                avatar = "https:$avatar"
+            }
 
             Log.d("YouTubeService", "Resolved: id=$channelId, name=$name")
             ResolvedChannel(
@@ -278,6 +282,9 @@ class YouTubeService {
                 }
                 if (avatarUrl.isEmpty()) {
                     avatarUrl = Regex(""""avatar"\s*:\s*\{\s*"thumbnails"\s*:\s*\[\s*\{\s*"url"\s*:\s*"([^"]+)"""").find(firstBody)?.groupValues?.get(1) ?: ""
+                }
+                if (avatarUrl.startsWith("//")) {
+                    avatarUrl = "https:$avatarUrl"
                 }
 
                 val sections = mutableListOf<ChannelSection>()
