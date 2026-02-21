@@ -84,7 +84,7 @@ const CalendarPage: React.FC = () => {
         }
     }, [currentDate, viewMode, observer]);
 
-    const generateMonthData = (date: Date) => {
+    const generateMonthData = async (date: Date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
         const days = new Date(year, month + 1, 0).getDate();
@@ -95,6 +95,9 @@ const CalendarPage: React.FC = () => {
             const status = getUposathaStatus(dayDate, observer);
             const festival = checkFestival(dayDate, observer, status.panchangam);
             data.push({ date: dayDate, uposatha: status, festival });
+
+            // Yield every 15 days
+            if (d % 15 === 0) await new Promise(r => setTimeout(r, 0));
         }
         setDaysInMonth(data);
     };

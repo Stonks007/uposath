@@ -34,15 +34,20 @@ const Home: React.FC = () => {
   const [channelName, setChannelName] = useState('Dhamma Inspiration');
 
   useIonViewWillEnter(() => {
-    loadStats();
-    loadChannel();
+    // Small delay to ensure smooth page transition
+    setTimeout(() => {
+      loadStats();
+      loadChannel();
+    }, 500);
   });
 
   useEffect(() => {
-    // Warm up festival cache in background once on mount
-    getSavedLocation().then(loc => {
-      warmUpFestivalCache(getObserver(loc));
-    });
+    // Warm up festival cache in background after app settles
+    setTimeout(() => {
+      getSavedLocation().then(loc => {
+        warmUpFestivalCache(getObserver(loc));
+      });
+    }, 3000);
   }, []);
 
   const loadChannel = async () => {

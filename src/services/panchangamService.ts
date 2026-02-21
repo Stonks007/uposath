@@ -1,6 +1,6 @@
 
 import { getPanchangam as getPanchangamRaw, type Panchangam } from '@ishubhamx/panchangam-js';
-import type { Observer } from 'astronomy-engine';
+import type { Observer } from '@ishubhamx/panchangam-js';
 
 const panchangamCache = new Map<string, Panchangam>();
 

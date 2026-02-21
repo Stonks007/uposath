@@ -14,7 +14,7 @@
  */
 import { tithiNames, type Panchangam } from '@ishubhamx/panchangam-js';
 import { getPanchangam } from './panchangamService';
-import type { Observer } from 'astronomy-engine';
+import type { Observer } from '@ishubhamx/panchangam-js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

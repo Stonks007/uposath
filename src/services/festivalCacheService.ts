@@ -58,7 +58,7 @@ export async function getPersistentFestivals(
 
     // Perform fresh scan
     await initMahayanaCalendar();
-    const festivals = getUpcomingFestivals(now, observer, 365);
+    const festivals = await getUpcomingFestivals(now, observer, 365);
 
     // Save to cache
     const cacheData: CachedData = {

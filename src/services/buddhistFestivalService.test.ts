@@ -81,8 +81,8 @@ describe('BuddhistFestivalService', () => {
 
     // ─── Upcoming Festival Scan ──────────────────────────────────────────────
 
-    it('should scan upcoming festivals from all 3 traditions (2026)', () => {
-        const upcoming = getUpcomingFestivals(new Date('2026-02-01'), nagpur, 365);
+    it('should scan upcoming festivals from all 3 traditions (2026)', async () => {
+        const upcoming = await getUpcomingFestivals(new Date('2026-02-01'), nagpur, 365);
 
         // Should have festivals from multiple traditions
         const traditions = new Set(upcoming.map(m => m.festival.tradition));

@@ -26,8 +26,38 @@ import {
 } from '../services/dailyVerseNotificationService';
 import { Observer } from '@ishubhamx/panchangam-js';
 import { getTimezones } from '../services/timeUtils';
-import { City } from 'country-state-city';
-import tzLookup from 'tz-lookup';
+// City import removed from here and moved to lazy getter to speed up bundle parsing
+// City and TzLookup imports removed from here and moved to lazy getters to speed up bundle parsing
+
+// Lazy load city data to keep bundle small and startup fast
+let memoizedCities: any[] | null = null;
+const getCitiesLazy = async () => {
+    if (!memoizedCities) {
+        try {
+            const { City } = await import('country-state-city');
+            memoizedCities = City.getAllCities();
+        } catch (e) {
+            console.error('Failed to load cities', e);
+            return [];
+        }
+    }
+    return memoizedCities;
+};
+
+let memoizedTzLookup: any = null;
+const getTzLookupLazy = async () => {
+    if (!memoizedTzLookup) {
+        try {
+            const { default: tz } = await import('tz-lookup');
+            memoizedTzLookup = tz;
+        } catch (e) {
+            console.error('Failed to load tz-lookup', e);
+            return () => 'UTC';
+        }
+    }
+    return memoizedTzLookup;
+};
+
 import { IonSelect, IonSelectOption, IonIcon, useIonAlert } from '@ionic/react';
 import { locationOutline, timeOutline, globeOutline, caretUpCircleOutline } from 'ionicons/icons';
 import { MalaService } from '../services/MalaService';
@@ -49,6 +79,11 @@ const SettingsPage: React.FC = () => {
 
     useIonViewWillEnter(() => {
         loadSettings();
+        // Warm up heavy libraries in the background while user is looking at settings
+        setTimeout(() => {
+            getCitiesLazy();
+            getTzLookupLazy();
+        }, 2000);
     });
 
     const loadSettings = async () => {
@@ -108,38 +143,84 @@ const SettingsPage: React.FC = () => {
         }
     };
 
+    const searchIdRef = React.useRef(0);
+    const searchTimeoutRef = React.useRef<any>(null);
+
+    // Helper function to filter and map cities
+    // Uses chunked processing to keep the UI thread alive during the scan of 200k+ cities
+    // Abortable if a new search starts
+    const getFilteredCities = async (query: string): Promise<SavedLocation[]> => {
+        const currentId = ++searchIdRef.current;
+        const q = query.toLowerCase();
+
+        // Only load libraries when first needed and not already loaded
+        const allCities = await getCitiesLazy();
+        if (currentId !== searchIdRef.current) return [];
+
+        const tzLookup = await getTzLookupLazy();
+        if (currentId !== searchIdRef.current) return [];
+
+        const matches: any[] = [];
+        const CHUNK_SIZE = 1000;
+
+        for (let i = 0; i < allCities.length; i++) {
+            // Check for abort every chunk
+            if (i % CHUNK_SIZE === 0) {
+                if (currentId !== searchIdRef.current) return [];
+                // Yield to event loop
+                await new Promise(r => setTimeout(r, 0));
+            }
+
+            const c = allCities[i];
+            if (c.name.toLowerCase().indexOf(q) !== -1) {
+                matches.push(c);
+                // Yield on every 5 matches to allow UI to breathe
+                if (matches.length % 5 === 0) {
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            if (matches.length >= 15) break;
+        }
+
+        if (currentId !== searchIdRef.current) return [];
+
+        return matches
+            .sort((a, b) => {
+                const aName = a.name.toLowerCase();
+                const bName = b.name.toLowerCase();
+                const aStarts = aName.startsWith(q);
+                const bStarts = bName.startsWith(q);
+                return aStarts && !bStarts ? -1 :
+                    !aStarts && bStarts ? 1 :
+                        aName.length - bName.length;
+            })
+            .map((c) => {
+                const lat = parseFloat(c.latitude);
+                const lon = parseFloat(c.longitude);
+                return {
+                    name: `${c.name}, ${c.stateCode}, ${c.countryCode}`,
+                    latitude: lat,
+                    longitude: lon,
+                    altitude: 0,
+                    timezone: tzLookup(lat, lon)
+                };
+            });
+    };
+
     const handleCitySearch = (query: string) => {
         setCitySearch(query);
+
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
         if (query.length > 2) {
-            const q = query.toLowerCase();
-            const allCities = City.getAllCities();
-            const matches = allCities
-                .filter((c) => c.name.toLowerCase().includes(q))
-                .sort((a, b) => {
-                    const aName = a.name.toLowerCase();
-                    const bName = b.name.toLowerCase();
-                    // Exact starts-with hits first
-                    const aStarts = aName.startsWith(q);
-                    const bStarts = bName.startsWith(q);
-                    if (aStarts && !bStarts) return -1;
-                    if (!aStarts && bStarts) return 1;
-                    // Then shorter names
-                    return aName.length - bName.length;
-                })
-                .slice(0, 10)
-                .map((c) => {
-                    const lat = parseFloat(c.latitude);
-                    const lon = parseFloat(c.longitude);
-                    return {
-                        name: `${c.name}, ${c.stateCode}, ${c.countryCode}`,
-                        latitude: lat,
-                        longitude: lon,
-                        altitude: 0,
-                        timezone: tzLookup(lat, lon)
-                    };
-                });
-            setFilteredCities(matches);
-            setShowCityDropdown(true);
+            searchTimeoutRef.current = setTimeout(async () => {
+                const matches = await getFilteredCities(query);
+                setFilteredCities(matches);
+                setShowCityDropdown(true);
+            }, 300);
         } else {
             setFilteredCities([]);
             setShowCityDropdown(false);

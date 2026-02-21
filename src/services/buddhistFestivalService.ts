@@ -450,11 +450,11 @@ export function checkFestivalByTradition(
     return null;
 }
 
-export function getUpcomingFestivals(
+export async function getUpcomingFestivals(
     startDate: Date,
     observer: Observer,
     days = 365
-): FestivalMatch[] {
+): Promise<FestivalMatch[]> {
     const results: FestivalMatch[] = [];
     const seenIds = new Set<string>();
     const endDate = new Date(startDate);
@@ -478,6 +478,7 @@ export function getUpcomingFestivals(
 
     // ── Theravada + Mahayana: daily scan ──
     const current = new Date(startDate);
+    let daysProcessed = 0;
     while (current < endDate) {
         const p = getPanchangam(current, observer);
 
@@ -498,6 +499,12 @@ export function getUpcomingFestivals(
         }
 
         current.setDate(current.getDate() + 1);
+        daysProcessed++;
+
+        // Yield frequently to keep UI responsive on lower-end devices
+        if (daysProcessed % 10 === 0) {
+            await new Promise(r => setTimeout(r, 10));
+        }
     }
 
     // Sort by date
