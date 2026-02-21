@@ -4,6 +4,7 @@ import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonGrid, IonRow, 
 import { checkmarkCircle, closeCircle, moon, ellipseOutline } from 'ionicons/icons';
 import { UposathaStats, UposathaObservance } from '../../types/ObservanceTypes';
 import { UposathaObservanceService } from '../../services/UposathaObservanceService';
+import '../../pages/SatiStatsPage.css';
 
 const UposathaStatsView: React.FC = () => {
     const [stats, setStats] = useState<UposathaStats | null>(null);
@@ -33,60 +34,67 @@ const UposathaStatsView: React.FC = () => {
     return (
         <div style={{ paddingBottom: '40px' }}>
             {/* Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)', color: 'white' }}>
-                    <IonCardContent className="text-center">
-                        <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{stats.rate.toFixed(0)}%</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.9 }}>Observance Rate</div>
-                    </IonCardContent>
-                </IonCard>
-                <IonCard style={{ margin: 0, background: 'linear-gradient(135deg, #f59e0b 0%, #ca8a04 100%)', color: 'white' }}>
-                    <IonCardContent className="text-center">
-                        <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{stats.currentStreak}</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.9 }}>Current Streak</div>
-                    </IonCardContent>
-                </IonCard>
+            <div className="observance-summary-grid">
+                <div className="glass-card observance-summary-card text-center">
+                    <div className="observance-rate-value">{stats.rate.toFixed(0)}%</div>
+                    <div className="stat-label-small">Observance Rate</div>
+                </div>
+                <div className="glass-card observance-summary-card text-center">
+                    <div className="streak-value">{stats.currentStreak}</div>
+                    <div className="stat-label-small">Current Streak</div>
+                </div>
             </div>
 
-            <IonCard style={{ margin: '0 0 16px 0' }}>
-                <IonCardHeader>
-                    <IonCardTitle style={{ fontSize: '1rem' }}>Moon Phase Breakdown</IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent>
-                    <div style={{ marginBottom: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '4px' }}>
-                            <span>Full Moon 🌕</span>
-                            <span>{stats.byMoonPhase.full.observed} / {stats.byMoonPhase.full.total}</span>
-                        </div>
-                        <IonProgressBar value={stats.byMoonPhase.full.total > 0 ? stats.byMoonPhase.full.observed / stats.byMoonPhase.full.total : 0} color="success" />
+            <div className="glass-card moon-breakdown-card">
+                <h3>Moon Phase Breakdown</h3>
+                <div className="moon-phase-row">
+                    <div className="moon-phase-info">
+                        <span>Full Moon 🌕</span>
+                        <span>{stats.byMoonPhase.full.observed} / {stats.byMoonPhase.full.total}</span>
                     </div>
-                    <div style={{ marginBottom: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '4px' }}>
-                            <span>New Moon 🌑</span>
-                            <span>{stats.byMoonPhase.new.observed} / {stats.byMoonPhase.new.total}</span>
-                        </div>
-                        <IonProgressBar value={stats.byMoonPhase.new.total > 0 ? stats.byMoonPhase.new.observed / stats.byMoonPhase.new.total : 0} color="primary" />
+                    <IonProgressBar value={stats.byMoonPhase.full.total > 0 ? stats.byMoonPhase.full.observed / stats.byMoonPhase.full.total : 0} color="primary" />
+                </div>
+                <div className="moon-phase-row">
+                    <div className="moon-phase-info">
+                        <span>New Moon 🌑</span>
+                        <span>{stats.byMoonPhase.new.observed} / {stats.byMoonPhase.new.total}</span>
                     </div>
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '4px' }}>
-                            <span>Quarters 🌗</span>
-                            <span>{stats.byMoonPhase.quarter.observed} / {stats.byMoonPhase.quarter.total}</span>
-                        </div>
-                        <IonProgressBar value={stats.byMoonPhase.quarter.total > 0 ? stats.byMoonPhase.quarter.observed / stats.byMoonPhase.quarter.total : 0} color="warning" />
+                    <IonProgressBar value={stats.byMoonPhase.new.total > 0 ? stats.byMoonPhase.new.observed / stats.byMoonPhase.new.total : 0} color="medium" />
+                </div>
+                <div className="moon-phase-row">
+                    <div className="moon-phase-info">
+                        <span>Quarters 🌗</span>
+                        <span>{stats.byMoonPhase.quarter.observed} / {stats.byMoonPhase.quarter.total}</span>
                     </div>
-                </IonCardContent>
-            </IonCard>
+                    <IonProgressBar value={stats.byMoonPhase.quarter.total > 0 ? stats.byMoonPhase.quarter.observed / stats.byMoonPhase.quarter.total : 0} color="secondary" />
+                </div>
+            </div>
 
-            <h3 style={{ marginLeft: '4px', fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--ion-color-step-800)' }}>Recent History</h3>
-            <IonList inset>
+            <h3 className="practice-breakdown-title">Recent History</h3>
+            <IonList inset={true} style={{ margin: '0', background: 'transparent' }}>
                 {history.slice(0, 10).map(obs => (
-                    <IonItem key={obs.id}>
-                        <div slot="start" style={{ fontSize: '1.5rem' }}>
+                    <IonItem key={obs.id} className="glass-card history-item" lines="none" detail={false}>
+                        <div slot="start" className="icon-wrapper icon-wrapper--medium history-item-icon" style={{
+                            borderColor: obs.status === 'observed' ? 'var(--color-mahayana-accent)40' : 'var(--ion-color-danger)40',
+                            background: obs.status === 'observed' ? 'var(--color-mahayana-accent)15' : 'var(--ion-color-danger)15',
+                            fontSize: '1.4rem'
+                        }}>
                             {getPhaseIcon(obs.moonPhase)}
                         </div>
                         <IonLabel>
-                            <h2>{new Date(obs.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</h2>
-                            <p>{obs.status === 'observed' ? (obs.level || 'Full') : (obs.skipReason || 'Skipped')}</p>
+                            <h2 style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>
+                                {new Date(obs.date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                            </h2>
+                            <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                                <span style={{
+                                    color: obs.status === 'observed' ? 'var(--color-mahayana-accent)' : 'var(--ion-color-danger)',
+                                    fontWeight: '700',
+                                    marginRight: '6px'
+                                }}>
+                                    {obs.status.toUpperCase()}
+                                </span>
+                                • {obs.status === 'observed' ? (obs.level || 'Full Practice') : (obs.skipReason || 'Not Recorded')}
+                            </p>
                         </IonLabel>
                         <IonNote slot="end">
                             {obs.status === 'observed' ? (
@@ -98,9 +106,9 @@ const UposathaStatsView: React.FC = () => {
                     </IonItem>
                 ))}
                 {history.length === 0 && (
-                    <IonItem lines="none">
-                        <IonLabel className="text-center text-gray-500 italic">No history yet.</IonLabel>
-                    </IonItem>
+                    <div className="glass-card" style={{ padding: '40px', textAlign: 'center', opacity: 0.6 }}>
+                        No history recorded.
+                    </div>
                 )}
             </IonList>
         </div>

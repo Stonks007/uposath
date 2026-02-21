@@ -8,12 +8,10 @@ import {
     IonToolbar,
     IonButtons,
     IonButton,
-    IonCard,
-    IonCardContent,
     IonIcon
 } from '@ionic/react';
 import { ellipsisVertical, chevronForward } from 'ionicons/icons';
-import { MalaService } from '../services/MalaService';
+import { useHistory } from 'react-router-dom';
 import AnapanasatiCard from '../components/sati/AnapanasatiCard';
 import TripleGemNavCard from '../components/sati/TripleGemNavCard';
 import EmptinessNavCard from '../components/sati/EmptinessNavCard';
@@ -24,10 +22,8 @@ import { getSavedLocation } from '../services/locationManager';
 
 
 const SatiPage: React.FC = () => {
+    const history = useHistory();
     const [uposathaLabel, setUposathaLabel] = useState<string | null>(null);
-    const [todayTotal, setTodayTotal] = useState<number>(0);
-    const [streak, setStreak] = useState<number>(0);
-    const [isUposatha, setIsUposatha] = useState(false);
 
     // Initial load
     useEffect(() => {
@@ -36,17 +32,10 @@ const SatiPage: React.FC = () => {
             const observer = loc ? new Observer(loc.latitude, loc.longitude, loc.altitude) : new Observer(24.7914, 85.0002, 111);
             const status = getUposathaStatus(new Date(), observer);
 
-            setIsUposatha(status.isUposatha);
             if (status.isUposatha) {
                 const icon = status.isFullMoon ? '🌕' : (status.isNewMoon ? '🌑' : '🌗');
                 setUposathaLabel(`${icon} ${status.paliLabel || 'Uposatha'} Day — Practice Triple Gem Recollection`);
             }
-
-            // Load Stats Summary
-            const total = await MalaService.getTodayTotal();
-            const stats = await MalaService.getStats();
-            setTodayTotal(total);
-            setStreak(stats.overall.currentStreak);
         };
         load();
     }, []);
@@ -67,12 +56,8 @@ const SatiPage: React.FC = () => {
             <IonContent fullscreen className="ion-padding">
                 {/* Uposatha Banner */}
                 {uposathaLabel && (
-                    <div style={{
-                        background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
-                        border: '1px solid #FDE68A',
-                        color: '#92400E',
+                    <div className="glass-card" style={{
                         padding: '16px',
-                        borderRadius: '16px',
                         marginBottom: '24px',
                         textAlign: 'center',
                         fontWeight: '700',
@@ -80,51 +65,41 @@ const SatiPage: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '10px',
-                        boxShadow: '0 4px 12px rgba(251, 191, 36, 0.12)',
                         fontSize: '0.95rem',
-                        lineHeight: '1.4'
+                        lineHeight: '1.4',
+                        background: 'rgba(255, 198, 112, 0.15)',
+                        borderColor: 'rgba(255, 198, 112, 0.3)',
+                        color: 'var(--color-accent-primary)'
                     }}>
-                        <span style={{ fontSize: '1.5rem' }}>✨</span>
+                        <span style={{ fontSize: '1.5rem', filter: 'drop-shadow(0 0 8px rgba(255,198,112,0.6))' }}>✨</span>
                         {uposathaLabel}
                     </div>
                 )}
 
                 {/* Statistics Card — top of page */}
-                <IonCard routerLink="/sati/stats" style={{
-                    borderRadius: '16px',
-                    margin: '16px 0',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    background: 'var(--color-bg-card, #ffffff)',
-                    overflow: 'hidden'
+                <div className="glass-card" onClick={() => history.push('/sati/stats')} style={{
+                    marginBottom: '24px',
+                    padding: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer'
                 }}>
-                    <IonCardContent style={{ padding: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div style={{
-                                    fontSize: '1.8rem',
-                                    width: '48px',
-                                    height: '48px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    background: 'var(--ion-color-primary-tint, #e0f2fe)',
-                                    borderRadius: '50%'
-                                }}>
-                                    📈
-                                </div>
-                                <div>
-                                    <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: 'var(--color-text-primary, #111827)' }}>
-                                        View Statistics
-                                    </h2>
-                                    <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: 'var(--color-text-secondary, #6b7280)' }}>
-                                        Track your practice progress
-                                    </p>
-                                </div>
-                            </div>
-                            <IonIcon icon={chevronForward} color="medium" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div className="icon-wrapper icon-wrapper--large" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' }}>
+                            📈
                         </div>
-                    </IonCardContent>
-                </IonCard>
+                        <div>
+                            <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>
+                                View Statistics
+                            </h2>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+                                Track your practice progress
+                            </p>
+                        </div>
+                    </div>
+                    <IonIcon icon={chevronForward} style={{ color: 'var(--color-text-tertiary)' }} />
+                </div>
 
                 {/* Triple Gem Recollection Card */}
                 <TripleGemNavCard />

@@ -1,0 +1,248 @@
+.sati-stats-container {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 16px;
+}
+
+.journey-overview-card {
+    padding: 24px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(255, 198, 112, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.journey-overview-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+}
+
+.stats-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.stat-value-large {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    font-family: var(--font-family-display);
+    color: var(--color-text-primary);
+}
+
+.stat-value-accent {
+    color: var(--color-accent-primary);
+}
+
+.stat-label-small {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-top: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.practice-breakdown-title {
+    margin: 0 0 16px 8px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-family: var(--font-family-display);
+    color: var(--color-text-primary);
+}
+
+.category-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.category-stat-card {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.category-stat-card .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.category-stat-card .cat-icon {
+    font-size: 1.4rem;
+}
+
+.category-stat-card .cat-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.category-stat-card .main-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-display);
+}
+
+.category-stat-card .sub-value {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+}
+
+/* History List Styles */
+.history-item {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --inner-padding-end: 12px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    --border-style: none;
+}
+
+.history-item-icon {
+    width: 42px;
+    height: 42px;
+    margin-right: 12px;
+}
+
+/* Modal Specific Styles */
+.type-breakdown-card {
+    margin-bottom: 16px;
+    padding: 20px;
+}
+
+.type-breakdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.type-breakdown-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.mini-log-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+.mini-log-title {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+    padding-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.mini-log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.mini-log-item:last-child {
+    border-bottom: none;
+}
+
+/* Custom Segment overrides if needed */
+ion-segment {
+    --background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 4px;
+    margin: 8px 16px;
+    width: auto;
+}
+
+ion-segment-button {
+    --indicator-color: var(--color-accent-primary);
+    --color-checked: var(--color-accent-primary);
+    --color: var(--color-text-muted);
+    --border-radius: 8px;
+    min-height: 36px;
+}
+
+/* Observance View Styles */
+.observance-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.observance-summary-card {
+    padding: 20px;
+}
+
+.observance-rate-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-mahayana-accent);
+    /* Greenish for positivity */
+    font-family: var(--font-family-display);
+}
+
+.streak-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-accent-primary);
+    font-family: var(--font-family-display);
+}
+
+.moon-breakdown-card {
+    margin-bottom: 24px;
+    padding: 20px;
+}
+
+.moon-breakdown-card h3 {
+    margin: 0 0 16px 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.moon-phase-row {
+    margin-bottom: 16px;
+}
+
+.moon-phase-row:last-child {
+    margin-bottom: 0;
+}
+
+.moon-phase-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    --background: rgba(255, 255, 255, 0.05);
+}
