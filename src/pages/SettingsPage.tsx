@@ -6,15 +6,14 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonList,
-    IonItem,
     IonLabel,
     IonToggle,
-    IonListHeader,
-    IonNote,
     IonButton,
     useIonViewWillEnter,
-    IonItemDivider
+    IonSelect,
+    IonSelectOption,
+    IonIcon,
+    useIonAlert
 } from '@ionic/react';
 import { Preferences } from '@capacitor/preferences';
 import { getSavedLocation, saveLocation, type SavedLocation } from '../services/locationManager';
@@ -58,10 +57,24 @@ const getTzLookupLazy = async () => {
     return memoizedTzLookup;
 };
 
-import { IonSelect, IonSelectOption, IonIcon, useIonAlert } from '@ionic/react';
-import { locationOutline, timeOutline, globeOutline, caretUpCircleOutline } from 'ionicons/icons';
 import { MalaService } from '../services/MalaService';
 import { UposathaObservanceService } from '../services/UposathaObservanceService';
+import './SettingsPage.css';
+import {
+    locationOutline,
+    timeOutline,
+    globeOutline,
+    caretUpCircleOutline,
+    notificationsOutline,
+    eyeOutline,
+    languageOutline,
+    statsChartOutline,
+    informationCircleOutline,
+    trashOutline,
+    radioOutline,
+    sparklesOutline,
+    calendarOutline
+} from 'ionicons/icons';
 
 const SettingsPage: React.FC = () => {
     const [location, setLocation] = useState<SavedLocation | null>(null);
@@ -336,247 +349,262 @@ const SettingsPage: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader>
-                <IonToolbar>
-                    <IonTitle>Settings</IonTitle>
+            <IonHeader className="ion-no-border">
+                <IonToolbar style={{
+                    '--background': 'rgba(2, 2, 4, 0.7)',
+                    'backdropFilter': 'blur(20px)',
+                    '--border-style': 'none'
+                }}>
+                    <IonTitle style={{ fontSize: '1.6rem', fontWeight: '800' }}>Settings</IonTitle>
                 </IonToolbar>
             </IonHeader>
-            <IonContent fullscreen>
-                <IonList inset style={{ overflow: 'visible', contain: 'none', position: 'relative', zIndex: 20 }}>
-                    <IonItemDivider>
-                        <IonLabel>Location & Timezone</IonLabel>
-                    </IonItemDivider>
-
-                    <IonItem>
-                        <IonIcon icon={locationOutline} slot="start" color="primary" />
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Current Location</h2>
-                            <p>{location ? location.name : 'Not set'}</p>
-                            {location && <p className="text-xs">{location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>}
-                        </IonLabel>
-                    </IonItem>
-
-                    <div style={{ padding: '0 16px 12px', position: 'relative', zIndex: 100 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                            <IonIcon icon={globeOutline} color="secondary" style={{ fontSize: '1.2rem' }} />
-                            <span style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--color-text-primary, #f5f0e8)' }}>Search City</span>
+            <IonContent className="settings-container">
+                {/* Location & Timezone */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Location & Timezone</div>
+                    <div className="glass-card settings-card">
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium icon-wrapper--primary settings-item-icon">
+                                <IonIcon icon={locationOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Current Location</h2>
+                                <p>{location ? location.name : 'Not set'}</p>
+                            </div>
                         </div>
-                        <div style={{ position: 'relative', zIndex: 101 }}>
-                            <input
-                                type="text"
-                                autoComplete="off"
-                                value={citySearch}
-                                onChange={e => handleCitySearch(e.target.value)}
-                                onFocus={() => { if (citySearch.length > 0) setShowCityDropdown(true); }}
-                                placeholder="Type a city name..."
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 16px',
-                                    borderRadius: showCityDropdown ? '12px 12px 0 0' : '12px',
-                                    border: showCityDropdown ? '1px solid rgba(255, 198, 112, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
-                                    borderBottom: showCityDropdown ? 'none' : undefined,
-                                    background: 'rgba(255, 255, 255, 0.04)',
-                                    color: 'var(--color-text-primary, #f5f0e8)',
-                                    fontSize: '0.95rem',
-                                    fontFamily: 'Inter, sans-serif',
-                                    outline: 'none',
-                                    boxSizing: 'border-box' as any,
-                                    transition: 'border-color 0.2s ease',
-                                }}
-                                onBlur={() => setTimeout(() => setShowCityDropdown(false), 200)}
-                            />
-                            {showCityDropdown && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    left: '0',
-                                    right: '0',
-                                    zIndex: 9999,
-                                    background: 'rgba(18, 18, 18, 0.98)',
-                                    border: '1px solid rgba(255, 198, 112, 0.4)',
-                                    borderTop: 'none',
-                                    borderRadius: '0 0 12px 12px',
-                                    maxHeight: '280px',
-                                    overflowY: 'auto',
-                                    boxShadow: '0 30px 60px rgba(0, 0, 0, 0.9)',
-                                    backdropFilter: 'blur(25px)',
-                                }}>
-                                    {filteredCities.length > 0 ? (
-                                        filteredCities.map((city, idx) => (
-                                            <div
-                                                key={`${city.name}-${idx}`}
-                                                onMouseDown={() => selectCity(city)}
-                                                style={{
-                                                    padding: '14px 18px',
-                                                    cursor: 'pointer',
-                                                    borderBottom: idx === filteredCities.length - 1 ? 'none' : '1px solid rgba(255, 255, 255, 0.04)',
-                                                    fontSize: '0.9rem',
-                                                    color: '#f5f0e8',
-                                                }}
-                                            >
-                                                <div style={{ fontWeight: '600', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>{city.name}</span>
-                                                    <span style={{ fontSize: '0.65rem', color: '#ffc670', opacity: 0.8 }}>
-                                                        {city.timezone?.split('/').pop()?.replace(/_/g, ' ')}
-                                                    </span>
+
+                        <div className="settings-input-container">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                                <IonIcon icon={globeOutline} color="secondary" style={{ fontSize: '1rem' }} />
+                                <span style={{ fontWeight: '700', fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Search City</span>
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="text"
+                                    className="city-search-input"
+                                    autoComplete="off"
+                                    value={citySearch}
+                                    onChange={e => handleCitySearch(e.target.value)}
+                                    onFocus={() => { if (citySearch.length > 0) setShowCityDropdown(true); }}
+                                    placeholder="Type city name (e.g. Colombo, Bangkok)..."
+                                    onBlur={() => setTimeout(() => setShowCityDropdown(false), 200)}
+                                />
+                                {showCityDropdown && (
+                                    <div className="city-dropdown-glass">
+                                        {filteredCities.length > 0 ? (
+                                            filteredCities.map((city, idx) => (
+                                                <div
+                                                    key={`${city.name}-${idx}`}
+                                                    className="city-dropdown-item"
+                                                    onMouseDown={() => selectCity(city)}
+                                                >
+                                                    <div style={{ fontWeight: '700', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <span>{city.name}</span>
+                                                        <span style={{ fontSize: '0.65rem', color: 'var(--color-accent-primary)', opacity: 0.9, background: 'rgba(255, 198, 112, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                                                            {city.timezone?.split('/').pop()?.replace(/_/g, ' ')}
+                                                        </span>
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>
+                                                        {city.latitude.toFixed(2)}°, {city.longitude.toFixed(2)}°
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.4)', marginTop: '2px' }}>
-                                                    {city.latitude.toFixed(2)}°, {city.longitude.toFixed(2)}°
-                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                                                No matches found for "{citySearch}"
                                             </div>
-                                        ))
-                                    ) : (
-                                        <div style={{ padding: '20px', textAlign: 'center', color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.85rem' }}>
-                                            No matches found for "{citySearch}"
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium icon-wrapper--tertiary settings-item-icon">
+                                <IonIcon icon={timeOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Timezone</h2>
+                                <p style={{ color: 'var(--color-accent-primary)', fontWeight: '700' }}>
+                                    {location?.timezone || 'Select a city mapping above'}
+                                </p>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <IonItem>
-                        <IonIcon icon={timeOutline} slot="start" color="tertiary" />
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Timezone</h2>
-                            <p style={{ color: 'var(--ion-color-tertiary)', fontWeight: 'bold' }}>
-                                {location?.timezone || 'Select a city above'}
-                            </p>
-                        </IonLabel>
-                    </IonItem>
-                </IonList>
+                {/* Notifications */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Notifications</div>
+                    <div className="glass-card settings-card">
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#FCD34D' }}>
+                                <IonIcon icon={notificationsOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Uposatha Days</h2>
+                                <p>Alerts for full moon, new moon, and quarter days.</p>
+                            </div>
+                            <IonToggle
+                                className="settings-toggle"
+                                checked={notificationsEnabled}
+                                onIonChange={e => toggleUposatha(e.detail.checked)}
+                            />
+                        </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>Notifications</IonLabel>
-                    </IonItemDivider>
-                    <IonItem>
-                        <IonLabel>Uposatha Days</IonLabel>
-                        <IonToggle
-                            slot="end"
-                            checked={notificationsEnabled}
-                            onIonChange={e => toggleUposatha(e.detail.checked)}
-                        />
-                    </IonItem>
-                    <IonItem>
-                        <IonLabel>Buddhist Festivals</IonLabel>
-                        <IonToggle
-                            slot="end"
-                            checked={festivalsEnabled}
-                            onIonChange={e => toggleFestivals(e.detail.checked)}
-                        />
-                    </IonItem>
-                    <IonItem>
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Daily Dhammapada Verse</h2>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>A persistent notification updated daily at sunrise.</p>
-                        </IonLabel>
-                        <IonToggle
-                            slot="end"
-                            checked={dailyVerseEnabled}
-                            onIonChange={e => toggleDailyVerse(e.detail.checked)}
-                        />
-                    </IonItem>
-                    <IonItem lines="none">
-                        <IonNote className="ion-text-wrap" style={{ fontSize: '0.8rem' }}>
-                            Notifications are scheduled locally on your device based on your location's astronomical data.
-                        </IonNote>
-                    </IonItem>
-                </IonList>
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#F472B6' }}>
+                                <IonIcon icon={sparklesOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Buddhist Festivals</h2>
+                                <p>Reminders for annual major celebrations.</p>
+                            </div>
+                            <IonToggle
+                                className="settings-toggle"
+                                checked={festivalsEnabled}
+                                onIonChange={e => toggleFestivals(e.detail.checked)}
+                            />
+                        </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>Daily Verse Display</IonLabel>
-                    </IonItemDivider>
-                    <IonItem>
-                        <IonLabel>Show verse card on Calendar screen</IonLabel>
-                        <IonToggle
-                            slot="end"
-                            checked={showDailyVerseCard}
-                            onIonChange={e => toggleShowDailyVerseCard(e.detail.checked)}
-                        />
-                    </IonItem>
-                </IonList>
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#6EE7B7' }}>
+                                <IonIcon icon={radioOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Daily Dhammapada Verse</h2>
+                                <p>Persistent sunrise notification for daily reflection.</p>
+                            </div>
+                            <IonToggle
+                                className="settings-toggle"
+                                checked={dailyVerseEnabled}
+                                onIonChange={e => toggleDailyVerse(e.detail.checked)}
+                            />
+                        </div>
+                    </div>
+                </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>Pali Text Settings</IonLabel>
-                    </IonItemDivider>
-                    <IonItem>
-                        <IonIcon icon={caretUpCircleOutline} slot="start" color="warning" />
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Pali Script</h2>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Script used for all Pali texts (Triple Gem, Anapanasati, etc.)</p>
-                        </IonLabel>
-                        <IonSelect
-                            slot="end"
-                            interface="action-sheet"
-                            placeholder="Select"
-                            value={paliScript}
-                            onIonChange={e => handlePaliScriptChange(e.detail.value)}
-                        >
-                            <IonSelectOption value="roman">Roman (Default)</IonSelectOption>
-                            <IonSelectOption value="devanagari">Devanagari (देवनागरी)</IonSelectOption>
-                            <IonSelectOption value="sinhala">Sinhala (සිංහල)</IonSelectOption>
-                            <IonSelectOption value="thai">Thai (ไทย)</IonSelectOption>
-                            <IonSelectOption value="burmese">Burmese (မြန်မာ)</IonSelectOption>
-                        </IonSelect>
-                    </IonItem>
-                </IonList>
+                {/* Interface Settings */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Interface & Text</div>
+                    <div className="glass-card settings-card">
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#818CF8' }}>
+                                <IonIcon icon={eyeOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Calendar: Show Daily Verse</h2>
+                                <p>Toggle the verse card on the main calendar view.</p>
+                            </div>
+                            <IonToggle
+                                className="settings-toggle"
+                                checked={showDailyVerseCard}
+                                onIonChange={e => toggleShowDailyVerseCard(e.detail.checked)}
+                            />
+                        </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>Uposatha Tracking</IonLabel>
-                    </IonItemDivider>
-                    <IonItem>
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Enable Observance Tracking</h2>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Log and track your Uposatha observances and precepts.</p>
-                        </IonLabel>
-                        <IonToggle
-                            slot="end"
-                            checked={trackingEnabled}
-                            onIonChange={e => toggleTracking(e.detail.checked)}
-                        />
-                    </IonItem>
-                    <IonItem button onClick={handleClearObservanceHistory} detail={false}>
-                        <IonLabel color="danger">Clear Observance History</IonLabel>
-                    </IonItem>
-                </IonList>
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#FBBF24' }}>
+                                <IonIcon icon={languageOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Pali Script</h2>
+                                <p>Script used for all Pali texts and chants.</p>
+                            </div>
+                            <IonSelect
+                                className="settings-select"
+                                interface="action-sheet"
+                                value={paliScript}
+                                onIonChange={e => handlePaliScriptChange(e.detail.value)}
+                            >
+                                <IonSelectOption value="roman">Roman (Default)</IonSelectOption>
+                                <IonSelectOption value="devanagari">Devanagari (देवनागरी)</IonSelectOption>
+                                <IonSelectOption value="sinhala">Sinhala (සිංහල)</IonSelectOption>
+                                <IonSelectOption value="thai">Thai (ไทย)</IonSelectOption>
+                                <IonSelectOption value="burmese">Burmese (မြန်မာ)</IonSelectOption>
+                            </IonSelect>
+                        </div>
+                    </div>
+                </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>Sati Practice</IonLabel>
-                    </IonItemDivider>
-                    <IonItem button routerLink="/sati" detail>
-                        <IonLabel>Go to Sati Practice</IonLabel>
-                    </IonItem>
-                    <IonItem button routerLink="/sati/stats" detail>
-                        <IonLabel>View Practice Statistics</IonLabel>
-                    </IonItem>
-                </IonList>
+                {/* Uposatha Tracking */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Uposatha Logs</div>
+                    <div className="glass-card settings-card">
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#fbbf24' }}>
+                                <IonIcon icon={calendarOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Enable Tracking</h2>
+                                <p>Record and visualize your observance history.</p>
+                            </div>
+                            <IonToggle
+                                className="settings-toggle"
+                                checked={trackingEnabled}
+                                onIonChange={e => toggleTracking(e.detail.checked)}
+                            />
+                        </div>
+                        <div className="settings-item clickable" onClick={handleClearObservanceHistory}>
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#EF4444', background: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                                <IonIcon icon={trashOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2 style={{ color: '#EF4444' }}>Clear Data</h2>
+                                <p>Permanently delete all observance records.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <IonList inset>
-                    <IonItemDivider>
-                        <IonLabel>About & Credits</IonLabel>
-                    </IonItemDivider>
-                    <IonItem lines="none">
-                        <IonLabel className="ion-text-wrap">
-                            <h2>Texts & Sources</h2>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                Dhammapada verses translated by F. Max Müller (public domain). Text source: Project Gutenberg eBook #2017.
-                            </p>
-                        </IonLabel>
-                    </IonItem>
-                </IonList>
+                {/* Practice Shortcuts */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Practice Access</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="glass-card settings-card" onClick={() => (window as any).location = '/sati'} style={{ cursor: 'pointer', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary" style={{ marginBottom: '12px' }}>
+                                <IonIcon icon={sparklesOutline} />
+                            </div>
+                            <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>Sati Practice</div>
+                        </div>
+                        <div className="glass-card settings-card" onClick={() => (window as any).location = '/sati/stats'} style={{ cursor: 'pointer', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div className="icon-wrapper icon-wrapper--large" style={{ marginBottom: '12px', color: '#6EE7B7', borderColor: 'rgba(110, 231, 183, 0.3)', background: 'rgba(110, 231, 183, 0.1)' }}>
+                                <IonIcon icon={statsChartOutline} />
+                            </div>
+                            <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>Practice Stats</div>
+                        </div>
+                    </div>
+                </div>
 
-                <div className="ion-padding text-center text-sm text-gray-500">
-                    <p>Uposatha App v0.1.0</p>
-                    <p>Calculations by @ishubhamx/panchangam-js</p>
+                {/* About Section */}
+                <div className="settings-section">
+                    <div className="settings-section-title">About</div>
+                    <div className="glass-card settings-card" style={{ padding: '20px' }}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                            <div className="icon-wrapper icon-wrapper--medium icon-wrapper--secondary">
+                                <IonIcon icon={informationCircleOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2 style={{ fontSize: '1rem', marginBottom: '8px' }}>Uposatha App</h2>
+                                <p style={{ fontSize: '0.85rem' }}>
+                                    A spiritual companion for the traditional Buddhist calendar, featuring astronomical Uposatha calculations and Sati meditation tracking.
+                                </p>
+                                <p style={{ fontSize: '0.75rem', marginTop: '12px', fontStyle: 'italic' }}>
+                                    Dhammapada texts sourced from public domain project Gutenberg.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="about-footer">
+                    <p style={{ fontWeight: '700', color: 'var(--color-text-secondary)' }}>Uposatha v0.1.0-alpha</p>
+                    <p>Designed for reflection and awareness.</p>
                 </div>
             </IonContent>
-        </IonPage >
+        </IonPage>
     );
 };
 
 export default SettingsPage;
+

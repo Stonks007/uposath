@@ -1,0 +1,186 @@
+.settings-container {
+    --padding-start: 20px;
+    --padding-end: 20px;
+    --padding-top: 24px;
+    background: var(--color-bg-primary);
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-item.clickable {
+    cursor: pointer;
+}
+
+.settings-item.clickable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Ionic Component Overrides */
+ion-toggle {
+    --handle-background: var(--color-text-primary);
+    --handle-background-checked: var(--color-bg-primary);
+    --background: rgba(255, 255, 255, 0.1);
+    --background-checked: var(--color-accent-primary);
+    padding: 0;
+}
+
+ion-select::part(placeholder),
+ion-select::part(text) {
+    font-weight: 700;
+    color: var(--color-accent-primary);
+    text-align: end;
+}
+
+ion-select::part(icon) {
+    display: none;
+    /* Hide default icon for cleaner look if requested, or style it */
+}
+
+.settings-section-title {
+    font-family: var(--font-family-display);
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--color-accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    padding-left: 4px;
+    opacity: 0.9;
+}
+
+.settings-card {
+    padding: 8px 4px;
+    /* Minimal padding since items will have their own or we'll manage strictly */
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease;
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+}
+
+.settings-item-icon {
+    margin-right: 16px;
+}
+
+.settings-item-label {
+    flex: 1;
+}
+
+.settings-item-label h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.settings-item-label p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+}
+
+.settings-toggle {
+    margin-left: 12px;
+}
+
+.settings-input-container {
+    padding: 16px;
+    position: relative;
+    z-index: 100;
+}
+
+.city-search-input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.city-search-input:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 198, 112, 0.4);
+    box-shadow: 0 0 20px rgba(255, 198, 112, 0.1);
+}
+
+.city-search-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.city-dropdown-glass {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: rgba(12, 12, 18, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 198, 112, 0.3);
+    border-radius: 18px;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    animation: dropdownIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.city-dropdown-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.city-dropdown-item:hover {
+    background: rgba(255, 198, 112, 0.08);
+}
+
+.city-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+/* Custom Select Styling */
+.settings-select {
+    --placeholder-color: var(--color-text-muted);
+    font-weight: 700;
+    color: var(--color-accent-primary);
+}
+
+.about-footer {
+    padding: 40px 24px 60px;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.about-footer p {
+    margin: 4px 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
