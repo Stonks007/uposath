@@ -162,5 +162,22 @@ export const SatiStatsService = {
                 await EmptinessService.deleteSession(id);
                 break;
         }
+    },
+
+    async saveSession(session: any, category: PracticeCategory): Promise<void> {
+        switch (category) {
+            case 'mala':
+                await MalaService.saveEntry(session);
+                break;
+            case 'anapanasati':
+                await AnapanasatiService.saveSession(session);
+                break;
+            case 'mantra':
+                await MantraService.saveSession(session);
+                break;
+            case 'emptiness':
+                await EmptinessService.saveSession(session);
+                break;
+        }
     }
 };

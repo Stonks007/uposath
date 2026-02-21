@@ -49,11 +49,12 @@
 }
 
 .practice-breakdown-title {
-    margin: 0 0 16px 8px;
-    font-size: 1.25rem;
+    margin: 0;
+    font-size: 1.1rem;
     font-weight: 800;
     font-family: var(--font-family-display);
     color: var(--color-text-primary);
+    white-space: nowrap;
 }
 
 .category-cards-grid {
@@ -168,12 +169,53 @@
 
 /* Custom Segment overrides if needed */
 ion-segment {
-    --background: rgba(255, 255, 255, 0.05);
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    padding: 4px;
-    margin: 8px 16px;
+    --background: transparent;
+    background: transparent;
+    margin: 4px 0;
+    width: 100%;
+    min-height: 38px;
+}
+
+/* Time Filter "Pills" - Scaled down to prevent overflow */
+.time-filter-mini {
+    --background: transparent;
+    background: transparent;
+    margin: 0;
     width: auto;
+    min-height: 26px;
+    flex: 0 1 auto;
+    max-width: 70%;
+    /* Prevent it from pushing title too hard */
+}
+
+.time-filter-mini ion-segment-button {
+    --indicator-color: transparent !important;
+    --color-checked: var(--color-bg-primary);
+    --color: var(--color-text-secondary);
+    --border-radius: 12px;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    min-width: 45px;
+    min-height: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: none;
+    margin-left: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.time-filter-mini ion-segment-button ion-label {
+    margin: 0;
+}
+
+.time-filter-mini ion-segment-button.segment-button-checked {
+    background: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--color-bg-primary) !important;
+    box-shadow: 0 2px 8px rgba(255, 198, 112, 0.2);
 }
 
 ion-segment-button {
@@ -181,7 +223,28 @@ ion-segment-button {
     --color-checked: var(--color-accent-primary);
     --color: var(--color-text-muted);
     --border-radius: 8px;
-    min-height: 36px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    min-height: 40px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    --indicator-height: 2px;
+}
+
+/* Category Filter "Tabs" */
+.category-filter-main {
+    --background: transparent;
+    margin: 0;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.category-filter-main ion-segment-button {
+    --background: transparent;
+    --background-checked: transparent;
+    margin: 0;
 }
 
 /* Observance View Styles */

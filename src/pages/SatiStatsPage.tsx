@@ -25,15 +25,17 @@ import {
     IonTextarea,
     IonSelect,
     IonSelectOption,
+    IonFab,
+    IonFabButton,
     useIonViewWillEnter
 } from '@ionic/react';
-import { trashOutline, createOutline } from 'ionicons/icons';
+import { trashOutline, createOutline, addOutline } from 'ionicons/icons';
 import { MalaService } from '../services/MalaService';
-import { AnapanasatiService, AnapanasatiStats } from '../services/AnapanasatiService';
+import { AnapanasatiService, AnapanasatiStats, AnapanasatiSession } from '../services/AnapanasatiService';
 import { MantraService } from '../services/MantraService';
 import { EmptinessService } from '../services/EmptinessService';
 import { SatiStatsService } from '../services/SatiStatsService';
-import { MalaEntry, MalaStats, GlobalStats, UnifiedSession, PracticeCategory, EmptinessStats, Mantra, MantraSession } from '../types/SatiTypes';
+import { MalaEntry, MalaStats, GlobalStats, UnifiedSession, PracticeCategory, EmptinessStats, Mantra, MantraSession, EmptinessSession } from '../types/SatiTypes';
 import UposathaStatsView from '../components/uposatha/UposathaStatsView';
 import './SatiStatsPage.css';
 
@@ -65,7 +67,8 @@ const SatiStatsPage: React.FC = () => {
 
     // Filter & Pagination State
     const [logFilter, setLogFilter] = useState<PracticeCategory | 'all'>('all');
-    const [displayLimit, setDisplayLimit] = useState(20);
+    const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+
 
     const loadData = async () => {
         try {
@@ -105,7 +108,7 @@ const SatiStatsPage: React.FC = () => {
             });
 
             // Log status for debugging on device
-            const failedCount = results.filter(r => r.status === 'rejected').length;
+            const failedCount = results.filter(r => (r as any).status === 'rejected').length;
             if (failedCount > 0) {
                 console.warn(`${failedCount} sati services failed to load on device`);
             }
@@ -171,62 +174,88 @@ const SatiStatsPage: React.FC = () => {
         });
     };
 
-    const handleSaveEdit = async () => {
-        if (editingSession) {
-            // value construction depends on category
-            // We need to fetch original to keep other fields?
-            // Or just construct a partial update if our services support it.
-            // Our services (updated in previous steps) assume full object replacement usually or we need to fetch -> update -> save.
-
-            // Let's fetch the specific session first to ensure we don't lose data
-            let original: any = null;
-            if (editingSession.category === 'mala') {
-                const entries = await MalaService.getEntries();
-                original = entries.find(e => e.id === editingSession.id);
-                if (original) {
-                    original.beads = editingSession.count;
-                    original.timestamp = editingSession.timestamp;
-                    original.notes = editingSession.notes;
-                }
-            } else if (editingSession.category === 'anapanasati') {
-                const sessions = await AnapanasatiService.getSessions();
-                original = sessions.find(s => s.id === editingSession.id);
-                if (original) {
-                    original.durationMinutes = editingSession.count;
-                    original.durationSeconds = editingSession.seconds;
-                    original.timestamp = editingSession.timestamp;
-                    original.reflection = editingSession.notes;
-                    if (editingSession.focus) original.focus = editingSession.focus;
-                }
-            } else if (editingSession.category === 'emptiness') {
-                const sessions = await EmptinessService.getSessions();
-                original = sessions.find(s => s.id === editingSession.id);
-                if (original) {
-                    original.durationMinutes = editingSession.count;
-                    original.durationSeconds = editingSession.seconds;
-                    original.timestamp = editingSession.timestamp;
-                    (original as any).reflection = editingSession.notes;
-                    if (editingSession.technique) original.focus = editingSession.technique;
-                }
-            } else if (editingSession.category === 'mantra') {
-                const sessions = await MantraService.getSessions();
-                original = sessions.find(s => s.id === editingSession.id);
-                if (original) {
-                    original.reps = editingSession.count;
-                    original.durationMinutes = (editingSession.count / 108) * 15; // Approx
-                    original.timestamp = editingSession.timestamp;
-                    original.notes = editingSession.notes;
-                }
-            }
-
-            if (original) {
-                await SatiStatsService.updateSession(original, editingSession.category);
-                setEditingSession(null);
-                loadData();
-            }
-        }
+    const handleManualLog = () => {
+        setEditingSession({
+            id: '', // Empty ID indicates new session
+            category: logFilter === 'all' ? 'anapanasati' : logFilter,
+            count: 0,
+            seconds: 0,
+            timestamp: new Date().toISOString(),
+            notes: '',
+            focus: 'all_16',
+            technique: 'anatta'
+        });
     };
 
+    const handleSaveEdit = async () => {
+        if (!editingSession) return;
+
+        try {
+            const isNew = editingSession.id === '';
+            const id = isNew ? crypto.randomUUID() : editingSession.id;
+
+            if (editingSession.category === 'mala') {
+                const entry: MalaEntry = {
+                    id,
+                    timestamp: editingSession.timestamp,
+                    beads: editingSession.count,
+                    notes: editingSession.notes,
+                    practiceType: 'buddha' // Defaulting for simple manual log
+                };
+                if (isNew) await SatiStatsService.saveSession(entry, 'mala');
+                else await SatiStatsService.updateSession(entry, 'mala');
+            } else if (editingSession.category === 'anapanasati') {
+                const session: AnapanasatiSession = {
+                    id,
+                    timestamp: editingSession.timestamp,
+                    durationMinutes: editingSession.count,
+                    durationSeconds: editingSession.seconds || 0,
+                    plannedDurationMinutes: editingSession.count,
+                    focus: (editingSession.focus as any) || 'all_16',
+                    completed: true,
+                    endedEarly: false,
+                    reflection: editingSession.notes
+                };
+                if (isNew) await SatiStatsService.saveSession(session, 'anapanasati');
+                else await SatiStatsService.updateSession(session, 'anapanasati');
+            } else if (editingSession.category === 'mantra') {
+                // For mantra, manual log needs a mantraId. We'll pick the first available one or handle error.
+                if (mantras.length === 0) {
+                    alert('Please create a Mantra first in the Mantras overview.');
+                    return;
+                }
+                const session: MantraSession = {
+                    id,
+                    mantraId: mantras[0].id, // Default to first for manual log
+                    timestamp: editingSession.timestamp,
+                    reps: editingSession.count,
+                    durationMinutes: 0,
+                    completed: true,
+                    notes: editingSession.notes
+                };
+                if (isNew) await SatiStatsService.saveSession(session, 'mantra');
+                else await SatiStatsService.updateSession(session, 'mantra');
+            } else if (editingSession.category === 'emptiness') {
+                const session: EmptinessSession = {
+                    id,
+                    timestamp: editingSession.timestamp,
+                    durationMinutes: editingSession.count,
+                    durationSeconds: editingSession.seconds || 0,
+                    tradition: 'theravada',
+                    focus: (editingSession.technique as any) || 'anatta',
+                    completed: true,
+                    reflection: editingSession.notes
+                };
+                if (isNew) await SatiStatsService.saveSession(session, 'emptiness');
+                else await SatiStatsService.updateSession(session, 'emptiness');
+            }
+
+            setEditingSession(null);
+            loadData();
+        } catch (err) {
+            console.error('Failed to save session:', err);
+        }
+    };
     const getCategoryIcon = (cat: PracticeCategory) => {
         switch (cat) {
             case 'mala': return '📿';
@@ -248,10 +277,32 @@ const SatiStatsPage: React.FC = () => {
     };
 
     // Derived state for filtering and grouping
-    const filteredHistory = history.filter(item => logFilter === 'all' || item.category === logFilter);
-    const paginatedHistory = filteredHistory.slice(0, displayLimit);
+    const filteredHistory = history.filter(item => {
+        const categoryMatch = logFilter === 'all' || item.category === logFilter;
+        if (!categoryMatch) return false;
 
-    const groupedHistory = paginatedHistory.reduce((groups: { [key: string]: UnifiedSession[] }, item) => {
+        if (timeFilter === 'all') return true;
+
+        const date = new Date(item.timestamp);
+        const now = new Date();
+        now.setHours(23, 59, 59, 999); // End of today
+
+        if (timeFilter === 'today') {
+            return date.toDateString() === new Date().toDateString();
+        } else if (timeFilter === 'week') {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            weekAgo.setHours(0, 0, 0, 0);
+            return date >= weekAgo;
+        } else if (timeFilter === 'month') {
+            const monthAgo = new Date();
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            monthAgo.setHours(0, 0, 0, 0);
+            return date >= monthAgo;
+        }
+        return true;
+    });
+    const groupedHistory = filteredHistory.reduce((groups: { [key: string]: UnifiedSession[] }, item) => {
         const date = new Date(item.timestamp);
         const today = new Date();
         const yesterday = new Date(today);
@@ -385,8 +436,18 @@ const SatiStatsPage: React.FC = () => {
                         </div>
 
                         {/* Unified History List */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '32px', marginBottom: '16px' }}>
-                            <h3 className="practice-breakdown-title" style={{ margin: 0 }}>History Log</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '40px', marginBottom: '16px', padding: '0 4px' }}>
+                            <h3 className="practice-breakdown-title">History Log</h3>
+                            <IonSegment
+                                value={timeFilter}
+                                onIonChange={e => setTimeFilter(e.detail.value as any)}
+                                className="time-filter-mini"
+                            >
+                                <IonSegmentButton value="today"><IonLabel>Today</IonLabel></IonSegmentButton>
+                                <IonSegmentButton value="week"><IonLabel>Week</IonLabel></IonSegmentButton>
+                                <IonSegmentButton value="month"><IonLabel>Month</IonLabel></IonSegmentButton>
+                                <IonSegmentButton value="all"><IonLabel>All</IonLabel></IonSegmentButton>
+                            </IonSegment>
                         </div>
 
                         <IonSegment
@@ -394,16 +455,22 @@ const SatiStatsPage: React.FC = () => {
                             value={logFilter}
                             onIonChange={e => {
                                 setLogFilter(e.detail.value as PracticeCategory | 'all');
-                                setDisplayLimit(20); // Reset pagination on filter change
                             }}
-                            style={{ marginBottom: '16px', '--background': 'rgba(0,0,0,0.1)' }}
+                            className="category-filter-main"
                         >
-                            <IonSegmentButton value="all"><IonLabel>Sabba</IonLabel></IonSegmentButton>
-                            <IonSegmentButton value="mala"><IonLabel>Tiratana</IonLabel></IonSegmentButton>
-                            <IonSegmentButton value="anapanasati"><IonLabel>Ānāpāna</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="all"><IonLabel>All</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="mala"><IonLabel>Triple Gem</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="anapanasati"><IonLabel>Breathing</IonLabel></IonSegmentButton>
                             <IonSegmentButton value="mantra"><IonLabel>Mantra</IonLabel></IonSegmentButton>
-                            <IonSegmentButton value="emptiness"><IonLabel>Suññatā</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="emptiness"><IonLabel>Emptiness</IonLabel></IonSegmentButton>
                         </IonSegment>
+
+                        {/* Manual Log FAB */}
+                        <IonFab vertical="bottom" horizontal="end" slot="fixed" style={{ marginBottom: '16px', marginRight: '8px' }}>
+                            <IonFabButton onClick={handleManualLog} className="premium-fab" style={{ '--background': 'var(--color-accent-primary)', '--color': 'var(--color-bg-primary)' }}>
+                                <IonIcon icon={addOutline} />
+                            </IonFabButton>
+                        </IonFab>
 
                         <div style={{ margin: '0', background: 'transparent' }}>
                             {Object.entries(groupedHistory).map(([dateLabel, items]) => (
@@ -477,17 +544,7 @@ const SatiStatsPage: React.FC = () => {
                                 </div>
                             )}
 
-                            <IonInfiniteScroll
-                                onIonInfinite={(e) => {
-                                    if (displayLimit < filteredHistory.length) {
-                                        setDisplayLimit(prev => prev + 20);
-                                    }
-                                    setTimeout(() => e.target.complete(), 500);
-                                }}
-                                disabled={displayLimit >= filteredHistory.length}
-                            >
-                                <IonInfiniteScrollContent loadingText="Loading more history..." />
-                            </IonInfiniteScroll>
+
                         </div>
                     </>
                 )}
