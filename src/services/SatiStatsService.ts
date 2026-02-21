@@ -72,19 +72,25 @@ export const SatiStatsService = {
                 timestamp: e.timestamp,
                 category: 'mala',
                 title: `${e.practiceType || 'Buddha'} Recollection`,
-                detail: `${e.beads} beads`
+                detail: `${e.beads} beads`,
+                notes: e.notes
             });
         });
 
         // 2. Anapanasati
         const anaSessions = await AnapanasatiService.getSessions();
         anaSessions.forEach(s => {
+            const detail = s.durationSeconds !== undefined
+                ? `${s.durationMinutes}:${s.durationSeconds < 10 ? '0' : ''}${s.durationSeconds} mins`
+                : `${s.durationMinutes} mins`;
             history.push({
                 id: s.id,
                 timestamp: s.timestamp,
                 category: 'anapanasati',
                 title: 'Anapanasati',
-                detail: `${s.durationMinutes} mins`
+                detail,
+                durationSeconds: s.durationSeconds,
+                notes: s.reflection
             });
         });
 
@@ -98,21 +104,25 @@ export const SatiStatsService = {
                 timestamp: s.timestamp,
                 category: 'mantra',
                 title: m ? m.basic.name : 'Mantra Practice',
-                detail: `${s.reps} beads`
+                detail: `${s.reps} beads`,
+                notes: s.notes
             });
         });
 
         // 4. Emptiness
         const empSessions = await EmptinessService.getSessions();
         empSessions.forEach(s => {
-            // We need to resolve title from ID or keep it simple
-            // For now simple title based on tradition or focus ID
+            const detail = s.durationSeconds !== undefined
+                ? `${s.durationMinutes}:${s.durationSeconds < 10 ? '0' : ''}${s.durationSeconds} mins`
+                : `${s.durationMinutes} mins`;
             history.push({
                 id: s.id,
                 timestamp: s.timestamp,
                 category: 'emptiness',
-                title: 'Emptiness', // Could look up specific sutra name if needed
-                detail: `${s.durationMinutes} mins`
+                title: 'Emptiness',
+                detail,
+                durationSeconds: s.durationSeconds,
+                notes: s.reflection || (s as any).notes
             });
         });
 

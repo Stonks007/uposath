@@ -107,9 +107,6 @@ const AnapanasatiPage: React.FC = () => {
                         <IonButton id="anapanasati-settings-btn">
                             <IonIcon icon={settingsOutline} />
                         </IonButton>
-                        <IonButton routerLink="/sati/anapanasati/stats">
-                            <IonIcon icon={barChartOutline} />
-                        </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
@@ -152,24 +149,44 @@ const AnapanasatiPage: React.FC = () => {
 
             <IonContent fullscreen className="ion-padding">
                 {/* Header Card */}
-                <div className="anapanasati-header-card">
-                    <h2 className="anapanasati-title">
+                <div className="glass-card" style={{ textAlign: 'center', marginBottom: '24px', padding: '32px 16px' }}>
+                    <div className="icon-wrapper icon-wrapper--large" style={{
+                        margin: '0 auto 16px',
+                        borderColor: 'var(--color-mahayana-accent)40',
+                        background: 'var(--color-mahayana-accent)10'
+                    }}>
+                        🌬️
+                    </div>
+                    <h2 style={{
+                        fontSize: '1.75rem',
+                        fontWeight: '800',
+                        color: 'var(--color-text-primary)',
+                        margin: '0 0 8px',
+                        fontFamily: 'var(--font-family-display)'
+                    }}>
                         {content.title.pali}
                     </h2>
-                    <p className="anapanasati-subtitle">
+                    <p style={{
+                        fontSize: '1rem',
+                        color: 'var(--color-text-secondary)',
+                        margin: '0 auto',
+                        lineHeight: '1.5',
+                        maxWidth: '600px'
+                    }}>
                         {content.title[currentLanguage] || content.title.en}
                     </p>
                 </div>
 
                 {/* Main Action - Start Session */}
-                <div className="action-container">
+                <div className="action-container" style={{ marginBottom: '32px', textAlign: 'center', padding: '0 8px' }}>
                     <IonButton
                         expand="block"
                         routerLink="/sati/anapanasati/session"
-                        className="start-session-button"
+                        className="premium-button premium-button--accent"
+                        style={{ height: '56px' }}
                     >
                         <IonIcon icon={play} slot="start" />
-                        Start Practice Session
+                        Ānāpānasati Bhāvanā
                     </IonButton>
 
                     {stats && stats.currentStreak > 0 && (

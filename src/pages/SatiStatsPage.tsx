@@ -17,10 +17,15 @@ import {
     IonAlert,
     IonModal,
     IonInput,
-    useIonViewWillEnter,
     IonDatetime,
     IonSegment,
-    IonSegmentButton
+    IonSegmentButton,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    useIonViewWillEnter
 } from '@ionic/react';
 import { trashOutline, createOutline } from 'ionicons/icons';
 import { MalaService } from '../services/MalaService';
@@ -56,7 +61,11 @@ const SatiStatsPage: React.FC = () => {
 
     // ... (inside component)
     const [statsView, setStatsView] = useState<'practice' | 'observance'>('practice');
-    const [editingSession, setEditingSession] = useState<{ id: string, category: PracticeCategory, count: number, timestamp: string } | null>(null);
+    const [editingSession, setEditingSession] = useState<{ id: string, category: PracticeCategory, count: number, seconds?: number, timestamp: string, notes?: string, focus?: string, technique?: string } | null>(null);
+
+    // Filter & Pagination State
+    const [logFilter, setLogFilter] = useState<PracticeCategory | 'all'>('all');
+    const [displayLimit, setDisplayLimit] = useState(20);
 
     const loadData = async () => {
         try {
@@ -117,7 +126,7 @@ const SatiStatsPage: React.FC = () => {
         }
     };
 
-    const handleEditClick = (session: UnifiedSession) => {
+    const handleEditClick = async (session: UnifiedSession) => {
         // Extract count from detail string or fetch it? 
         // Detail string is like "108 beads" or "20 mins".
         // Let's parse it for now as a quick solution, or fetch full object if needed.
@@ -129,11 +138,36 @@ const SatiStatsPage: React.FC = () => {
             count = parseFloat(numMatch[0]);
         }
 
+        let focus = undefined;
+        let technique = undefined;
+        let notes = session.notes;
+        let seconds = session.durationSeconds;
+
+        if (session.category === 'anapanasati') {
+            const anaSessions = await AnapanasatiService.getSessions();
+            const orig = anaSessions.find(s => s.id === session.id);
+            if (orig) {
+                focus = orig.focus;
+                seconds = orig.durationSeconds;
+            }
+        } else if (session.category === 'emptiness') {
+            const empSessions = await EmptinessService.getSessions();
+            const orig = empSessions.find(s => s.id === session.id);
+            if (orig) {
+                technique = orig.focus;
+                seconds = orig.durationSeconds;
+            }
+        }
+
         setEditingSession({
             id: session.id,
             category: session.category,
             count: count,
-            timestamp: session.timestamp
+            seconds: seconds,
+            timestamp: session.timestamp,
+            notes: notes,
+            focus: focus,
+            technique: technique
         });
     };
 
@@ -152,28 +186,36 @@ const SatiStatsPage: React.FC = () => {
                 if (original) {
                     original.beads = editingSession.count;
                     original.timestamp = editingSession.timestamp;
+                    original.notes = editingSession.notes;
                 }
             } else if (editingSession.category === 'anapanasati') {
                 const sessions = await AnapanasatiService.getSessions();
                 original = sessions.find(s => s.id === editingSession.id);
                 if (original) {
                     original.durationMinutes = editingSession.count;
+                    original.durationSeconds = editingSession.seconds;
                     original.timestamp = editingSession.timestamp;
+                    original.reflection = editingSession.notes;
+                    if (editingSession.focus) original.focus = editingSession.focus;
                 }
             } else if (editingSession.category === 'emptiness') {
                 const sessions = await EmptinessService.getSessions();
                 original = sessions.find(s => s.id === editingSession.id);
                 if (original) {
                     original.durationMinutes = editingSession.count;
+                    original.durationSeconds = editingSession.seconds;
                     original.timestamp = editingSession.timestamp;
+                    (original as any).reflection = editingSession.notes;
+                    if (editingSession.technique) original.focus = editingSession.technique;
                 }
             } else if (editingSession.category === 'mantra') {
                 const sessions = await MantraService.getSessions();
                 original = sessions.find(s => s.id === editingSession.id);
                 if (original) {
                     original.reps = editingSession.count;
-                    original.durationMinutes = (editingSession.count / 108) * 15; // Approx or keep original? Let's just update reps.
+                    original.durationMinutes = (editingSession.count / 108) * 15; // Approx
                     original.timestamp = editingSession.timestamp;
+                    original.notes = editingSession.notes;
                 }
             }
 
@@ -205,6 +247,32 @@ const SatiStatsPage: React.FC = () => {
         }
     };
 
+    // Derived state for filtering and grouping
+    const filteredHistory = history.filter(item => logFilter === 'all' || item.category === logFilter);
+    const paginatedHistory = filteredHistory.slice(0, displayLimit);
+
+    const groupedHistory = paginatedHistory.reduce((groups: { [key: string]: UnifiedSession[] }, item) => {
+        const date = new Date(item.timestamp);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        let dateString = '';
+        if (date.toDateString() === today.toDateString()) {
+            dateString = 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            dateString = 'Yesterday';
+        } else {
+            dateString = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        if (!groups[dateString]) {
+            groups[dateString] = [];
+        }
+        groups[dateString].push(item);
+        return groups;
+    }, {});
+
     return (
         <IonPage>
             <IonHeader>
@@ -212,7 +280,7 @@ const SatiStatsPage: React.FC = () => {
                     <IonButtons slot="start">
                         <IonBackButton defaultHref="/sati" />
                     </IonButtons>
-                    <IonTitle>Practice Statistics</IonTitle>
+                    <IonTitle>Sati Bhāvanā</IonTitle>
                 </IonToolbar>
                 <IonToolbar style={{ '--background': 'transparent' }}>
                     <IonSegment value={statsView} onIonChange={e => setStatsView(e.detail.value as any)}>
@@ -292,7 +360,7 @@ const SatiStatsPage: React.FC = () => {
                                 <div className="glass-card category-stat-card" onClick={() => setShowAnapanasatiDetails(true)}>
                                     <div className="cat-header">
                                         <span className="cat-icon">🌬️</span>
-                                        <span className="cat-name" style={{ color: '#6EE7B7' }}>Anapanasati</span>
+                                        <span className="cat-name" style={{ color: '#6EE7B7' }}>Ānāpānasati</span>
                                     </div>
                                     <div style={{ marginTop: 'auto' }}>
                                         <div className="main-value">{anapanasatiStats.totalMinutes}</div>
@@ -306,7 +374,7 @@ const SatiStatsPage: React.FC = () => {
                                 <div className="glass-card category-stat-card" onClick={() => setShowEmptinessDetails(true)}>
                                     <div className="cat-header">
                                         <span className="cat-icon">🧘</span>
-                                        <span className="cat-name" style={{ color: '#93C5FD' }}>Emptiness</span>
+                                        <span className="cat-name" style={{ color: '#93C5FD' }}>Suññatā</span>
                                     </div>
                                     <div style={{ marginTop: 'auto' }}>
                                         <div className="main-value">{emptinessStats.totalMinutes}</div>
@@ -317,50 +385,110 @@ const SatiStatsPage: React.FC = () => {
                         </div>
 
                         {/* Unified History List */}
-                        <h3 className="practice-breakdown-title">History Log</h3>
-                        <IonList inset={true} style={{ margin: '0', background: 'transparent' }}>
-                            {history.slice(0, 50).map(item => (
-                                <IonItem key={item.id} className="glass-card history-item" lines="none" detail={false}>
-                                    <div slot="start" className="icon-wrapper icon-wrapper--medium history-item-icon" style={{
-                                        borderColor: `${getCategoryColor(item.category)}40`,
-                                        background: `${getCategoryColor(item.category)}15`
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '32px', marginBottom: '16px' }}>
+                            <h3 className="practice-breakdown-title" style={{ margin: 0 }}>History Log</h3>
+                        </div>
+
+                        <IonSegment
+                            scrollable
+                            value={logFilter}
+                            onIonChange={e => {
+                                setLogFilter(e.detail.value as PracticeCategory | 'all');
+                                setDisplayLimit(20); // Reset pagination on filter change
+                            }}
+                            style={{ marginBottom: '16px', '--background': 'rgba(0,0,0,0.1)' }}
+                        >
+                            <IonSegmentButton value="all"><IonLabel>Sabba</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="mala"><IonLabel>Tiratana</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="anapanasati"><IonLabel>Ānāpāna</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="mantra"><IonLabel>Mantra</IonLabel></IonSegmentButton>
+                            <IonSegmentButton value="emptiness"><IonLabel>Suññatā</IonLabel></IonSegmentButton>
+                        </IonSegment>
+
+                        <div style={{ margin: '0', background: 'transparent' }}>
+                            {Object.entries(groupedHistory).map(([dateLabel, items]) => (
+                                <div key={dateLabel} style={{ marginBottom: '24px' }}>
+                                    <div style={{
+                                        position: 'sticky',
+                                        top: 0,
+                                        zIndex: 10,
+                                        background: 'var(--color-bg-primary)',
+                                        padding: '8px 4px',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '800',
+                                        color: 'var(--color-text-secondary)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        backdropFilter: 'blur(10px)',
+                                        WebkitBackdropFilter: 'blur(10px)',
+                                        borderBottom: '1px solid var(--glass-border)'
                                     }}>
-                                        {getCategoryIcon(item.category)}
+                                        {dateLabel}
                                     </div>
-                                    <IonLabel className="ion-text-wrap">
-                                        <h2 style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>
-                                            {item.title}
-                                        </h2>
-                                        <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
-                                            <span style={{
-                                                color: getCategoryColor(item.category),
-                                                fontWeight: '600',
-                                                marginRight: '6px'
-                                            }}>
-                                                {item.category.toUpperCase()}
-                                            </span>
-                                            • {new Date(item.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                        </p>
-                                    </IonLabel>
-                                    <div slot="end" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                                        <span style={{ fontWeight: '800', color: 'var(--color-text-primary)', fontSize: '0.95rem', fontFamily: 'var(--font-family-display)' }}>{item.detail}</span>
-                                        <div style={{ display: 'flex' }}>
-                                            <IonButton fill="clear" size="small" color="primary" onClick={() => handleEditClick(item)}>
-                                                <IonIcon icon={createOutline} />
-                                            </IonButton>
-                                            <IonButton fill="clear" size="small" color="danger" onClick={() => setEntryToDelete({ id: item.id, category: item.category })}>
-                                                <IonIcon icon={trashOutline} />
-                                            </IonButton>
-                                        </div>
-                                    </div>
-                                </IonItem>
+                                    <IonList inset={true} style={{ margin: '8px 0 0 0', background: 'transparent' }}>
+                                        {items.map(item => (
+                                            <IonItem key={item.id} className="glass-card history-item" lines="none" detail={false} style={{ marginBottom: '8px' }}>
+                                                <div slot="start" className="icon-wrapper icon-wrapper--medium history-item-icon" style={{
+                                                    borderColor: `${getCategoryColor(item.category)}40`,
+                                                    background: `${getCategoryColor(item.category)}15`
+                                                }}>
+                                                    {getCategoryIcon(item.category)}
+                                                </div>
+                                                <IonLabel className="ion-text-wrap">
+                                                    <h2 style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>
+                                                        {item.title}
+                                                    </h2>
+                                                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                                                        <span style={{
+                                                            color: getCategoryColor(item.category),
+                                                            fontWeight: '600',
+                                                            marginRight: '6px'
+                                                        }}>
+                                                            {item.category.toUpperCase()}
+                                                        </span>
+                                                        • {new Date(item.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                    {item.notes && (
+                                                        <p style={{ marginTop: '4px', fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontStyle: 'italic', borderLeft: `2px solid ${getCategoryColor(item.category)}`, paddingLeft: '8px' }}>
+                                                            "{item.notes}"
+                                                        </p>
+                                                    )}
+                                                </IonLabel>
+                                                <div slot="end" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                                    <span style={{ fontWeight: '800', color: 'var(--color-text-primary)', fontSize: '0.95rem', fontFamily: 'var(--font-family-display)' }}>{item.detail}</span>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <IonButton fill="clear" size="small" color="primary" onClick={() => handleEditClick(item)}>
+                                                            <IonIcon icon={createOutline} />
+                                                        </IonButton>
+                                                        <IonButton fill="clear" size="small" color="danger" onClick={() => setEntryToDelete({ id: item.id, category: item.category })}>
+                                                            <IonIcon icon={trashOutline} />
+                                                        </IonButton>
+                                                    </div>
+                                                </div>
+                                            </IonItem>
+                                        ))}
+                                    </IonList>
+                                </div>
                             ))}
-                            {history.length === 0 && (
+
+                            {filteredHistory.length === 0 && (
                                 <div className="glass-card" style={{ padding: '40px', textAlign: 'center', opacity: 0.6 }}>
-                                    No records found.
+                                    No records found for this filter.
                                 </div>
                             )}
-                        </IonList>
+
+                            <IonInfiniteScroll
+                                onIonInfinite={(e) => {
+                                    if (displayLimit < filteredHistory.length) {
+                                        setDisplayLimit(prev => prev + 20);
+                                    }
+                                    setTimeout(() => e.target.complete(), 500);
+                                }}
+                                disabled={displayLimit >= filteredHistory.length}
+                            >
+                                <IonInfiniteScrollContent loadingText="Loading more history..." />
+                            </IonInfiniteScroll>
+                        </div>
                     </>
                 )}
                 {statsView === 'observance' && <UposathaStatsView />}
@@ -698,7 +826,7 @@ const SatiStatsPage: React.FC = () => {
             >
                 <IonHeader>
                     <IonToolbar style={{ '--background': 'transparent' }}>
-                        <IonTitle>Anapanasati Breakdown</IonTitle>
+                        <IonTitle>Ānāpānasati</IonTitle>
                         <IonButtons slot="end">
                             <IonButton onClick={() => setShowAnapanasatiDetails(false)}>Close</IonButton>
                         </IonButtons>
@@ -711,7 +839,7 @@ const SatiStatsPage: React.FC = () => {
                                 <div className="type-breakdown-header">
                                     <div className="icon-wrapper icon-wrapper--medium" style={{ borderColor: 'var(--color-mahayana-accent)40', background: 'var(--color-mahayana-accent)10' }}>🌬️</div>
                                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--color-mahayana-accent)', fontWeight: '800', fontFamily: 'var(--font-family-display)' }}>
-                                        Breath Awareness
+                                        Ānāpānasati
                                     </h3>
                                 </div>
 
@@ -732,14 +860,14 @@ const SatiStatsPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="mini-log-title" style={{ paddingLeft: '4px', marginBottom: '12px' }}>Focus Areas</div>
+                                <div className="mini-log-title" style={{ paddingLeft: '4px', marginBottom: '12px' }}>Kammaṭṭhāna</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
                                     {[
-                                        { id: 'all_16', name: 'Full 16 Steps', icon: '🌬️', color: '#10B981' },
-                                        { id: 'body', name: 'Body', icon: '💪', color: '#F97316' },
-                                        { id: 'feelings', name: 'Feelings', icon: '❤️', color: '#EF4444' },
-                                        { id: 'mind', name: 'Mind', icon: '🧠', color: '#3B82F6' },
-                                        { id: 'dhammas', name: 'Dhammas', icon: '☸️', color: '#8B5CF6' }
+                                        { id: 'all_16', name: 'Sabbasati', icon: '🌬️', color: '#10B981' },
+                                        { id: 'body', name: 'Kāya', icon: '💪', color: '#F97316' },
+                                        { id: 'feelings', name: 'Vedanā', icon: '❤️', color: '#EF4444' },
+                                        { id: 'mind', name: 'Citta', icon: '🧠', color: '#3B82F6' },
+                                        { id: 'dhammas', name: 'Dhamma', icon: '☸️', color: '#8B5CF6' }
                                     ].map(focus => (
                                         <div key={focus.id} className="glass-card" style={{
                                             padding: '12px',
@@ -803,7 +931,7 @@ const SatiStatsPage: React.FC = () => {
             >
                 <IonHeader>
                     <IonToolbar style={{ '--background': 'transparent' }}>
-                        <IonTitle>Emptiness Breakdown</IonTitle>
+                        <IonTitle>Suññatā</IonTitle>
                         <IonButtons slot="end">
                             <IonButton onClick={() => setShowEmptinessDetails(false)}>Close</IonButton>
                         </IonButtons>
@@ -816,7 +944,7 @@ const SatiStatsPage: React.FC = () => {
                                 <div className="type-breakdown-header">
                                     <div className="icon-wrapper icon-wrapper--medium" style={{ borderColor: 'var(--color-mahayana-primary)40', background: 'var(--color-mahayana-primary)10' }}>🧘</div>
                                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--color-mahayana-secondary)', fontWeight: '800', fontFamily: 'var(--font-family-display)' }}>
-                                        Wisdom & Insight
+                                        Paññā & Vipassanā
                                     </h3>
                                 </div>
 
@@ -837,12 +965,12 @@ const SatiStatsPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="mini-log-title" style={{ paddingLeft: '4px', marginBottom: '12px' }}>Techniques</div>
+                                <div className="mini-log-title" style={{ paddingLeft: '4px', marginBottom: '12px' }}>Suññatā Bhāvanā</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
                                     {[
-                                        { id: 'anatta', name: 'Selflessness', icon: '∅', color: '#6B7280' },
-                                        { id: 'progressive', name: 'Dwelling', icon: '🏔️', color: '#60A5FA' },
-                                        { id: 'heart_sutra', name: 'Heart Sutra', icon: '❤️', color: '#EC4899' }
+                                        { id: 'anatta', name: 'Anattā', icon: '∅', color: '#6B7280' },
+                                        { id: 'progressive', name: 'Vihāra', icon: '🏔️', color: '#60A5FA' },
+                                        { id: 'heart_sutra', name: 'Hṛdaya Sūtra', icon: '❤️', color: '#EC4899' }
                                     ].map(tech => (
                                         <div key={tech.id} className="glass-card" style={{
                                             padding: '12px',
@@ -893,10 +1021,10 @@ const SatiStatsPage: React.FC = () => {
                         </div>
                     )}
                 </IonContent>
-            </IonModal>
+            </IonModal >
 
             {/* Edit Session Modal */}
-            <IonModal
+            < IonModal
                 isOpen={!!editingSession}
                 onDidDismiss={() => setEditingSession(null)}
                 initialBreakpoint={0.8}
@@ -928,15 +1056,84 @@ const SatiStatsPage: React.FC = () => {
                             </div>
 
                             <div>
-                                <div className="stat-label-small" style={{ marginBottom: '12px' }}>
-                                    {editingSession.category === 'anapanasati' || editingSession.category === 'emptiness' ? 'Duration (Minutes)' : 'Count / Beads'}
+                                <div style={{ display: 'flex', gap: '16px' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <div className="stat-label-small" style={{ marginBottom: '12px' }}>
+                                            {editingSession.category === 'anapanasati' || editingSession.category === 'emptiness' ? 'Minutes' : 'Count / Beads'}
+                                        </div>
+                                        <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px' }}>
+                                            <IonInput
+                                                type="number"
+                                                value={editingSession.count}
+                                                onIonChange={e => setEditingSession({ ...editingSession, count: parseFloat(e.detail.value!) })}
+                                                style={{ fontSize: '1.2rem', fontWeight: '700' }}
+                                            />
+                                        </IonItem>
+                                    </div>
+                                    {(editingSession.category === 'anapanasati' || editingSession.category === 'emptiness') && (
+                                        <div style={{ flex: 1 }}>
+                                            <div className="stat-label-small" style={{ marginBottom: '12px' }}>Seconds</div>
+                                            <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px' }}>
+                                                <IonInput
+                                                    type="number"
+                                                    value={editingSession.seconds || 0}
+                                                    onIonChange={e => setEditingSession({ ...editingSession, seconds: parseInt(e.detail.value!) })}
+                                                    style={{ fontSize: '1.2rem', fontWeight: '700' }}
+                                                />
+                                            </IonItem>
+                                        </div>
+                                    )}
                                 </div>
-                                <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px' }}>
-                                    <IonInput
-                                        type="number"
-                                        value={editingSession.count}
-                                        onIonChange={e => setEditingSession({ ...editingSession, count: parseFloat(e.detail.value!) })}
-                                        style={{ fontSize: '1.2rem', fontWeight: '700' }}
+                            </div>
+                            {/* Category Specific Fields */}
+                            {editingSession.category === 'anapanasati' && (
+                                <div>
+                                    <div className="stat-label-small" style={{ marginBottom: '12px' }}>Focus Area</div>
+                                    <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px' }}>
+                                        <IonSelect
+                                            value={editingSession.focus}
+                                            onIonChange={e => setEditingSession({ ...editingSession, focus: e.detail.value })}
+                                            interface="popover"
+                                            style={{ width: '100%', fontSize: '1.1rem', fontWeight: '600' }}
+                                        >
+                                            <IonSelectOption value="all_16">Sabbasati</IonSelectOption>
+                                            <IonSelectOption value="body">Kāya</IonSelectOption>
+                                            <IonSelectOption value="feelings">Vedanā</IonSelectOption>
+                                            <IonSelectOption value="mind">Citta</IonSelectOption>
+                                            <IonSelectOption value="dhammas">Dhamma</IonSelectOption>
+                                        </IonSelect>
+                                    </IonItem>
+                                </div>
+                            )}
+
+                            {editingSession.category === 'emptiness' && (
+                                <div>
+                                    <div className="stat-label-small" style={{ marginBottom: '12px' }}>Technique</div>
+                                    <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px' }}>
+                                        <IonSelect
+                                            value={editingSession.technique}
+                                            onIonChange={e => setEditingSession({ ...editingSession, technique: e.detail.value })}
+                                            interface="popover"
+                                            style={{ width: '100%', fontSize: '1.1rem', fontWeight: '600' }}
+                                        >
+                                            <IonSelectOption value="anatta">Anattā</IonSelectOption>
+                                            <IonSelectOption value="progressive">Anupubba-suññatā-vihāra</IonSelectOption>
+                                            <IonSelectOption value="heart_sutra">Hṛdaya Sūtra</IonSelectOption>
+                                        </IonSelect>
+                                    </IonItem>
+                                </div>
+                            )}
+
+                            {/* Reflections / Notes Field */}
+                            <div>
+                                <div className="stat-label-small" style={{ marginBottom: '12px' }}>Reflections / Notes</div>
+                                <IonItem lines="none" className="glass-card" style={{ '--background': 'transparent', '--padding-start': '12px', alignItems: 'flex-start' }}>
+                                    <IonTextarea
+                                        value={editingSession.notes}
+                                        onIonChange={e => setEditingSession({ ...editingSession, notes: e.detail.value! })}
+                                        placeholder="Add notes about your practice..."
+                                        rows={3}
+                                        style={{ marginTop: '8px', marginBottom: '8px' }}
                                     />
                                 </IonItem>
                             </div>
@@ -949,8 +1146,8 @@ const SatiStatsPage: React.FC = () => {
                         </div>
                     )}
                 </IonContent>
-            </IonModal>
-        </IonPage>
+            </IonModal >
+        </IonPage >
     );
 };
 

@@ -8,6 +8,7 @@ export interface AnapanasatiSession {
     id: string;
     timestamp: string; // ISO string
     durationMinutes: number;
+    durationSeconds?: number;
     plannedDurationMinutes: number;
     focus: 'all_16' | 'body' | 'feelings' | 'mind' | 'dhammas';
     completed: boolean;

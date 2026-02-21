@@ -246,3 +246,30 @@ ion-progress-bar {
     border-radius: 3px;
     --background: rgba(255, 255, 255, 0.05);
 }
+
+/* Fix IonDatetime visibility in Edit Modal */
+ion-datetime {
+    --background: rgba(0, 0, 0, 0.3) !important;
+    --background-focused: rgba(0, 0, 0, 0.5) !important;
+    color: var(--color-text-primary) !important;
+    border-radius: 12px;
+}
+
+/* Target the button-like interface Ionic renders in compact/collapsed state */
+ion-datetime::part(native),
+ion-datetime::part(calendar-day),
+ion-datetime::part(time-button) {
+    color: var(--color-text-primary) !important;
+}
+
+ion-datetime::part(time-button) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 4px 8px;
+}
+
+ion-datetime::part(time-button-active) {
+    background: var(--color-accent-primary) !important;
+    color: var(--color-bg-primary) !important;
+}

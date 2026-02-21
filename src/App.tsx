@@ -49,6 +49,7 @@ import TripleGemPage from './pages/TripleGemPage';
 import AnapanasatiPage from './pages/AnapanasatiPage';
 import AnapanasatiSessionPage from './pages/AnapanasatiSessionPage';
 import EmptinessPage from './pages/EmptinessPage';
+import EmptinessSessionPage from './pages/EmptinessSessionPage';
 import MantraListPage from './pages/MantraListPage';
 import MantraEditPage from './pages/MantraEditPage';
 import MantraPracticePage from './pages/MantraPracticePage';
@@ -115,6 +116,7 @@ const App: React.FC = () => {
             <Route exact path="/sati/anapanasati" component={AnapanasatiPage} />
             <Route exact path="/sati/anapanasati/session" component={AnapanasatiSessionPage} />
             <Route exact path="/sati/emptiness" component={EmptinessPage} />
+            <Route exact path="/sati/emptiness/session" component={EmptinessSessionPage} />
             <Route exact path="/sati/mantras" component={MantraListPage} />
             <Route exact path="/sati/mantras/edit/:id" component={MantraEditPage} />
             <Route exact path="/sati/mantras/practice/:id" component={MantraPracticePage} />

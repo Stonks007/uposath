@@ -38,6 +38,7 @@ export interface MalaEntry {
     timestamp: string; // ISO 8601
     beads: number;
     practiceType: PracticeType;
+    notes?: string;
 }
 
 export interface PracticeStats {
@@ -101,10 +102,12 @@ export interface EmptinessSession {
     id: string;
     timestamp: string; // ISO
     durationMinutes: number;
+    durationSeconds?: number;
     focus: string; // section id (e.g. 'anatta', 'heart_sutra')
     tradition: 'theravada' | 'mahayana';
     completed: boolean;
     quality?: number; // 1-5
+    reflection?: string;
     tags?: string[];
 }
 
@@ -192,6 +195,7 @@ export interface MantraSession {
     mantraId: string;
     timestamp: string;
     durationMinutes: number;
+    durationSeconds?: number;
     reps: number;
     completed: boolean;
     quality?: number; // 1-5
@@ -208,6 +212,8 @@ export interface UnifiedSession {
     category: PracticeCategory;
     title: string;
     detail: string; // e.g., "108 beads", "20 mins", "Green Tara"
+    durationSeconds?: number;
+    notes?: string;
 }
 
 export interface GlobalStats {

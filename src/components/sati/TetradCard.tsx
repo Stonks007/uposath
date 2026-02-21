@@ -50,65 +50,135 @@ const TetradCard: React.FC<TetradCardProps> = ({ tetrad, language = 'en', script
     };
 
     return (
-        <IonCard className="tetrad-card">
+        <div className="glass-card" style={{ marginBottom: '16px', overflow: 'hidden' }}>
             <div
                 onClick={() => setExpanded(!expanded)}
                 className="tetrad-header"
                 style={{
-                    borderLeft: `6px solid ${tetrad.color} `,
-                    background: expanded ? `rgba(${hexToRgb(tetrad.color)}, 0.08)` : undefined
+                    borderLeft: `4px solid ${tetrad.color}`,
+                    background: expanded ? `${tetrad.color}15` : 'transparent',
+                    padding: '16px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer'
                 }}
             >
-                <div className="tetrad-info">
-                    <div className="tetrad-icon">{tetrad.icon}</div>
-                    <div className="tetrad-text">
-                        <h3>{getPaliText(tetrad.title as any)}</h3>
-                        <div className="tetrad-desc">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div className="icon-wrapper icon-wrapper--medium" style={{
+                        borderColor: `${tetrad.color}40`,
+                        background: `${tetrad.color}15`,
+                        fontSize: '1.5rem'
+                    }}>
+                        {tetrad.icon}
+                    </div>
+                    <div>
+                        <h3 style={{
+                            margin: '0 0 4px 0',
+                            fontSize: '1.2rem',
+                            fontWeight: '700',
+                            color: 'var(--color-text-primary)'
+                        }}>
+                            {getPaliText(tetrad.title as any)}
+                        </h3>
+                        <div style={{
+                            fontSize: '0.9rem',
+                            color: 'var(--color-text-secondary)'
+                        }}>
                             {getLocalized(tetrad.title, language)}
                         </div>
                     </div>
                 </div>
-                <IonIcon icon={expanded ? chevronUp : chevronDown} style={{ color: 'var(--color-text-tertiary, #9ca3af)' }} />
+                <IonIcon
+                    icon={expanded ? chevronUp : chevronDown}
+                    style={{ color: 'var(--color-text-tertiary)', fontSize: '1.5rem' }}
+                />
             </div>
 
             {expanded && (
-                <IonCardContent className="tetrad-content-wrapper" style={{ background: `rgba(${hexToRgb(tetrad.color)}, 0.03)` }}>
-                    <div style={{ height: '1px', background: 'rgba(0,0,0,0.05)', marginBottom: '16px' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ padding: '0 16px 16px 16px' }}>
+                    <div style={{
+                        height: '1px',
+                        background: 'var(--glass-border)',
+                        margin: '8px 0 16px',
+                        opacity: 0.5
+                    }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {tetrad.steps.map(step => (
-                            <div key={step.number} className="step-card">
-                                <div className="step-header">
-                                    <div
-                                        className="step-number-badge"
-                                        style={{ background: tetrad.color }}
-                                    >
+                            <div key={step.number} style={{
+                                background: 'rgba(0,0,0,0.1)',
+                                borderRadius: '12px',
+                                padding: '16px',
+                                border: '1px solid var(--glass-border)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                    <div style={{
+                                        width: '28px',
+                                        height: '28px',
+                                        borderRadius: '50%',
+                                        background: tetrad.color,
+                                        color: '#fff',
+                                        fontSize: '0.85rem',
+                                        fontWeight: '700',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        boxShadow: `0 2px 8px ${tetrad.color}40`
+                                    }}>
                                         {step.number}
                                     </div>
-                                    <div className="step-title">
+                                    <div style={{
+                                        fontWeight: '700',
+                                        fontSize: '1rem',
+                                        color: 'var(--color-text-primary)'
+                                    }}>
                                         {getLocalized(step.title, language)}
                                     </div>
                                 </div>
 
-                                <div className="step-pali" style={{ fontFamily: script !== 'roman' ? 'sans-serif' : '"Noto Serif", serif' }}>
+                                <div style={{
+                                    fontStyle: 'italic',
+                                    color: 'var(--color-mahayana-accent)',
+                                    fontSize: '0.95rem',
+                                    marginBottom: '8px',
+                                    paddingLeft: '40px',
+                                    fontFamily: script !== 'roman' ? 'sans-serif' : 'var(--font-family-display)'
+                                }}>
                                     "{getPaliText(step.pali)}"
                                 </div>
 
-                                <div className="step-translation">
+                                <div style={{
+                                    color: 'var(--color-text-secondary)',
+                                    fontSize: '0.95rem',
+                                    paddingLeft: '40px',
+                                    marginBottom: step.guidance ? '12px' : '0',
+                                    lineHeight: '1.6'
+                                }}>
                                     {getLocalized(step.translation, language)}
                                 </div>
 
                                 {step.guidance && (
-                                    <div className="step-guidance">
-                                        <span>💡</span>
-                                        <span>{getLocalized(step.guidance, language)}</span>
+                                    <div style={{
+                                        paddingLeft: '40px',
+                                        fontSize: '0.85rem',
+                                        color: 'var(--color-text-tertiary)',
+                                        display: 'flex',
+                                        gap: '8px',
+                                        alignItems: 'flex-start',
+                                        paddingTop: '12px',
+                                        borderTop: '1px dashed var(--glass-border)'
+                                    }}>
+                                        <span style={{ fontSize: '1.2rem', opacity: 0.8 }}>💡</span>
+                                        <span style={{ lineHeight: '1.5' }}>{getLocalized(step.guidance, language)}</span>
                                     </div>
                                 )}
                             </div>
                         ))}
                     </div>
-                </IonCardContent>
+                </div>
             )}
-        </IonCard>
+        </div>
     );
 };
 
