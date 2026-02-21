@@ -47,7 +47,8 @@ const CONSONANTS = {
     's': { dev: 'स', sinh: 'ස', thai: 'ส', bur: 'သ' },
     'h': { dev: 'ह', sinh: 'හ', thai: 'ห', bur: 'ဟ' },
     'ḷ': { dev: 'ळ', sinh: 'ළ', thai: 'ฬ', bur: 'ဠ' },
-    'ṃ': { dev: 'ं', sinh: 'ං', thai: 'ํ', bur: 'ံ' } // Anusvara
+    'ṃ': { dev: 'ं', sinh: 'ං', thai: 'ํ', bur: 'ံ', isModifier: true }, // Anusvara (dot below)
+    'ṁ': { dev: 'ं', sinh: 'ං', thai: 'ํ', bur: 'ံ', isModifier: true }  // Anusvara (dot above)
 };
 
 // Vowel signs (matras) when following a consonant
@@ -129,26 +130,21 @@ export const PaliTransliterator = {
                 let mappedCons = (cons as any)[script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai'];
                 out += mappedCons;
 
-                if (vowelChar === 'a') {
-                    // Inherent 'a', do nothing to script usually. 
-                    // Just skip the 'a' in input.
-                    i++;
-                } else if (VOWEL_SIGNS[vowelChar as keyof typeof VOWEL_SIGNS]) {
-                    // Explicit other vowel
-                    out += (VOWEL_SIGNS[vowelChar as keyof typeof VOWEL_SIGNS] as any)[script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai'];
-                    i++;
-                } else {
-                    // No vowel follows -> Virama (Halant)
-                    // Unless it's Anusvara 'ṃ' -> that's separate.
-                    // Or if it's punctuation.
-                    // For Thai, Virama is Phinthu (dot below) or Thanthakhat? 
-                    // Usually Pali Thai uses explicit formatting. 
-                    // For simplicity, let's use standard Virama for Dev/Sinh.
-                    // Thai often doesn't use visible virama for inherent vowel suppression in same way, 
-                    // but assumes inherent 'o' or 'a'. 
-                    // Let's apply Virama for Dev/Sinh/Bur.
-                    if (['dev', 'sinh', 'bur'].includes(script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai' as any)) {
-                        out += (VIRAMA as any)[script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai'];
+                // Modifiers (like Anusvara) don't take vowel signs or virama
+                if (!(cons as any).isModifier) {
+                    if (vowelChar === 'a') {
+                        // Inherent 'a', do nothing to script usually. 
+                        // Just skip the 'a' in input.
+                        i++;
+                    } else if (VOWEL_SIGNS[vowelChar as keyof typeof VOWEL_SIGNS]) {
+                        // Explicit other vowel
+                        out += (VOWEL_SIGNS[vowelChar as keyof typeof VOWEL_SIGNS] as any)[script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai'];
+                        i++;
+                    } else {
+                        // No vowel follows -> Virama (Halant)
+                        if (['dev', 'sinh', 'bur'].includes(script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai' as any)) {
+                            out += (VIRAMA as any)[script === 'burmese' ? 'bur' : script === 'devanagari' ? 'dev' : script === 'sinhala' ? 'sinh' : 'thai'];
+                        }
                     }
                 }
             } else if (VOWELS[char as keyof typeof VOWELS]) {
