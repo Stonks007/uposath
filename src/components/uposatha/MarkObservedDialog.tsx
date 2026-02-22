@@ -61,26 +61,28 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
     };
 
     return (
-        <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-            <IonHeader>
-                <IonToolbar>
-                    <IonTitle>Log Observance</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton onClick={onClose}>Cancel</IonButton>
-                        <IonButton strong onClick={handleSave}>Save</IonButton>
-                    </IonButtons>
+        <IonModal isOpen={isOpen} onDidDismiss={onClose} style={{ '--background': 'transparent', '--border-radius': '16px' }} className="glass-modal">
+            <IonHeader className="ion-no-border">
+                <IonToolbar style={{ '--background': 'transparent' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold' }}>Log Observance</h3>
+                        <IonButtons>
+                            <IonButton onClick={onClose} color="medium">Cancel</IonButton>
+                            <IonButton strong color="primary" onClick={handleSave}>Save</IonButton>
+                        </IonButtons>
+                    </div>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-                <div className="text-center mb-4">
+            <IonContent className="ion-padding" style={{ '--background': 'transparent' }}>
+                <div className="text-center mb-4 mt-2">
                     <h2 className="text-lg font-bold">
                         {date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
                     </h2>
-                    <p className="text-sm text-gray-500">How was your Uposatha?</p>
+                    <p className="text-sm text-gray-400">How was your Uposatha?</p>
                 </div>
 
-                <IonList inset>
-                    <IonItem>
+                <IonList inset className="glass-list">
+                    <IonItem className="glass-item">
                         <IonSelect
                             label="Observance Level"
                             labelPlacement="floating"
@@ -93,10 +95,10 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                         </IonSelect>
                     </IonItem>
 
-                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-600">
+                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-400">
                         Practices
                     </div>
-                    <IonItem lines="none">
+                    <IonItem lines="none" className="glass-item">
                         <IonCheckbox
                             checked={precepts.includes('8_precepts')}
                             onIonChange={() => togglePrecept('8_precepts')}
@@ -112,7 +114,7 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                             Visited Monastery / Temple
                         </IonCheckbox>
                     </IonItem>
-                    <IonItem lines="none">
+                    <IonItem lines="none" className="glass-item">
                         <IonCheckbox
                             checked={precepts.includes('study')}
                             onIonChange={() => togglePrecept('study')}
@@ -121,10 +123,10 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                         </IonCheckbox>
                     </IonItem>
 
-                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-600">
+                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-400">
                         Time (Minutes)
                     </div>
-                    <IonItem>
+                    <IonItem className="glass-item">
                         <IonInput
                             label="Meditation"
                             type="number"
@@ -133,7 +135,7 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                             onIonChange={e => setMeditation(parseInt(e.detail.value || '0'))}
                         />
                     </IonItem>
-                    <IonItem>
+                    <IonItem className="glass-item">
                         <IonInput
                             label="Chanting"
                             type="number"
@@ -142,7 +144,7 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                             onIonChange={e => setChanting(parseInt(e.detail.value || '0'))}
                         />
                     </IonItem>
-                    <IonItem>
+                    <IonItem className="glass-item">
                         <IonInput
                             label="Study/Reading"
                             type="number"
@@ -152,10 +154,10 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                         />
                     </IonItem>
 
-                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-600">
+                    <div className="ion-padding-start ion-padding-top font-bold text-sm text-gray-400">
                         Quality
                     </div>
-                    <IonItem lines="none">
+                    <IonItem lines="none" className="glass-item">
                         <div className="flex items-center justify-center w-full py-2">
                             {[1, 2, 3, 4, 5].map(starIdx => (
                                 <IonIcon
@@ -168,7 +170,7 @@ const MarkObservedDialog: React.FC<MarkObservedDialogProps> = ({ isOpen, onClose
                         </div>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem className="glass-item">
                         <IonTextarea
                             label="Reflection / Notes"
                             labelPlacement="floating"

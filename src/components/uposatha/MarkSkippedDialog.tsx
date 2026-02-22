@@ -39,26 +39,28 @@ const MarkSkippedDialog: React.FC<MarkSkippedDialogProps> = ({ isOpen, onClose, 
     };
 
     return (
-        <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.5} breakpoints={[0, 0.5, 0.75]}>
-            <IonHeader>
-                <IonToolbar>
-                    <IonTitle>Skip Uposatha</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton onClick={onClose}>Cancel</IonButton>
-                        <IonButton strong color="warning" onClick={handleSave}>Confirm</IonButton>
-                    </IonButtons>
+        <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.5} breakpoints={[0, 0.5, 0.75]} style={{ '--background': 'transparent', '--border-radius': '16px' }} className="glass-modal">
+            <IonHeader className="ion-no-border">
+                <IonToolbar style={{ '--background': 'transparent' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold' }}>Skip Uposatha</h3>
+                        <IonButtons>
+                            <IonButton onClick={onClose} color="medium">Cancel</IonButton>
+                            <IonButton strong color="warning" onClick={handleSave}>Confirm</IonButton>
+                        </IonButtons>
+                    </div>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-                <div className="text-center mb-4">
+            <IonContent className="ion-padding" style={{ '--background': 'transparent' }}>
+                <div className="text-center mb-4 mt-2">
                     <h2 className="text-lg font-bold">
                         {date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
                     </h2>
-                    <p className="text-sm text-gray-500">Life happens. What prevented observance today?</p>
+                    <p className="text-sm text-gray-400">Life happens. What prevented observance today?</p>
                 </div>
 
-                <IonList inset>
-                    <IonItem>
+                <IonList inset className="glass-list">
+                    <IonItem className="glass-item">
                         <IonSelect
                             label="Reason"
                             labelPlacement="floating"
@@ -73,7 +75,7 @@ const MarkSkippedDialog: React.FC<MarkSkippedDialogProps> = ({ isOpen, onClose, 
                         </IonSelect>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem className="glass-item">
                         <IonTextarea
                             label="Note (Optional)"
                             labelPlacement="floating"

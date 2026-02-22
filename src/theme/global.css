@@ -90,6 +90,30 @@ body {
         0 0 20px rgba(255, 198, 112, 0.05);
 }
 
+/* --- Glass Modal & List Elements --- */
+.glass-modal::part(content) {
+    background: rgba(12, 12, 18, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.glass-list {
+    background: transparent !important;
+}
+
+.glass-item {
+    --background: rgba(255, 255, 255, 0.03);
+    --border-radius: 12px;
+    --inner-border-width: 0;
+    --border-color: rgba(255, 255, 255, 0.05);
+    --border-style: solid;
+    --border-width: 1px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
 /* --- Calendar Grid Utilities --- */
 .calendar-grid {
     display: grid;
