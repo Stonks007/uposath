@@ -345,7 +345,7 @@ const CalendarPage: React.FC = () => {
                             <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
                             <div className="legend-item"><span>🌗</span> Ashtami Uposatha</div>
                             <div className="legend-item"><span>🌖</span> Chaturdashi Uposatha</div>
-                            <div className="legend-item"><span>○</span> Muted (Optional)</div>
+                            <div className="legend-item"><span>○</span> Kshaya / Vridhi</div>
                         </div>
                     </div>
 
