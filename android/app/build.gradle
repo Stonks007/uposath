@@ -14,7 +14,7 @@ android {
         applicationId = "com.buddhist.uposatha"
         minSdkVersion = rootProject.ext.minSdkVersion
         targetSdkVersion = rootProject.ext.targetSdkVersion
-        versionCode 1771764404
+        versionCode 1771764976
         versionName "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
