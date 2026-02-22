@@ -59,6 +59,7 @@ const getTzLookupLazy = async () => {
 
 import { MalaService } from '../services/MalaService';
 import { UposathaObservanceService } from '../services/UposathaObservanceService';
+import { BackupRestoreService } from '../services/BackupRestoreService';
 import './SettingsPage.css';
 import {
     locationOutline,
@@ -73,7 +74,9 @@ import {
     trashOutline,
     radioOutline,
     sparklesOutline,
-    calendarOutline
+    calendarOutline,
+    cloudUploadOutline,
+    cloudDownloadOutline
 } from 'ionicons/icons';
 
 const SettingsPage: React.FC = () => {
@@ -90,6 +93,8 @@ const SettingsPage: React.FC = () => {
     const [citySearch, setCitySearch] = useState('');
     const [showCityDropdown, setShowCityDropdown] = useState(false);
     const [filteredCities, setFilteredCities] = useState<SavedLocation[]>([]);
+    const [backupLoading, setBackupLoading] = useState(false);
+    const [restoreLoading, setRestoreLoading] = useState(false);
 
     useIonViewWillEnter(() => {
         loadSettings();
@@ -355,6 +360,83 @@ const SettingsPage: React.FC = () => {
         }
     };
 
+    const handleExportBackup = async () => {
+        setBackupLoading(true);
+        try {
+            await BackupRestoreService.exportBackup();
+        } catch (e: any) {
+            console.error('Backup export failed', e);
+            presentAlert({
+                header: 'Export Failed',
+                message: e?.message || 'An unexpected error occurred while creating the backup.',
+                buttons: ['OK'],
+            });
+        } finally {
+            setBackupLoading(false);
+        }
+    };
+
+    const handleRestoreBackup = async () => {
+        setRestoreLoading(true);
+        try {
+            const payload = await BackupRestoreService.importFromFile();
+            const summary = BackupRestoreService.summarize(payload);
+
+            const lines = [
+                summary.uposathaObservances > 0 ? `☸ ${summary.uposathaObservances} Observance records` : '',
+                summary.malaEntries > 0 ? `📿 ${summary.malaEntries} Mala entries` : '',
+                summary.anapanasatiSessions > 0 ? `🌬 ${summary.anapanasatiSessions} Anapanasati sessions` : '',
+                summary.mantras > 0 ? `🔔 ${summary.mantras} Mantras` : '',
+                summary.mantraSessions > 0 ? `🧘 ${summary.mantraSessions} Mantra sessions` : '',
+                summary.emptinessSessions > 0 ? `✨ ${summary.emptinessSessions} Emptiness sessions` : '',
+            ].filter(Boolean).join('\n');
+
+            const dateStr = payload.createdAt
+                ? new Date(payload.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : 'Unknown date';
+
+            presentAlert({
+                header: 'Restore Backup?',
+                message: `This will replace ALL current data with this backup from ${dateStr}:\n\n${lines}`,
+                buttons: [
+                    'Cancel',
+                    {
+                        text: 'Restore',
+                        role: 'destructive',
+                        handler: async () => {
+                            try {
+                                await BackupRestoreService.restoreBackup(payload);
+                                presentAlert({
+                                    header: 'Restored ✓',
+                                    message: 'Your data has been restored successfully. Restart the app to see all changes.',
+                                    buttons: ['OK'],
+                                });
+                            } catch (e: any) {
+                                presentAlert({
+                                    header: 'Restore Failed',
+                                    message: e?.message || 'An error occurred while restoring.',
+                                    buttons: ['OK'],
+                                });
+                            }
+                        },
+                    },
+                ],
+            });
+        } catch (e: any) {
+            if (e?.message?.includes('cancelled')) {
+                // User cancelled file picker — silent
+            } else {
+                presentAlert({
+                    header: 'Invalid Backup',
+                    message: e?.message || 'The selected file could not be read as a valid backup.',
+                    buttons: ['OK'],
+                });
+            }
+        } finally {
+            setRestoreLoading(false);
+        }
+    };
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border" style={{ background: 'rgba(2, 2, 4, 0.7)', backdropFilter: 'blur(20px)' }}>
@@ -573,6 +655,37 @@ const SettingsPage: React.FC = () => {
                             <div className="settings-item-label">
                                 <h2 style={{ color: '#EF4444' }}>Clear Data</h2>
                                 <p>Permanently delete all observance records.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Data Backup & Restore */}
+                <div className="settings-section">
+                    <div className="settings-section-title">Data Backup & Restore</div>
+                    <div className="glass-card settings-card">
+                        <div
+                            className={`settings-item clickable ${backupLoading ? 'disabled' : ''}`}
+                            onClick={!backupLoading ? handleExportBackup : undefined}
+                        >
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#60A5FA', background: 'rgba(96, 165, 250, 0.1)', borderColor: 'rgba(96, 165, 250, 0.25)' }}>
+                                <IonIcon icon={cloudUploadOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>{backupLoading ? 'Exporting…' : 'Export Backup'}</h2>
+                                <p>Save all practice data as a shareable JSON file.</p>
+                            </div>
+                        </div>
+                        <div
+                            className={`settings-item clickable ${restoreLoading ? 'disabled' : ''}`}
+                            onClick={!restoreLoading ? handleRestoreBackup : undefined}
+                        >
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#34D399', background: 'rgba(52, 211, 153, 0.1)', borderColor: 'rgba(52, 211, 153, 0.25)' }}>
+                                <IonIcon icon={cloudDownloadOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>{restoreLoading ? 'Reading…' : 'Restore from Backup'}</h2>
+                                <p>Import a previously exported backup file.</p>
                             </div>
                         </div>
                     </div>
