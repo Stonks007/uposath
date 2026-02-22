@@ -32,6 +32,7 @@
 <summary><b>📖 Table of Contents</b></summary>
 
 - [Overview](#-overview)
+- [App Preview](#-app-preview)
 - [Feature Showcase](#-feature-showcase)
 - [Tech Stack & Architecture](#%EF%B8%8F-tech-stack--architecture)
 - [Project Structure](#-project-structure)
@@ -56,13 +57,45 @@
 
 | 💡 Problem | ✅ Uposath Solution |
 |---|---|
-| Scattered lunar calendars for different traditions | Unified engine for **Theravāda**, **Mahāyāna** (Chinese lunar), and **Vajrayāna** (Tibetan lunar) |
+| Multi-tradition Support | Unified engine for **Theravāda**, **Mahāyāna** (Chinese lunar), and **Vajrayāna** (Tibetan lunar) |
 | No way to track observance consistency | Visual heatmaps, streaks, and moon-phase breakdown statistics |
 | Generic meditation timers | Purpose-built **Ānāpānasati** and **Śūnyatā** timers with zen bell cues and step guidance |
 | Mantra counters lack depth | Digital mālā with custom deity mantras, per-mantra stats, and tradition tagging |
 | Dhamma audio needs multiple apps | Native background playback with **ExoPlayer**, intelligent caching, and YouTube integration |
 
 ---
+
+## 📸 App Preview
+
+<div align="center">
+  <table style="border-collapse: collapse; border: none;">
+    <tr>
+      <td align="center"><b>Home</b></td>
+      <td align="center"><b>Calendar</b></td>
+      <td align="center"><b>Festivals</b></td>
+      <td align="center"><b>Mindfulness (Sati)</b></td>
+    </tr>
+    <tr>
+      <td><img src="src/screenshots/home.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/calendar.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/festivals.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/sati.jpeg" width="200" style="border-radius: 12px;"></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Sati Stats</b></td>
+      <td align="center"><b>Library</b></td>
+      <td align="center"><b>Audio Player</b></td>
+      <td align="center"><b>Settings</b></td>
+    </tr>
+    <tr>
+      <td><img src="src/screenshots/sati%20stats.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/library.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/player.jpeg" width="200" style="border-radius: 12px;"></td>
+      <td><img src="src/screenshots/settings.jpeg" width="200" style="border-radius: 12px;"></td>
+    </tr>
+  </table>
+</div>
+
 
 ## ✨ Feature Showcase
 
