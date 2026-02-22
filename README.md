@@ -20,6 +20,10 @@
 
   <br>
 
+  [![Download APK](https://img.shields.io/badge/Download-APK_v1.0.0-success?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Stonks007/uposath/releases/download/v1.0.0/Uposatha-v1.0.0.apk)
+
+  <br>
+
   <sub>*"Appamādo amatapadaṃ" — Heedfulness is the path to the Deathless.*<br>— Dhammapada 21</sub>
 
 </div>
@@ -276,6 +280,14 @@ uposath/
 | [Node.js](https://nodejs.org/) | ≥ 18.0 | JavaScript runtime |
 | [Android Studio](https://developer.android.com/studio) | SDK 34+ | Native build & emulator |
 | Git | Latest | Version control |
+
+### 📲 Quick Install
+
+If you just want to use the app on your Android device:
+
+**[Download Uposath v1.0.0 APK](https://github.com/Stonks007/uposath/releases/download/v1.0.0/Uposatha-v1.0.0.apk)**
+
+### 🏗️ Build from Source
 
 ### Installation
 
