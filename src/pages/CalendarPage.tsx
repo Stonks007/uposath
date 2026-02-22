@@ -191,7 +191,7 @@ const CalendarPage: React.FC = () => {
                             onClick={() => handleDayClick(day.date)}
                         >
                             <span className="day-number">{day.date.getDate()}</span>
-                            {moon && <span className="moon-indicator">{moon}</span>}
+                            {moon && <span className={`moon-indicator ${moon === '○' ? 'moon-optional' : ''}`}>{moon}</span>}
                             {day.festival && (
                                 <div
                                     className="festival-indicator"
@@ -300,7 +300,7 @@ const CalendarPage: React.FC = () => {
                                     {todayData.u.isUposatha
                                         ? `✨ ${todayData.u.paliLabel || 'Uposatha'}`
                                         : todayData.u.isOptional
-                                            ? `○ ${todayData.u.isKshaya ? 'Kshaya' : 'Vridhi'}`
+                                            ? <><span className="moon-optional">○</span> {todayData.u.isKshaya ? 'Kshaya' : 'Vridhi'}</>
                                             : 'No Uposatha Day'}
                                 </span>
                             </div>
@@ -345,7 +345,7 @@ const CalendarPage: React.FC = () => {
                             <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
                             <div className="legend-item"><span>🌗</span> Ashtami Uposatha</div>
                             <div className="legend-item"><span>🌖</span> Chaturdashi Uposatha</div>
-                            <div className="legend-item"><span>○</span> Kshaya / Vridhi</div>
+                            <div className="legend-item"><span className="moon-optional">○</span> Kshaya / Vridhi (Optional Uposatha)</div>
                         </div>
                     </div>
 

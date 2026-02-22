@@ -174,6 +174,11 @@
     margin-top: 2px;
 }
 
+.moon-optional {
+    color: var(--color-accent-primary);
+    font-weight: 800;
+}
+
 .festival-indicator {
     position: absolute;
     bottom: 4px;
