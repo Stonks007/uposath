@@ -84,6 +84,7 @@ const SettingsPage: React.FC = () => {
     const [showDailyVerseCard, setShowDailyVerseCard] = useState(true);
     const [timezones] = useState(getTimezones());
     const [paliScript, setPaliScript] = useState('roman');
+    const [translationLanguage, setTranslationLanguage] = useState('en');
     const [trackingEnabled, setTrackingEnabled] = useState(true);
     const [presentAlert] = useIonAlert();
     const [citySearch, setCitySearch] = useState('');
@@ -121,6 +122,7 @@ const SettingsPage: React.FC = () => {
 
         const prefs = await MalaService.getPreferences();
         setPaliScript(prefs.paliScript);
+        setTranslationLanguage(prefs.translationLanguage);
     };
 
     const toggleTracking = async (enabled: boolean) => {
@@ -321,6 +323,12 @@ const SettingsPage: React.FC = () => {
         await MalaService.savePreferences({ ...prefs, paliScript: script });
     };
 
+    const handleLanguageChange = async (lang: string) => {
+        setTranslationLanguage(lang);
+        const prefs = await MalaService.getPreferences();
+        await MalaService.savePreferences({ ...prefs, translationLanguage: lang });
+    };
+
     const updateSchedules = async (uposatha: boolean, festivals: boolean) => {
         if (!location) return;
         const observer = new Observer(location.latitude, location.longitude, location.altitude);
@@ -349,12 +357,8 @@ const SettingsPage: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader className="ion-no-border">
-                <IonToolbar style={{
-                    '--background': 'rgba(2, 2, 4, 0.7)',
-                    'backdropFilter': 'blur(20px)',
-                    '--border-style': 'none'
-                }}>
+            <IonHeader className="ion-no-border" style={{ background: 'rgba(2, 2, 4, 0.7)', backdropFilter: 'blur(20px)' }}>
+                <IonToolbar style={{ '--background': 'transparent', '--border-style': 'none' }}>
                     <IonTitle style={{ fontSize: '1.6rem', fontWeight: '800' }}>Settings</IonTitle>
                 </IonToolbar>
             </IonHeader>
@@ -519,6 +523,26 @@ const SettingsPage: React.FC = () => {
                             >
                                 <IonSelectOption value="roman">Roman (Default)</IonSelectOption>
                                 <IonSelectOption value="devanagari">Devanagari (देवनागरी)</IonSelectOption>
+                            </IonSelect>
+                        </div>
+
+                        <div className="settings-item">
+                            <div className="icon-wrapper icon-wrapper--medium settings-item-icon" style={{ color: '#10B981' }}>
+                                <IonIcon icon={globeOutline} />
+                            </div>
+                            <div className="settings-item-label">
+                                <h2>Translation Language</h2>
+                                <p>Language for verses and teachings.</p>
+                            </div>
+                            <IonSelect
+                                className="settings-select"
+                                interface="action-sheet"
+                                value={translationLanguage}
+                                onIonChange={e => handleLanguageChange(e.detail.value)}
+                            >
+                                <IonSelectOption value="en">English</IonSelectOption>
+                                <IonSelectOption value="hi">Hindi (हिंदी)</IonSelectOption>
+                                <IonSelectOption value="mr">Marathi (मराठी)</IonSelectOption>
                             </IonSelect>
                         </div>
                     </div>

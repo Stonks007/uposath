@@ -31,6 +31,8 @@ ion-select::part(text) {
     font-weight: 700;
     color: var(--color-accent-primary);
     text-align: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 ion-select::part(icon) {
@@ -58,6 +60,7 @@ ion-select::part(icon) {
 .settings-item {
     display: flex;
     align-items: center;
+    gap: 16px;
     padding: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     transition: background 0.2s ease;
@@ -68,11 +71,12 @@ ion-select::part(icon) {
 }
 
 .settings-item-icon {
-    margin-right: 16px;
+    flex-shrink: 0;
 }
 
 .settings-item-label {
     flex: 1;
+    min-width: 0;
 }
 
 .settings-item-label h2 {
@@ -171,6 +175,10 @@ ion-select::part(icon) {
     --placeholder-color: var(--color-text-muted);
     font-weight: 700;
     color: var(--color-accent-primary);
+    flex-shrink: 1;
+    max-width: 60%;
+    --padding-start: 0;
+    --padding-end: 0;
 }
 
 .about-footer {
