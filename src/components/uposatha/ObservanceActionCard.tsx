@@ -88,7 +88,7 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                                         <IonIcon icon={ribbonOutline} />&nbsp;
                                         {observance.level?.toUpperCase()}
                                     </IonChip>
-                                    {observance.practiceMinutes && (
+                                    {observance.practiceMinutes && ((observance.practiceMinutes.meditation || 0) + (observance.practiceMinutes.chanting || 0) + (observance.practiceMinutes.study || 0)) > 0 && (
                                         <IonChip color="secondary" outline>
                                             <IonIcon icon={timeOutline} />&nbsp;
                                             {(observance.practiceMinutes.meditation || 0) + (observance.practiceMinutes.chanting || 0) + (observance.practiceMinutes.study || 0)}m
