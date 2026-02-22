@@ -352,6 +352,7 @@ Contributions are warmly welcomed! Whether it's fixing a bug, adding a new medit
 - **Mahāyāna lunar phase tracking** via [`chinese-lunar-calendar`](https://www.npmjs.com/package/chinese-lunar-calendar) by linlifengx
 - **Offline global location lookups** via [`country-state-city`](https://www.npmjs.com/package/country-state-city) by Harpreet Singh
 - **Offline geospatial timezone mapping** via [`tz-lookup`](https://www.npmjs.com/package/tz-lookup) by The Dark Sky Company
+- **YouTube Music playback architecture** inspired by the open-source work on [InnerTune](https://github.com/z-huang/InnerTune) by [Zion Huang](https://github.com/z-huang) and [Malopieds](https://github.com/Malopieds)
 
 ---
 
