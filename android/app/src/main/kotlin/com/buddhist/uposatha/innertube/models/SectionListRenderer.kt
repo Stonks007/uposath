@@ -1,5 +1,6 @@
 package com.buddhist.uposatha.innertube.models
 
+import com.buddhist.uposatha.innertube.models.response.BrowseResponse
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
@@ -47,6 +48,9 @@ data class SectionListRenderer(
         val musicResponsiveHeaderRenderer: MusicResponsiveHeaderRenderer?,
         val musicEditablePlaylistDetailHeaderRenderer: MusicEditablePlaylistDetailHeaderRenderer?,
         val gridRenderer: GridRenderer?,
+        val videoRenderer: BrowseResponse.VideoRenderer? = null,
+        val gridVideoRenderer: BrowseResponse.GridVideoRenderer? = null,
+        val reelItemRenderer: BrowseResponse.ReelItemRenderer? = null,
     )
 }
 

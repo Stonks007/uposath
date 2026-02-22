@@ -88,3 +88,17 @@ data class ArtistItem(
         get() = "https://music.youtube.com/channel/$id"
 }
 
+@Serializable
+data class VideoItem(
+    override val id: String,
+    override val title: String,
+    val author: Artist?,
+    val durationText: String?,
+    val viewCountText: String? = null,
+    override val thumbnail: String?,
+) : YTItem() {
+    override val explicit: Boolean = false
+    override val shareLink: String
+        get() = "https://www.youtube.com/watch?v=$id"
+}
+

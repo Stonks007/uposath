@@ -416,3 +416,15 @@
     --placeholder-color: rgba(255, 255, 255, 0.25);
     padding: 8px 12px 4px;
 }
+
+/* Infinite Scroll */
+ion-infinite-scroll {
+    margin-top: 16px;
+    margin-bottom: 40px;
+}
+
+ion-infinite-scroll-content {
+    --color: var(--color-accent-primary, #ffc670);
+    font-size: 0.85rem;
+    font-weight: 500;
+}

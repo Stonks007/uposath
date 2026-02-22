@@ -7,9 +7,12 @@ import com.buddhist.uposatha.innertube.models.ArtistItem
 import com.buddhist.uposatha.innertube.models.MusicResponsiveListItemRenderer
 import com.buddhist.uposatha.innertube.models.PlaylistItem
 import com.buddhist.uposatha.innertube.models.SongItem
+import com.buddhist.uposatha.innertube.models.VideoItem
 import com.buddhist.uposatha.innertube.models.YTItem
 import com.buddhist.uposatha.innertube.models.oddElements
 import com.buddhist.uposatha.innertube.models.splitBySeparator
+import com.buddhist.uposatha.innertube.models.response.BrowseResponse
+import com.buddhist.uposatha.innertube.models.YTText
 import com.buddhist.uposatha.innertube.utils.parseTime
 import kotlinx.serialization.Serializable
 
@@ -111,6 +114,49 @@ object SearchPage {
             }
             else -> null
         }
+    }
+
+    fun fromVideoRenderer(renderer: BrowseResponse.VideoRenderer): YTItem {
+        return VideoItem(
+            id = renderer.videoId,
+            title = renderer.title.text ?: "",
+            author = renderer.shortBylineText?.runs?.firstOrNull()?.let {
+                Artist(
+                    name = it.text,
+                    id = it.navigationEndpoint?.browseEndpoint?.browseId
+                )
+            },
+            durationText = renderer.lengthText?.text,
+            viewCountText = renderer.viewCountText?.text,
+            thumbnail = renderer.thumbnail.thumbnails.lastOrNull()?.url
+        )
+    }
+
+    fun fromGridVideoRenderer(renderer: BrowseResponse.GridVideoRenderer): YTItem {
+        return VideoItem(
+            id = renderer.videoId,
+            title = renderer.title.text ?: "",
+            author = renderer.shortBylineText?.runs?.firstOrNull()?.let {
+                Artist(
+                    name = it.text,
+                    id = it.navigationEndpoint?.browseEndpoint?.browseId
+                )
+            },
+            durationText = renderer.thumbnailOverlays?.firstOrNull()?.thumbnailOverlayTimeStatusRenderer?.text?.text,
+            viewCountText = renderer.viewCountText?.text,
+            thumbnail = renderer.thumbnail.thumbnails.lastOrNull()?.url
+        )
+    }
+
+    fun fromReelItemRenderer(renderer: BrowseResponse.ReelItemRenderer): YTItem {
+        return VideoItem(
+            id = renderer.videoId,
+            title = renderer.headline.text ?: "",
+            author = null,
+            durationText = null,
+            viewCountText = renderer.viewCountText?.text,
+            thumbnail = renderer.thumbnail.thumbnails.lastOrNull()?.url
+        )
     }
 }
 

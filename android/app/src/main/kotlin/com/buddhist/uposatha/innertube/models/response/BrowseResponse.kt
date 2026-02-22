@@ -7,12 +7,15 @@ import com.buddhist.uposatha.innertube.models.Menu
 import com.buddhist.uposatha.innertube.models.MusicDetailHeaderRenderer
 import com.buddhist.uposatha.innertube.models.MusicEditablePlaylistDetailHeaderRenderer
 import com.buddhist.uposatha.innertube.models.MusicShelfRenderer
+import com.buddhist.uposatha.innertube.models.MusicTwoRowItemRenderer
 import com.buddhist.uposatha.innertube.models.ResponseContext
 import com.buddhist.uposatha.innertube.models.Runs
 import com.buddhist.uposatha.innertube.models.SectionListRenderer
 import com.buddhist.uposatha.innertube.models.SubscriptionButton
 import com.buddhist.uposatha.innertube.models.Tabs
+import com.buddhist.uposatha.innertube.models.Thumbnails
 import com.buddhist.uposatha.innertube.models.ThumbnailRenderer
+import com.buddhist.uposatha.innertube.models.YTText
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -45,6 +48,7 @@ data class BrowseResponse(
     @Serializable
     data class ContinuationContents(
         val sectionListContinuation: SectionListContinuation?,
+        val itemSectionContinuation: SectionListContinuation?,
         val musicPlaylistShelfContinuation: MusicPlaylistShelfContinuation?,
         val gridContinuation: GridContinuation?,
         val musicShelfContinuation: MusicShelfRenderer?
@@ -63,9 +67,15 @@ data class BrowseResponse(
 
         @Serializable
         data class GridContinuation(
-            val items: List<GridRenderer.Item>,
+            val items: List<Item>,
             val continuations: List<Continuation>?,
-        )
+        ) {
+            @Serializable
+            data class Item(
+                val musicTwoRowItemRenderer: MusicTwoRowItemRenderer? = null,
+                val videoRenderer: VideoRenderer? = null,
+            )
+        }
     }
 
     @Serializable
@@ -129,6 +139,47 @@ data class BrowseResponse(
             val thumbnails: List<MusicThumbnail>?,
         )
     }
+
+    @Serializable
+    data class VideoRenderer(
+        val videoId: String,
+        val thumbnail: Thumbnails,
+        val title: YTText,
+        val longBylineText: YTText? = null,
+        val shortBylineText: YTText? = null,
+        val lengthText: YTText? = null,
+        val viewCountText: YTText? = null,
+        val publishedTimeText: YTText? = null,
+    )
+
+    @Serializable
+    data class GridVideoRenderer(
+        val videoId: String,
+        val thumbnail: Thumbnails,
+        val title: YTText,
+        val shortBylineText: YTText? = null,
+        val viewCountText: YTText? = null,
+        val publishedTimeText: YTText? = null,
+        val thumbnailOverlays: List<ThumbnailOverlay>? = null,
+    ) {
+        @Serializable
+        data class ThumbnailOverlay(
+            val thumbnailOverlayTimeStatusRenderer: ThumbnailOverlayTimeStatusRenderer?,
+        ) {
+            @Serializable
+            data class ThumbnailOverlayTimeStatusRenderer(
+                val text: YTText,
+            )
+        }
+    }
+
+    @Serializable
+    data class ReelItemRenderer(
+        val videoId: String,
+        val thumbnail: Thumbnails,
+        val headline: YTText,
+        val viewCountText: YTText? = null,
+    )
 
     @Serializable
     data class Microformat(

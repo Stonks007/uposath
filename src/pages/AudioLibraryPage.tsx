@@ -12,6 +12,8 @@ import {
     IonInput,
     IonLabel,
     IonActionSheet,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     useIonViewWillEnter,
 } from '@ionic/react';
 import { addCircleOutline, musicalNotes, close, checkmarkCircle, trashOutline, starOutline } from 'ionicons/icons';
@@ -186,6 +188,50 @@ const AudioLibraryPage: React.FC = () => {
         setChannels(updated);
     };
 
+    const handleInfinite = async (e: CustomEvent<void>) => {
+        if (!activeChannel || !currentSection || !currentSection.continuation) {
+            (e.target as HTMLIonInfiniteScrollElement).complete();
+            return;
+        }
+
+        try {
+            console.log('Loading more videos for continuation:', currentSection.continuation);
+            const result = await DhammaAudio.getChannelVideos({
+                channelId: activeChannel.id,
+                page: 1, // field exists in definition but is ignored by native if continuation is present
+                continuation: currentSection.continuation
+            });
+
+            if (result.videos.length > 0) {
+                setSections(prev => {
+                    const newSections = [...prev];
+                    const section = { ...newSections[activeTab] };
+                    if (section) {
+                        section.videos = [...section.videos, ...result.videos];
+                        section.continuation = result.continuation;
+                        newSections[activeTab] = section;
+                    }
+                    return newSections;
+                });
+            } else {
+                // No more videos
+                setSections(prev => {
+                    const newSections = [...prev];
+                    const section = { ...newSections[activeTab] };
+                    if (section) {
+                        section.continuation = undefined;
+                        newSections[activeTab] = section;
+                    }
+                    return newSections;
+                });
+            }
+        } catch (err) {
+            console.error('Failed to load more videos:', err);
+        } finally {
+            (e.target as HTMLIonInfiniteScrollElement).complete();
+        }
+    };
+
     const playOrOpenVideo = (video: VideoInfo) => {
         if (currentSection?.title === 'Playlists') {
             history.push(`/playlist/${video.id}`);
@@ -337,6 +383,17 @@ const AudioLibraryPage: React.FC = () => {
                                         </div>
                                     );
                                 })}
+
+                                <IonInfiniteScroll
+                                    threshold="100px"
+                                    disabled={!currentSection.continuation}
+                                    onIonInfinite={handleInfinite}
+                                >
+                                    <IonInfiniteScrollContent
+                                        loadingText="Loading more Dhamma..."
+                                        loadingSpinner="bubbles"
+                                    />
+                                </IonInfiniteScroll>
                             </div>
                         ) : activeChannel ? (
                             <div className="library-empty-state" style={{ marginTop: '40px' }}>
