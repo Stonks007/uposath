@@ -6,6 +6,79 @@
     --background: var(--color-bg-primary);
 }
 
+/* ─── Year Selector ─── */
+
+.year-selector-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-md);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+}
+
+.year-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--color-accent-primary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.year-nav-btn:active {
+    background: rgba(255, 198, 112, 0.15);
+    border-color: var(--color-accent-primary);
+    transform: scale(0.92);
+}
+
+.year-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+}
+
+.year-number {
+    font-family: var(--font-family-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--color-text-primary);
+    text-shadow: 0 0 20px rgba(255, 198, 112, 0.2);
+}
+
+.year-today-btn {
+    padding: 2px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 198, 112, 0.3);
+    background: rgba(255, 198, 112, 0.1);
+    color: var(--color-accent-primary);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.year-today-btn:active {
+    background: var(--color-accent-primary);
+    color: var(--color-text-inverse);
+}
+
 /* ─── Filter Section ─── */
 
 .filter-container {

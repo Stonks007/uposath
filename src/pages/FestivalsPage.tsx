@@ -8,6 +8,8 @@ import {
     IonLabel,
     IonSegment,
     IonSegmentButton,
+    IonButton,
+    IonButtons,
     useIonViewWillEnter,
     IonIcon
 } from '@ionic/react';
@@ -27,6 +29,8 @@ import {
     chevronForwardOutline,
     chevronDownOutline,
     chevronUpOutline,
+    chevronBack,
+    chevronForward,
     bookOutline,
     leafOutline
 } from 'ionicons/icons';
@@ -42,21 +46,35 @@ const FestivalsPage: React.FC = () => {
     const [filter, setFilter] = useState<FilterOption>('All');
     const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
     const [showHindi, setShowHindi] = useState(false);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [loading, setLoading] = useState(false);
 
     useIonViewWillEnter(() => {
         loadData();
     });
 
-    const loadData = async () => {
+    const loadData = async (year?: number) => {
+        setLoading(true);
         const loc = await getSavedLocation();
         const currentObserver = getObserver(loc);
         setObserver(currentObserver);
         setLocationName(loc.name);
 
         // Fetch using persistent cache (includes fresh scan if invalid)
-        const upcoming = await getPersistentFestivals(currentObserver);
+        const upcoming = await getPersistentFestivals(currentObserver, false, year);
         setFestivals(upcoming);
-        setFilteredFestivals(upcoming);
+        setFilteredFestivals(
+            filter === 'All' ? upcoming : upcoming.filter(m => m.festival.tradition === filter)
+        );
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        loadData(selectedYear);
+    }, [selectedYear]);
+
+    const changeYear = (delta: number) => {
+        setSelectedYear(prev => prev + delta);
     };
 
     const handleFilterChange = (value: FilterOption) => {
@@ -179,6 +197,23 @@ const FestivalsPage: React.FC = () => {
             </IonHeader>
 
             <IonContent fullscreen className="festivals-container">
+                {/* ─── Year Selector ─── */}
+                <div className="year-selector-bar">
+                    <button className="year-nav-btn" onClick={() => changeYear(-1)}>
+                        <IonIcon icon={chevronBack} />
+                    </button>
+                    <div className="year-display">
+                        <span className="year-number">{selectedYear}</span>
+                        {selectedYear !== new Date().getFullYear() && (
+                            <button className="year-today-btn" onClick={() => setSelectedYear(new Date().getFullYear())}>
+                                Today
+                            </button>
+                        )}
+                    </div>
+                    <button className="year-nav-btn" onClick={() => changeYear(1)}>
+                        <IonIcon icon={chevronForward} />
+                    </button>
+                </div>
                 {/* ─── Tradition Filter ─── */}
                 <div className="filter-container">
                     <IonSegment

@@ -37,6 +37,10 @@ export interface BuddhistFestival {
     masaIndex?: number;
     /** Tithi index 0-29 (Theravada only) */
     tithiIndex?: number | number[];
+    /** Fixed Gregorian month 1-12 (for fixed-date observances) */
+    fixedMonth?: number;
+    /** Fixed Gregorian day 1-31 (for fixed-date observances) */
+    fixedDay?: number;
     /** Chinese lunar month 1-12 (Mahayana only) */
     chineseLunarMonth?: number;
     /** Chinese lunar day 1-30 (Mahayana only) */
@@ -95,6 +99,10 @@ const RAW_THERAVADA_FESTIVALS = [
     { name: "Śrāvaṇa Purnima", lunar_day: "Purnima", masa: "Śrāvaṇa", desc: "First Dhamma Saṅgīti; Rāhula's Arahantship", region: "India, Sri Lanka" },
     { name: "Kārtika Purnima", lunar_day: "Purnima", masa: "Kārttika", desc: "60 Arahants' mission; Sāriputta's Parinibbāna", region: "India, Sri Lanka" },
     { name: "Mārgaśīrṣa Purnima", lunar_day: "Purnima", masa: "Mārgaśīrṣa", desc: "Saṅghamittā's arrival with Mahābodhi branch", region: "Sri Lanka" },
+    // ─ Non-Purnima tithi-based festivals ─
+    { name: "Atthami Bucha", lunar_day: "23", masa: "Vaiśākha", desc: "Cremation of the Buddha — 8 days after Parinirvana", region: "Thailand" },
+    { name: "Vassa Begins", lunar_day: "1", masa: "Śrāvaṇa", desc: "Start of the 3-month Rains Retreat (Vassāna)", region: "Theravada Countries" },
+    { name: "Kathina", lunar_day: "Purnima", masa: "Kārttika", desc: "Post-Vassa robe offering ceremony to the Sangha", region: "Theravada Countries" },
 ];
 
 const THERAVADA_FESTIVALS: BuddhistFestival[] = RAW_THERAVADA_FESTIVALS.map(f => {
@@ -118,6 +126,83 @@ const THERAVADA_FESTIVALS: BuddhistFestival[] = RAW_THERAVADA_FESTIVALS.map(f =>
     };
 });
 
+// ─── Fixed Gregorian Date Festivals (Theravada) ─────────────────────────────
+
+const FIXED_DATE_FESTIVALS: BuddhistFestival[] = [
+    {
+        id: 'ambedkar_jayanti', name: "Ambedkar Jayanti",
+        fixedMonth: 4, fixedDay: 14,
+        description: "Birth Anniversary of Bodhisattva Dr. Babasaheb Ambedkar (1891)",
+        tradition: 'Theravada', region: "India"
+    },
+    {
+        id: 'ambedkar_death_anniversary', name: "Ambedkar Death Anniversary",
+        fixedMonth: 12, fixedDay: 6,
+        description: "Death Anniversary of Bodhisattva Dr. Babasaheb Ambedkar (1956)",
+        tradition: 'Theravada', region: "India"
+    },
+    {
+        id: 'dharmapala_day', name: "Dharmapala Day",
+        fixedMonth: 9, fixedDay: 17,
+        description: "Birth Anniversary of Anagarika Dharmapala (1864) — pioneer of Buddhist revival",
+        tradition: 'Theravada', region: "Sri Lanka, India, Global"
+    },
+    {
+        id: 'dharmapala_memorial', name: "Dharmapala Memorial",
+        fixedMonth: 4, fixedDay: 29,
+        description: "Death Anniversary of Anagarika Dharmapala (1933)",
+        tradition: 'Theravada', region: "Sri Lanka, India"
+    },
+];
+
+// ─── Ashoka Vijayadashami / Dhamma Diksha Detection ─────────────────────────
+
+/**
+ * Separate detection for Ashoka Vijayadashami (Ashwin Shukla Dashami).
+ * Checks both current and next day panchangam to capture the tithi
+ * at its start time rather than only at sunrise.
+ */
+function checkVijayadashami(
+    date: Date,
+    observer: Observer,
+    panchangam?: Panchangam
+): BuddhistFestival | null {
+    // Ashwin = masaIndex 6, Dashami = tithi 9 (0-indexed)
+    const ASHWIN_INDEX = 6;
+    const DASHAMI_TITHI = 9;
+
+    const p = panchangam ?? getPanchangam(date, observer);
+
+    // Check current day
+    if (p.masa.index === ASHWIN_INDEX && p.tithi === DASHAMI_TITHI) {
+        return {
+            id: 'ashoka_vijayadashami',
+            name: "Ashoka Vijayadashami / Dhamma Diksha Day",
+            description: "Emperor Ashoka's embrace of Buddhism; Dhamma Diksha Day — Dr. Ambedkar and ~500,000 followers converted to Buddhism at Deekshabhoomi, Nagpur (14 Oct 1956)",
+            tradition: 'Theravada',
+            region: "India",
+        };
+    }
+
+    // Also check next day's panchangam to detect tithi that started after sunrise
+    try {
+        const nextDay = new Date(date);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const pNext = getPanchangam(nextDay, observer);
+        if (pNext?.masa?.index === ASHWIN_INDEX && pNext?.tithi === DASHAMI_TITHI) {
+            return {
+                id: 'ashoka_vijayadashami',
+                name: "Ashoka Vijayadashami / Dhamma Diksha Day",
+                description: "Emperor Ashoka's embrace of Buddhism; Dhamma Diksha Day — Dr. Ambedkar and ~500,000 followers converted to Buddhism at Deekshabhoomi, Nagpur (14 Oct 1956)",
+                tradition: 'Theravada',
+                region: "India",
+            };
+        }
+    } catch { /* next-day panchangam unavailable */ }
+
+    return null;
+}
+
 function checkTheravadaFestival(
     date: Date,
     observer: Observer,
@@ -125,6 +210,19 @@ function checkTheravadaFestival(
 ): BuddhistFestival | null {
     const p = panchangam ?? getPanchangam(date, observer);
 
+    // 1. Check fixed Gregorian date observances
+    const gMonth = date.getMonth() + 1;
+    const gDay = date.getDate();
+    const fixedMatch = FIXED_DATE_FESTIVALS.find(f =>
+        f.fixedMonth === gMonth && f.fixedDay === gDay
+    );
+    if (fixedMatch) return fixedMatch;
+
+    // 2. Check Ashoka Vijayadashami / Dhamma Diksha (separate tithi logic)
+    const vijayadashami = checkVijayadashami(date, observer, p);
+    if (vijayadashami) return vijayadashami;
+
+    // 3. Standard masa/tithi matching
     return THERAVADA_FESTIVALS.find(f => {
         if (f.masaIndex !== p.masa.index) return false;
         if (Array.isArray(f.tithiIndex)) {
@@ -251,7 +349,63 @@ const MAHAYANA_FESTIVALS: BuddhistFestival[] = [
     },
 ];
 
+// ─── Japanese Buddhist Festivals (Fixed Gregorian Dates) ─────────────────────
+
+const JAPANESE_FESTIVALS: BuddhistFestival[] = [
+    {
+        id: 'shogatsu', name: "Shōgatsu",
+        fixedMonth: 1, fixedDay: 1,
+        description: "Japanese New Year — temple bell ringing (Joya no Kane) and first shrine visit",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "正月"
+    },
+    {
+        id: 'setsubun', name: "Setsubun",
+        fixedMonth: 2, fixedDay: 3,
+        description: "Bean-throwing festival — driving out evil spirits before the start of spring",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "節分"
+    },
+    {
+        id: 'spring_higan', name: "Spring Higan",
+        fixedMonth: 3, fixedDay: 20,
+        description: "Week of equinox observance — honoring ancestors and reflecting on the Six Pāramitās",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "春彼岸"
+    },
+    {
+        id: 'hanamatsuri', name: "Hanamatsuri",
+        fixedMonth: 4, fixedDay: 8,
+        description: "Flower Festival — Birthday of Shakyamuni Buddha (bathing the baby Buddha statue)",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "花祭り"
+    },
+    {
+        id: 'obon', name: "Obon",
+        fixedMonth: 8, fixedDay: 13,
+        description: "Festival of the Dead — honoring ancestors, lantern floating, and Bon Odori dances",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "お盆"
+    },
+    {
+        id: 'autumn_higan', name: "Autumn Higan",
+        fixedMonth: 9, fixedDay: 22,
+        description: "Autumn equinox observance — visiting graves, offering flowers, and chanting sūtras",
+        tradition: 'Mahayana', region: "Japan",
+        alsoKnownAs: "秋彼岸"
+    },
+];
+
 function checkMahayanaFestival(date: Date): BuddhistFestival | null {
+    // 1. Check fixed-date Japanese festivals
+    const gMonth = date.getMonth() + 1;
+    const gDay = date.getDate();
+    const fixedMatch = JAPANESE_FESTIVALS.find(f =>
+        f.fixedMonth === gMonth && f.fixedDay === gDay
+    );
+    if (fixedMatch) return fixedMatch;
+
+    // 2. Chinese Lunar calendar matching
     const lunarDate = getChineseLunarDateSync(date);
     if (!lunarDate) return null;
 
@@ -283,8 +437,8 @@ const VAJRAYANA_FESTIVAL_DEFS: VajrayanaFestivalDef[] = [
         tibetanMonth: 1, tibetanDay: 1,
         dates: {
             2024: '2024-02-10', 2025: '2025-02-28', 2026: '2026-02-18',
-            2027: '2027-03-08', 2028: '2028-02-26', 2029: '2029-02-14',
-            2030: '2030-03-04'
+            2027: '2027-02-07', 2028: '2028-02-25', 2029: '2029-02-14',
+            2030: '2030-03-05'
         }
     },
     {
@@ -294,7 +448,7 @@ const VAJRAYANA_FESTIVAL_DEFS: VajrayanaFestivalDef[] = [
         tibetanMonth: 1, tibetanDay: 15,
         dates: {
             2024: '2024-02-24', 2025: '2025-03-14', 2026: '2026-03-03',
-            2027: '2027-03-22', 2028: '2028-03-11', 2029: '2029-02-28',
+            2027: '2027-02-21', 2028: '2028-03-10', 2029: '2029-02-28',
             2030: '2030-03-18'
         }
     },
@@ -305,7 +459,7 @@ const VAJRAYANA_FESTIVAL_DEFS: VajrayanaFestivalDef[] = [
         tibetanMonth: 4, tibetanDay: 15,
         dates: {
             2024: '2024-05-23', 2025: '2025-06-11', 2026: '2026-05-31',
-            2027: '2027-06-20', 2028: '2028-06-08', 2029: '2029-05-28',
+            2027: '2027-06-18', 2028: '2028-06-07', 2029: '2029-05-27',
             2030: '2030-06-16'
         }
     },
@@ -327,7 +481,7 @@ const VAJRAYANA_FESTIVAL_DEFS: VajrayanaFestivalDef[] = [
         tibetanMonth: 9, tibetanDay: 22,
         dates: {
             2024: '2024-11-15', 2025: '2025-11-11', 2026: '2026-11-01',
-            2027: '2027-11-20', 2028: '2028-11-09', 2029: '2029-10-29',
+            2027: '2027-11-20', 2028: '2028-11-11', 2029: '2029-10-29',
             2030: '2030-11-17'
         }
     },
@@ -516,7 +670,9 @@ export async function getUpcomingFestivals(
 export function getAllFestivalDefinitions(): BuddhistFestival[] {
     return [
         ...THERAVADA_FESTIVALS,
+        ...FIXED_DATE_FESTIVALS,
         ...MAHAYANA_FESTIVALS,
+        ...JAPANESE_FESTIVALS,
         ...VAJRAYANA_FESTIVAL_DEFS.map(d => ({
             id: d.id,
             name: d.name,

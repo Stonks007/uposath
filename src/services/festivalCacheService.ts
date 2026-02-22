@@ -20,31 +20,29 @@ interface CachedData {
 
 /**
  * Gets festivals from cache if valid, otherwise performs a fresh scan.
+ * If `year` is given, scans Jan 1–Dec 31 of that year instead of 365 days from today.
  */
 export async function getPersistentFestivals(
     observer: Observer,
-    forceRefresh = false
+    forceRefresh = false,
+    year?: number
 ): Promise<FestivalMatch[]> {
     const now = new Date();
-    const currentYear = now.getFullYear();
+    const targetYear = year ?? now.getFullYear();
+    const cacheKey = year ? `${CACHE_KEY}_${year}` : CACHE_KEY;
 
     if (!forceRefresh) {
-        const { value } = await Preferences.get({ key: CACHE_KEY });
+        const { value } = await Preferences.get({ key: cacheKey });
         if (value) {
             try {
                 const data: CachedData = JSON.parse(value);
                 const cacheDate = new Date(data.timestamp);
 
-                // Cache is valid if:
-                // 1. It was generated today (prevents stale "daysRemaining")
-                // 2. Location is roughly the same (within ~10km for safety)
-                // 3. Year matches
                 const isSameDay = cacheDate.toDateString() === now.toDateString();
                 const isSameLocation = Math.abs(data.lat - observer.latitude) < 0.1 &&
                     Math.abs(data.lng - observer.longitude) < 0.1;
 
-                if (isSameDay && isSameLocation && data.year === currentYear) {
-                    // Restore Date objects which were serialized to strings
+                if (isSameDay && isSameLocation && data.year === targetYear) {
                     return data.festivals.map(f => ({
                         ...f,
                         date: new Date(f.date)
@@ -58,19 +56,30 @@ export async function getPersistentFestivals(
 
     // Perform fresh scan
     await initMahayanaCalendar();
-    const festivals = await getUpcomingFestivals(now, observer, 365);
+
+    let startDate: Date;
+    let days: number;
+    if (year) {
+        startDate = new Date(year, 0, 1, 12, 0, 0);
+        days = 365 + (new Date(year, 1, 29).getDate() === 29 ? 1 : 0); // leap year aware
+    } else {
+        startDate = now;
+        days = 365;
+    }
+
+    const festivals = await getUpcomingFestivals(startDate, observer, days);
 
     // Save to cache
     const cacheData: CachedData = {
         timestamp: now.getTime(),
         lat: observer.latitude,
         lng: observer.longitude,
-        year: currentYear,
+        year: targetYear,
         festivals: festivals
     };
 
     await Preferences.set({
-        key: CACHE_KEY,
+        key: cacheKey,
         value: JSON.stringify(cacheData)
     });
 
