@@ -68,6 +68,7 @@ const NextUposathaWidget: React.FC = () => {
     const getPhaseIcon = () => {
         if (nextUposatha.status.isFullMoon) return '🌕';
         if (nextUposatha.status.isNewMoon) return '🌑';
+        if (nextUposatha.status.isChaturdashi) return '🌖';
         return '🌗';
     };
 

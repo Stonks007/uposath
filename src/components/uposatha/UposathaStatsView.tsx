@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonGrid, IonRow, IonCol, IonProgressBar, IonList, IonItem, IonLabel, IonNote, IonIcon } from '@ionic/react';
-import { checkmarkCircle, closeCircle, moon, ellipseOutline } from 'ionicons/icons';
+import { IonProgressBar, IonList, IonItem, IonLabel, IonNote, IonIcon } from '@ionic/react';
+import { checkmarkCircle, closeCircle } from 'ionicons/icons';
 import { UposathaStats, UposathaObservance } from '../../types/ObservanceTypes';
 import { UposathaObservanceService } from '../../services/UposathaObservanceService';
 import '../../pages/SatiStatsPage.css';
@@ -27,9 +27,92 @@ const UposathaStatsView: React.FC = () => {
         switch (phase) {
             case 'full': return '🌕';
             case 'new': return '🌑';
+            case 'chaturdashi': return '🌖';
             default: return '🌗';
         }
     };
+
+    const getPhaseLabel = (phase: string) => {
+        switch (phase) {
+            case 'full': return 'Pūrṇimā';
+            case 'new': return 'Amāvasyā';
+            case 'chaturdashi': return 'Catuddasī';
+            default: return 'Aṭṭhamī';
+        }
+    };
+
+    // --- PAKSHA HEATMAP ---
+    // Group history by paksha, sorted chronologically (oldest first for left-to-right reading)
+    const shuklaEntries = history
+        .filter(o => o.paksha === 'Shukla')
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const krishnaEntries = history
+        .filter(o => o.paksha === 'Krishna')
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Entries without paksha (legacy) — show in a combined row
+    const legacyEntries = history
+        .filter(o => !o.paksha)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const renderHeatmapRow = (entries: UposathaObservance[], label: string) => (
+        <div style={{ marginBottom: '16px' }}>
+            <div style={{
+                fontSize: '0.75rem',
+                fontWeight: '800',
+                color: 'var(--color-text-tertiary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '8px'
+            }}>
+                {label}
+            </div>
+            <div style={{
+                display: 'flex',
+                gap: '4px',
+                flexWrap: 'wrap',
+                alignItems: 'center'
+            }}>
+                {entries.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                        No entries yet
+                    </div>
+                ) : entries.map(obs => {
+                    const isObserved = obs.status === 'observed';
+                    return (
+                        <div
+                            key={obs.id}
+                            title={`${new Date(obs.date).toLocaleDateString()} — ${obs.status.toUpperCase()} (${getPhaseLabel(obs.moonPhase)})`}
+                            style={{
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85rem',
+                                background: isObserved
+                                    ? 'rgba(16, 185, 129, 0.2)'
+                                    : 'rgba(239, 68, 68, 0.15)',
+                                border: `1px solid ${isObserved ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.3)'}`,
+                                cursor: 'default',
+                                transition: 'transform 0.15s ease',
+                                position: 'relative'
+                            }}
+                        >
+                            {getPhaseIcon(obs.moonPhase)}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
+    const phaseRows: { key: keyof UposathaStats['byMoonPhase']; icon: string; label: string; color: string }[] = [
+        { key: 'full', icon: '🌕', label: 'Pūrṇimā', color: 'var(--color-mahayana-accent)' },
+        { key: 'new', icon: '🌑', label: 'Amāvasyā', color: 'var(--color-text-secondary)' },
+        { key: 'chaturdashi', icon: '🌖', label: 'Catuddasī', color: '#A78BFA' },
+        { key: 'quarter', icon: '🌗', label: 'Aṭṭhamī', color: '#60A5FA' },
+    ];
 
     return (
         <div style={{ paddingBottom: '40px' }}>
@@ -45,34 +128,94 @@ const UposathaStatsView: React.FC = () => {
                 </div>
             </div>
 
-            <div className="glass-card moon-breakdown-card">
-                <h3>Moon Phase Breakdown</h3>
-                <div className="moon-phase-row">
-                    <div className="moon-phase-info">
-                        <span>Full Moon 🌕</span>
-                        <span>{stats.byMoonPhase.full.observed} / {stats.byMoonPhase.full.total}</span>
+            {/* Additional Stats Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '24px' }}>
+                <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-text-primary)', fontFamily: 'var(--font-family-display)' }}>
+                        {stats.observed}
                     </div>
-                    <IonProgressBar value={stats.byMoonPhase.full.total > 0 ? stats.byMoonPhase.full.observed / stats.byMoonPhase.full.total : 0} color="primary" />
+                    <div className="stat-label-small">Observed</div>
                 </div>
-                <div className="moon-phase-row">
-                    <div className="moon-phase-info">
-                        <span>New Moon 🌑</span>
-                        <span>{stats.byMoonPhase.new.observed} / {stats.byMoonPhase.new.total}</span>
+                <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--ion-color-danger)', fontFamily: 'var(--font-family-display)' }}>
+                        {stats.skipped}
                     </div>
-                    <IonProgressBar value={stats.byMoonPhase.new.total > 0 ? stats.byMoonPhase.new.observed / stats.byMoonPhase.new.total : 0} color="medium" />
+                    <div className="stat-label-small">Skipped</div>
                 </div>
-                <div className="moon-phase-row">
-                    <div className="moon-phase-info">
-                        <span>Quarters 🌗</span>
-                        <span>{stats.byMoonPhase.quarter.observed} / {stats.byMoonPhase.quarter.total}</span>
+                <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-mahayana-accent)', fontFamily: 'var(--font-family-display)' }}>
+                        {stats.longestStreak}
                     </div>
-                    <IonProgressBar value={stats.byMoonPhase.quarter.total > 0 ? stats.byMoonPhase.quarter.observed / stats.byMoonPhase.quarter.total : 0} color="secondary" />
+                    <div className="stat-label-small">Best Streak</div>
                 </div>
             </div>
 
+            {/* Paksha Heatmap */}
+            <div className="glass-card" style={{ padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{
+                    margin: '0 0 16px',
+                    fontSize: '1rem',
+                    fontWeight: '800',
+                    color: 'var(--color-accent-primary)',
+                    fontFamily: 'var(--font-family-display)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em'
+                }}>
+                    Paksha Observance Map
+                </h3>
+
+                {renderHeatmapRow(shuklaEntries, 'Śukla Pakṣa (Waxing)')}
+                {renderHeatmapRow(krishnaEntries, 'Kṛṣṇa Pakṣa (Waning)')}
+                {legacyEntries.length > 0 && renderHeatmapRow(legacyEntries, 'Earlier Records')}
+
+                {/* Legend */}
+                <div style={{
+                    display: 'flex',
+                    gap: '16px',
+                    marginTop: '16px',
+                    paddingTop: '12px',
+                    borderTop: '1px solid var(--glass-border)',
+                    fontSize: '0.7rem',
+                    color: 'var(--color-text-tertiary)',
+                    flexWrap: 'wrap'
+                }}>
+                    <span>🌕 Pūrṇimā</span>
+                    <span>🌑 Amāvasyā</span>
+                    <span>🌖 Catuddasī</span>
+                    <span>🌗 Aṭṭhamī</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: 'rgba(16, 185, 129, 0.25)', border: '1px solid rgba(16, 185, 129, 0.5)', display: 'inline-block' }} /> Observed
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', display: 'inline-block' }} /> Skipped
+                    </span>
+                </div>
+            </div>
+
+            {/* Moon Phase Breakdown — 4 categories */}
+            <div className="glass-card moon-breakdown-card">
+                <h3>Moon Phase Breakdown</h3>
+                {phaseRows.map(({ key, icon, label, color }) => {
+                    const phase = stats.byMoonPhase[key];
+                    return (
+                        <div className="moon-phase-row" key={key}>
+                            <div className="moon-phase-info">
+                                <span>{label} {icon}</span>
+                                <span>{phase.observed} / {phase.total}</span>
+                            </div>
+                            <IonProgressBar
+                                value={phase.total > 0 ? phase.observed / phase.total : 0}
+                                style={{ '--progress-background': color }}
+                            />
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Recent History */}
             <h3 className="practice-breakdown-title">Recent History</h3>
             <IonList inset={true} style={{ margin: '0', background: 'transparent' }}>
-                {history.slice(0, 10).map(obs => (
+                {history.slice(0, 15).map(obs => (
                     <IonItem key={obs.id} className="glass-card history-item" lines="none" detail={false}>
                         <div slot="start" className="icon-wrapper icon-wrapper--medium history-item-icon" style={{
                             borderColor: obs.status === 'observed' ? 'var(--color-mahayana-accent)40' : 'var(--ion-color-danger)40',
@@ -93,7 +236,10 @@ const UposathaStatsView: React.FC = () => {
                                 }}>
                                     {obs.status.toUpperCase()}
                                 </span>
-                                • {obs.status === 'observed' ? (obs.level || 'Full Practice') : (obs.skipReason || 'Not Recorded')}
+                                • {getPhaseLabel(obs.moonPhase)}
+                                {obs.paksha && <span> • {obs.paksha} Pakṣa</span>}
+                                {obs.status === 'observed' && obs.level && <span> • {obs.level}</span>}
+                                {obs.status === 'skipped' && obs.skipReason && <span> • {obs.skipReason}</span>}
                             </p>
                         </IonLabel>
                         <IonNote slot="end">

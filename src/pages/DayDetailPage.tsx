@@ -181,7 +181,13 @@ const DayDetailPage: React.FC = () => {
                 {(data.status.isUposatha || data.status.isOptional) && (
                     <ObservanceActionCard
                         date={date}
-                        moonPhase={data.status.isFullMoon ? 'full' : data.status.isNewMoon ? 'new' : 'quarter'}
+                        moonPhase={
+                            data.status.isFullMoon ? 'full'
+                                : data.status.isNewMoon ? 'new'
+                                    : data.status.isChaturdashi ? 'chaturdashi'
+                                        : 'quarter'
+                        }
+                        paksha={data.status.paksha as 'Shukla' | 'Krishna'}
                     />
                 )}
 

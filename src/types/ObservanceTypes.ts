@@ -1,7 +1,8 @@
 export interface UposathaObservance {
     id: string;
     date: string; // ISO YYYY-MM-DD
-    moonPhase: 'full' | 'new' | 'quarter';
+    moonPhase: 'full' | 'new' | 'quarter' | 'chaturdashi';
+    paksha?: 'Shukla' | 'Krishna';
     status: 'observed' | 'skipped';
     level?: 'full' | 'partial' | 'minimal';
     precepts?: string[]; // e.g., '8_precepts', 'monastery', 'study'
@@ -28,6 +29,7 @@ export interface UposathaStats {
         full: { observed: number; total: number };
         new: { observed: number; total: number };
         quarter: { observed: number; total: number };
+        chaturdashi: { observed: number; total: number };
     };
     monthlyStats: {
         month: string; // YYYY-MM

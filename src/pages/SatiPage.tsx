@@ -33,7 +33,7 @@ const SatiPage: React.FC = () => {
             const status = getUposathaStatus(new Date(), observer);
 
             if (status.isUposatha) {
-                const icon = status.isFullMoon ? '🌕' : (status.isNewMoon ? '🌑' : '🌗');
+                const icon = status.isFullMoon ? '🌕' : status.isNewMoon ? '🌑' : status.isChaturdashi ? '🌖' : '🌗';
                 setUposathaLabel(`${icon} ${status.paliLabel || 'Uposatha'} Day — Practice Triple Gem Recollection`);
             }
         };

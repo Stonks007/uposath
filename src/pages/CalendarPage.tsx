@@ -144,6 +144,7 @@ const CalendarPage: React.FC = () => {
         if (status.isUposatha) {
             if (status.isFullMoon) return '🌕';
             if (status.isNewMoon) return '🌑';
+            if (status.isChaturdashi) return '🌖';
             return '🌗';
         }
         if (status.isOptional) return '○';
@@ -342,7 +343,8 @@ const CalendarPage: React.FC = () => {
                         <div className="legend-grid">
                             <div className="legend-item"><span>🌕</span> Purnima Uposatha</div>
                             <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
-                            <div className="legend-item"><span>🌗</span> Ashtami / Chaturdashi</div>
+                            <div className="legend-item"><span>🌗</span> Ashtami Uposatha</div>
+                            <div className="legend-item"><span>🌖</span> Chaturdashi Uposatha</div>
                             <div className="legend-item"><span>○</span> Muted (Optional)</div>
                         </div>
                     </div>

@@ -9,11 +9,12 @@ import MarkSkippedDialog from './MarkSkippedDialog';
 
 interface ObservanceActionCardProps {
     date: Date;
-    moonPhase?: 'full' | 'new' | 'quarter'; // Optional, can be derived or passed
+    moonPhase?: 'full' | 'new' | 'quarter' | 'chaturdashi';
+    paksha?: 'Shukla' | 'Krishna';
     onUpdate?: () => void;
 }
 
-const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonPhase = 'full', onUpdate }) => {
+const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonPhase = 'full', paksha, onUpdate }) => {
     const [observance, setObservance] = useState<UposathaObservance | null>(null);
     const [showObservedDialog, setShowObservedDialog] = useState(false);
     const [showSkippedDialog, setShowSkippedDialog] = useState(false);
@@ -33,6 +34,7 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
             id: observance?.id || crypto.randomUUID(),
             date: date.toISOString().split('T')[0],
             moonPhase,
+            paksha,
             timestamp: new Date().toISOString(),
             status: data.status || 'observed', // Default, should be passed
             ...data

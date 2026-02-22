@@ -61,7 +61,8 @@ export const UposathaObservanceService = {
         const byPhase = {
             full: { observed: 0, total: 0 },
             new: { observed: 0, total: 0 },
-            quarter: { observed: 0, total: 0 }
+            quarter: { observed: 0, total: 0 },
+            chaturdashi: { observed: 0, total: 0 }
         };
 
         history.forEach(o => {
@@ -71,6 +72,9 @@ export const UposathaObservanceService = {
             } else if (o.moonPhase === 'new') {
                 byPhase.new.total++;
                 if (o.status === 'observed') byPhase.new.observed++;
+            } else if (o.moonPhase === 'chaturdashi') {
+                byPhase.chaturdashi.total++;
+                if (o.status === 'observed') byPhase.chaturdashi.observed++;
             } else {
                 byPhase.quarter.total++;
                 if (o.status === 'observed') byPhase.quarter.observed++;
