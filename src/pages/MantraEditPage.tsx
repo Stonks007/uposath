@@ -153,59 +153,57 @@ const MantraEditPage: React.FC = () => {
                         {/* Basic Info Section */}
                         <div className="edit-section">
                             <div className="edit-section-header">
-                                <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
-                                    <IonIcon icon={settingsOutline} color="primary" />
-                                </div>
-                                <h3 className="edit-section-title">Basic Info</h3>
+                                <h3 className="edit-section-title">Core Identity</h3>
                             </div>
                             <div className="edit-glass-card">
                                 <div className="input-group">
-                                    <label className="input-label">Name *</label>
+                                    <label className="input-label">Mantra Name *</label>
                                     <IonInput
                                         className="custom-input"
                                         value={mantra.basic.name}
                                         placeholder="e.g. Great Compassion Mantra"
-                                        onIonChange={e => setMantra({ ...mantra, basic: { ...mantra.basic, name: e.detail.value! } })}
+                                        onIonInput={e => setMantra(prev => prev ? { ...prev, basic: { ...prev.basic, name: e.detail.value! } } : null)}
                                     />
                                 </div>
+
                                 <div className="input-group">
-                                    <label className="input-label">Deity / Figure (Optional)</label>
+                                    <label className="input-label">Deity / Figure</label>
                                     <IonInput
                                         className="custom-input"
                                         value={mantra.basic.deity}
                                         placeholder="e.g. Avalokiteśvara"
-                                        onIonChange={e => setMantra({ ...mantra, basic: { ...mantra.basic, deity: e.detail.value! } })}
+                                        onIonInput={e => setMantra(prev => prev ? { ...prev, basic: { ...prev.basic, deity: e.detail.value! } } : null)}
                                     />
                                 </div>
-                                <div className="input-group">
-                                    <label className="input-label">Deity Image</label>
-                                    <div className="image-upload-container">
+
+                                <div className="input-group" style={{ marginTop: '24px' }}>
+                                    <label className="input-label">Iconography</label>
+                                    <div className="image-upload-row">
                                         <div className="image-preview-wrapper" onClick={handleChangeImage}>
                                             <img src={imageSrc} alt="Deity Preview" className="deity-preview-image" />
                                         </div>
-                                        <div className="image-actions">
-                                            <IonButton fill="clear" onClick={handleChangeImage}>
-                                                Change Image
-                                            </IonButton>
-                                            {mantra.basic.deityImageType === 'user' && (
-                                                <IonButton fill="clear" color="danger" onClick={handleResetImage}>
-                                                    Reset to Default
+                                        <div className="image-info">
+                                            <div className="image-info-title">Sacred Imagery</div>
+                                            <div className="image-actions">
+                                                <IonButton fill="clear" color="primary" onClick={handleChangeImage} className="mini-action-button">
+                                                    UPDATE
                                                 </IonButton>
-                                            )}
+                                                {mantra.basic.deityImageType === 'user' && (
+                                                    <IonButton fill="clear" color="danger" onClick={handleResetImage} className="mini-action-button">
+                                                        RESET
+                                                    </IonButton>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
                         {/* Mantra Text Section */}
                         <div className="edit-section">
                             <div className="edit-section-header">
-                                <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
-                                    <IonIcon icon={createOutline} color="primary" />
-                                </div>
-                                <h3 className="edit-section-title">Mantra Text</h3>
+                                <h3 className="edit-section-title">Sacred Text</h3>
                             </div>
                             <div className="edit-glass-card">
                                 <div className="input-group">
@@ -214,7 +212,7 @@ const MantraEditPage: React.FC = () => {
                                         className="custom-select"
                                         interface="popover"
                                         value={mantra.text.primaryScript}
-                                        onIonChange={e => setMantra({ ...mantra, text: { ...mantra.text, primaryScript: e.detail.value! } })}
+                                        onIonChange={e => setMantra(prev => prev ? { ...prev, text: { ...prev.text, primaryScript: e.detail.value! } } : null)}
                                     >
                                         <IonSelectOption value="devanagari">Devanagari</IonSelectOption>
                                         <IonSelectOption value="roman">Roman (IAST)</IonSelectOption>
@@ -229,39 +227,36 @@ const MantraEditPage: React.FC = () => {
                                         className="custom-textarea"
                                         rows={4}
                                         value={mantra.text.primaryText}
-                                        placeholder="Enter mantra text here..."
-                                        onIonChange={e => setMantra({ ...mantra, text: { ...mantra.text, primaryText: e.detail.value! } })}
+                                        placeholder="Enter the sacred syllables..."
+                                        onIonInput={e => setMantra(prev => prev ? { ...prev, text: { ...prev.text, primaryText: e.detail.value! } } : null)}
                                     />
                                 </div>
                                 <div className="input-group">
-                                    <label className="input-label">Transliteration (Optional)</label>
+                                    <label className="input-label">Transliteration</label>
                                     <IonTextarea
                                         className="custom-textarea"
                                         rows={2}
                                         value={mantra.text.transliteration}
-                                        placeholder="Romanized text..."
-                                        onIonChange={e => setMantra({ ...mantra, text: { ...mantra.text, transliteration: e.detail.value! } })}
+                                        placeholder="Phonetic reading..."
+                                        onIonInput={e => setMantra(prev => prev ? { ...prev, text: { ...prev.text, transliteration: e.detail.value! } } : null)}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Context Section */}
+                        {/* Context & Practice Sections Combined for flow */}
                         <div className="edit-section">
                             <div className="edit-section-header">
-                                <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
-                                    <IonIcon icon={leafOutline} color="primary" />
-                                </div>
-                                <h3 className="edit-section-title">Context</h3>
+                                <h3 className="edit-section-title">Tradition & Goals</h3>
                             </div>
                             <div className="edit-glass-card">
                                 <div className="input-group">
-                                    <label className="input-label">Tradition</label>
+                                    <label className="input-label">Lineage / Tradition</label>
                                     <IonSelect
                                         className="custom-select"
                                         interface="popover"
                                         value={mantra.tradition}
-                                        onIonChange={e => setMantra({ ...mantra, tradition: e.detail.value as MantraTradition })}
+                                        onIonChange={e => setMantra(prev => prev ? { ...prev, tradition: e.detail.value as MantraTradition } : null)}
                                     >
                                         <IonSelectOption value="mahayana">Mahayana</IonSelectOption>
                                         <IonSelectOption value="theravada">Theravada</IonSelectOption>
@@ -273,34 +268,30 @@ const MantraEditPage: React.FC = () => {
                                     </IonSelect>
                                 </div>
                                 <div className="input-group">
-                                    <label className="input-label">Purpose (Optional)</label>
+                                    <label className="input-label">Spiritual Purpose</label>
                                     <IonInput
                                         className="custom-input"
                                         value={mantra.purpose}
-                                        placeholder="e.g. Compassion, Healing"
-                                        onIonChange={e => setMantra({ ...mantra, purpose: e.detail.value! })}
+                                        placeholder="e.g. Compassion, Protection"
+                                        onIonInput={e => setMantra(prev => prev ? { ...prev, purpose: e.detail.value! } : null)}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Practice Defaults */}
                         <div className="edit-section">
                             <div className="edit-section-header">
-                                <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
-                                    <IonIcon icon={statsChartOutline} color="primary" />
-                                </div>
-                                <h3 className="edit-section-title">Practice Defaults</h3>
+                                <h3 className="edit-section-title">Practice Targets</h3>
                             </div>
                             <div className="edit-glass-card">
                                 <div className="practice-grid">
                                     <div className="input-group">
-                                        <label className="input-label">Target Beads</label>
+                                        <label className="input-label">Daily Reps</label>
                                         <IonInput
                                             className="custom-input"
                                             type="number"
                                             value={mantra.practice.defaultReps}
-                                            onIonChange={e => setMantra({ ...mantra, practice: { ...mantra.practice, defaultReps: parseInt(e.detail.value!, 10) } })}
+                                            onIonInput={e => setMantra(prev => prev ? { ...prev, practice: { ...prev.practice, defaultReps: parseInt(e.detail.value!, 10) || 0 } } : null)}
                                         />
                                     </div>
                                     <div className="input-group">
@@ -309,7 +300,7 @@ const MantraEditPage: React.FC = () => {
                                             className="custom-input"
                                             type="number"
                                             value={mantra.practice.defaultDurationMinutes}
-                                            onIonChange={e => setMantra({ ...mantra, practice: { ...mantra.practice, defaultDurationMinutes: parseInt(e.detail.value!, 10) } })}
+                                            onIonInput={e => setMantra(prev => prev ? { ...prev, practice: { ...prev.practice, defaultDurationMinutes: parseInt(e.detail.value!, 10) || 0 } } : null)}
                                         />
                                     </div>
                                 </div>
