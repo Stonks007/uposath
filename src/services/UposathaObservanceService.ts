@@ -58,7 +58,7 @@ export const UposathaObservanceService = {
         let history = await UposathaObservanceService.getHistory();
         let changed = false;
 
-        // Cleanup: Remove any 'ignored' or 'skipped' entries that are NO LONGER mathematically Uposatha days or Optional days.
+        // Cleanup: Remove any 'skipped' entries that are NO LONGER mathematically Uposatha days or Optional days.
         const cleanedHistory = history.filter(o => {
             if (o.status === 'observed') return true;
             const checkDate = new Date(`${o.date}T12:00:00`);
@@ -110,7 +110,7 @@ export const UposathaObservanceService = {
                         date: dateStr,
                         moonPhase,
                         paksha: status.paksha as 'Shukla' | 'Krishna',
-                        status: status.isUposatha ? 'skipped' : 'ignored',
+                        status: 'skipped',
                         timestamp: new Date().toISOString()
                     });
                 }
@@ -132,11 +132,12 @@ export const UposathaObservanceService = {
 
     async getStats(): Promise<UposathaStats> {
         const history = await UposathaObservanceService.getHistory();
-        const totalTracked = history.length;
         const observed = history.filter(o => o.status === 'observed').length;
         const skipped = history.filter(o => o.status === 'skipped').length;
-        const ignored = history.filter(o => o.status === 'ignored').length;
-        const rate = totalTracked > 0 ? (observed / totalTracked) * 100 : 0;
+
+        // Rate: Simple comparison of observed vs skipped
+        const total = observed + skipped;
+        const rate = total > 0 ? (observed / total) * 100 : 0;
 
         // Moon Phase Breakdown
         const byPhase = {
@@ -185,12 +186,6 @@ export const UposathaObservanceService = {
         let tempStreak = 0;
 
         // Current Streak
-        // Iterating from most recent. 
-        // Logic: If the MOST RECENT entry is observed, we start counting.
-        // If there are skipped days in between observed days, streak breaks.
-        // Note: Uposatha days are not consecutive days. They are specific dates.
-        // So we just check the sequence of *tracked* Uposatha days.
-
         for (const obs of sortedHistory) {
             if (obs.status === 'observed') {
                 currentStreak++;
@@ -200,7 +195,7 @@ export const UposathaObservanceService = {
         }
 
         // Longest Streak
-        for (const obs of sortedHistory) { // Working backwards in time
+        for (const obs of sortedHistory) {
             if (obs.status === 'observed') {
                 tempStreak++;
             } else {
@@ -211,10 +206,10 @@ export const UposathaObservanceService = {
         if (tempStreak > longestStreak) longestStreak = tempStreak;
 
         return {
-            totalTracked,
+            totalTracked: observed + skipped,
             observed,
             skipped,
-            ignored,
+            ignored: 0,
             rate,
             currentStreak,
             longestStreak,

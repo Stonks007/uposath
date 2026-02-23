@@ -4,11 +4,14 @@ import { IonProgressBar, IonList, IonItem, IonLabel, IonNote, IonIcon } from '@i
 import { checkmarkCircle, closeCircle, removeCircleOutline } from 'ionicons/icons';
 import { UposathaStats, UposathaObservance } from '../../types/ObservanceTypes';
 import { UposathaObservanceService } from '../../services/UposathaObservanceService';
+import LogObservanceDialog from './LogObservanceDialog';
 import '../../pages/SatiStatsPage.css';
 
 const UposathaStatsView: React.FC = () => {
     const [stats, setStats] = useState<UposathaStats | null>(null);
     const [history, setHistory] = useState<UposathaObservance[]>([]);
+    const [showDialog, setShowDialog] = useState(false);
+    const [editingRecord, setEditingRecord] = useState<UposathaObservance | null>(null);
 
     useEffect(() => {
         loadData();
@@ -19,6 +22,29 @@ const UposathaStatsView: React.FC = () => {
         const h = await UposathaObservanceService.getHistory();
         setStats(s);
         setHistory(h);
+    };
+
+    const handleEdit = (obs: UposathaObservance) => {
+        setEditingRecord(obs);
+        setShowDialog(true);
+    };
+
+    const handleSave = async (data: Partial<UposathaObservance>) => {
+        if (editingRecord) {
+            // Merge with existing data
+            const updated = { ...editingRecord, ...data };
+            await UposathaObservanceService.saveObservance(updated as UposathaObservance);
+            await loadData();
+            setEditingRecord(null);
+            setShowDialog(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        await UposathaObservanceService.deleteObservance(id);
+        await loadData();
+        setEditingRecord(null);
+        setShowDialog(false);
     };
 
     if (!stats) return <div className="ion-padding text-center">Loading stats...</div>;
@@ -82,6 +108,7 @@ const UposathaStatsView: React.FC = () => {
                         <div
                             key={obs.id}
                             title={`${new Date(obs.date).toLocaleDateString()} — ${obs.status.toUpperCase()} (${getPhaseLabel(obs.moonPhase)})`}
+                            onClick={() => handleEdit(obs)}
                             style={{
                                 width: '28px',
                                 height: '28px',
@@ -92,12 +119,13 @@ const UposathaStatsView: React.FC = () => {
                                 fontSize: '0.85rem',
                                 background: isObserved
                                     ? 'rgba(16, 185, 129, 0.2)'
-                                    : obs.status === 'skipped' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(156, 163, 175, 0.15)',
-                                border: `1px solid ${isObserved ? 'rgba(16, 185, 129, 0.4)' : obs.status === 'skipped' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(156, 163, 175, 0.3)'}`,
-                                cursor: 'default',
-                                transition: 'transform 0.15s ease',
+                                    : 'rgba(239, 68, 68, 0.15)',
+                                border: `1px solid ${isObserved ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.3)'}`,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease',
                                 position: 'relative'
                             }}
+                            className="heatmap-cell"
                         >
                             {getPhaseIcon(obs.moonPhase)}
                         </div>
@@ -129,7 +157,7 @@ const UposathaStatsView: React.FC = () => {
             </div>
 
             {/* Additional Stats Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '24px' }}>
                 <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
                     <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-text-primary)', fontFamily: 'var(--font-family-display)' }}>
                         {stats.observed}
@@ -141,12 +169,6 @@ const UposathaStatsView: React.FC = () => {
                         {stats.skipped}
                     </div>
                     <div className="stat-label-small">Skipped</div>
-                </div>
-                <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-family-display)' }}>
-                        {stats.ignored}
-                    </div>
-                    <div className="stat-label-small">Ignored</div>
                 </div>
                 <div className="glass-card" style={{ padding: '12px', textAlign: 'center' }}>
                     <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--color-mahayana-accent)', fontFamily: 'var(--font-family-display)' }}>
@@ -195,9 +217,6 @@ const UposathaStatsView: React.FC = () => {
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', display: 'inline-block' }} /> Skipped
                     </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: 'rgba(156, 163, 175, 0.15)', border: '1px solid rgba(156, 163, 175, 0.3)', display: 'inline-block' }} /> Ignored
-                    </span>
                 </div>
             </div>
 
@@ -225,10 +244,18 @@ const UposathaStatsView: React.FC = () => {
             <h3 className="practice-breakdown-title">Recent History</h3>
             <IonList inset={true} style={{ margin: '0', background: 'transparent' }}>
                 {history.slice(0, 15).map(obs => (
-                    <IonItem key={obs.id} className="glass-card history-item" lines="none" detail={false}>
+                    <IonItem
+                        key={obs.id}
+                        className="glass-card history-item"
+                        lines="none"
+                        detail={false}
+                        button
+                        onClick={() => handleEdit(obs)}
+                        style={{ cursor: 'pointer' }}
+                    >
                         <div slot="start" className="icon-wrapper icon-wrapper--medium history-item-icon" style={{
-                            borderColor: obs.status === 'observed' ? 'var(--color-mahayana-accent)40' : obs.status === 'skipped' ? 'var(--ion-color-danger)40' : 'var(--color-text-tertiary)40',
-                            background: obs.status === 'observed' ? 'var(--color-mahayana-accent)15' : obs.status === 'skipped' ? 'var(--ion-color-danger)15' : 'var(--color-text-tertiary)15',
+                            borderColor: obs.status === 'observed' ? 'var(--color-mahayana-accent)40' : 'var(--ion-color-danger)40',
+                            background: obs.status === 'observed' ? 'var(--color-mahayana-accent)15' : 'var(--ion-color-danger)15',
                             fontSize: '1.4rem'
                         }}>
                             {getPhaseIcon(obs.moonPhase)}
@@ -239,7 +266,7 @@ const UposathaStatsView: React.FC = () => {
                             </h2>
                             <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
                                 <span style={{
-                                    color: obs.status === 'observed' ? 'var(--color-mahayana-accent)' : obs.status === 'skipped' ? 'var(--ion-color-danger)' : 'var(--color-text-secondary)',
+                                    color: obs.status === 'observed' ? 'var(--color-mahayana-accent)' : 'var(--ion-color-danger)',
                                     fontWeight: '700',
                                     marginRight: '6px'
                                 }}>
@@ -254,10 +281,8 @@ const UposathaStatsView: React.FC = () => {
                         <IonNote slot="end">
                             {obs.status === 'observed' ? (
                                 <IonIcon icon={checkmarkCircle} color="success" style={{ fontSize: '1.5rem' }} />
-                            ) : obs.status === 'skipped' ? (
-                                <IonIcon icon={closeCircle} color="danger" style={{ fontSize: '1.5rem' }} />
                             ) : (
-                                <IonIcon icon={removeCircleOutline} color="medium" style={{ fontSize: '1.5rem' }} />
+                                <IonIcon icon={closeCircle} color="danger" style={{ fontSize: '1.5rem' }} />
                             )}
                         </IonNote>
                     </IonItem>
@@ -268,6 +293,19 @@ const UposathaStatsView: React.FC = () => {
                     </div>
                 )}
             </IonList>
+
+            <LogObservanceDialog
+                isOpen={showDialog}
+                onClose={() => {
+                    setShowDialog(false);
+                    setEditingRecord(null);
+                }}
+                onSave={handleSave}
+                onDelete={handleDelete}
+                date={editingRecord ? new Date(editingRecord.date) : new Date()}
+                tithi={editingRecord?.tithi}
+                existingRecord={editingRecord || undefined}
+            />
         </div>
     );
 };

@@ -4,8 +4,7 @@ import { IonCard, IonCardContent, IonButton, IonIcon, IonChip, useIonAlert } fro
 import { checkmarkCircle, closeCircle, timeOutline, ribbonOutline, removeCircleOutline } from 'ionicons/icons';
 import { UposathaObservance } from '../../types/ObservanceTypes';
 import { UposathaObservanceService } from '../../services/UposathaObservanceService';
-import MarkObservedDialog from './MarkObservedDialog';
-import MarkSkippedDialog from './MarkSkippedDialog';
+import LogObservanceDialog from './LogObservanceDialog';
 
 interface ObservanceActionCardProps {
     date: Date;
@@ -17,8 +16,8 @@ interface ObservanceActionCardProps {
 
 const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonPhase = 'full', paksha, tithi, onUpdate }) => {
     const [observance, setObservance] = useState<UposathaObservance | null>(null);
-    const [showObservedDialog, setShowObservedDialog] = useState(false);
-    const [showSkippedDialog, setShowSkippedDialog] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [initialStatus, setInitialStatus] = useState<'observed' | 'skipped'>('observed');
     const [presentAlert] = useIonAlert();
 
     useEffect(() => {
@@ -88,7 +87,7 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                     position: 'absolute',
                     left: 0, top: 0, bottom: 0,
                     width: '6px',
-                    background: isObserved ? '#10B981' : isSkipped ? '#EF4444' : 'var(--color-text-tertiary)'
+                    background: isObserved ? '#10B981' : '#EF4444'
                 }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -100,11 +99,11 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: isObserved ? 'rgba(16, 185, 129, 0.15)' : isSkipped ? 'rgba(239, 68, 68, 0.15)' : 'rgba(156, 163, 175, 0.15)',
-                            color: isObserved ? '#10B981' : isSkipped ? '#EF4444' : 'var(--color-text-secondary)'
+                            background: isObserved ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                            color: isObserved ? '#10B981' : '#EF4444'
                         }}>
                             <IonIcon
-                                icon={isObserved ? checkmarkCircle : isSkipped ? closeCircle : removeCircleOutline}
+                                icon={isObserved ? checkmarkCircle : closeCircle}
                                 style={{ fontSize: '1.5rem' }}
                             />
                         </div>
@@ -113,7 +112,7 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                                 Observance Status
                             </div>
                             <div style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--color-text-primary)' }}>
-                                {isObserved ? 'Observed' : isSkipped ? 'Skipped' : 'Ignored'}
+                                {isObserved ? 'Observed' : 'Skipped'}
                             </div>
                         </div>
                     </div>
@@ -192,7 +191,10 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <button
-                    onClick={() => setShowObservedDialog(true)}
+                    onClick={() => {
+                        setInitialStatus('observed');
+                        setShowDialog(true);
+                    }}
                     style={{
                         padding: '14px',
                         background: '#10B981',
@@ -214,7 +216,10 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                 </button>
 
                 <button
-                    onClick={() => setShowSkippedDialog(true)}
+                    onClick={() => {
+                        setInitialStatus('skipped');
+                        setShowDialog(true);
+                    }}
                     style={{
                         padding: '14px',
                         background: 'rgba(239, 68, 68, 0.1)',
@@ -235,20 +240,14 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
                 </button>
             </div>
 
-            <MarkObservedDialog
-                isOpen={showObservedDialog}
-                onClose={() => setShowObservedDialog(false)}
+            <LogObservanceDialog
+                isOpen={showDialog}
+                onClose={() => setShowDialog(false)}
                 onSave={handleSave}
                 date={date}
                 tithi={tithi}
-            />
-
-            <MarkSkippedDialog
-                isOpen={showSkippedDialog}
-                onClose={() => setShowSkippedDialog(false)}
-                onSave={handleSave}
-                date={date}
-                tithi={tithi}
+                initialStatus={initialStatus}
+                existingRecord={observance || undefined}
             />
         </div>
     );
