@@ -66,11 +66,58 @@
     opacity: 0.9;
 }
 
+/* Location Display */
+.home-location-container {
+    margin-top: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.home-location-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.location-pin-icon {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    flex-shrink: 0;
+}
+
+.location-text {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 500;
+}
+
+.location-chevron {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-left: 2px;
+}
+
+.home-location-row.is-unset .location-pin-icon,
+.home-location-row.is-unset .location-text {
+    color: var(--color-accent-primary, #fbbf24);
+}
+
+.location-note {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.30);
+    font-style: italic;
+    margin: 3px 0 0 0;
+    max-width: 80%;
+    line-height: 1.3;
+}
+
 .home-hero__accent {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: var(--space-lg);
+    margin-top: 6px;
 }
 
 .home-hero__accent::before {

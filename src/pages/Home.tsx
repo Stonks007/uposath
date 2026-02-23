@@ -14,8 +14,9 @@ import {
   IonLabel,
   useIonViewWillEnter
 } from '@ionic/react';
-import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline, chevronForwardOutline } from 'ionicons/icons';
+import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline, chevronForwardOutline, locationOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import { Preferences } from '@capacitor/preferences';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
 import { SatiStatsService } from '../services/SatiStatsService';
@@ -35,9 +36,12 @@ const Home: React.FC = () => {
   });
   const [observanceStats, setObservanceStats] = useState<UposathaStats | null>(null);
   const [channelName, setChannelName] = useState('Dhamma Inspiration');
+  const [locationName, setLocationName] = useState('Set your location');
+  const [isLocationSet, setIsLocationSet] = useState(false);
 
   useIonViewWillEnter(() => {
     // Small delay to ensure smooth page transition
+    loadLocation();
     setTimeout(() => {
       loadStats();
       loadChannel();
@@ -64,6 +68,17 @@ const Home: React.FC = () => {
     }
   };
 
+  const loadLocation = async () => {
+    try {
+      const { value } = await Preferences.get({ key: 'uposatha_location' });
+      const loc = await getSavedLocation();
+      setLocationName(loc.name);
+      setIsLocationSet(!!value);
+    } catch (err) {
+      console.error('Failed to load location info:', err);
+    }
+  };
+
   const loadStats = async () => {
     try {
       const globalStats = await SatiStatsService.getGlobalStats();
@@ -84,7 +99,18 @@ const Home: React.FC = () => {
     <IonPage>
       <IonHeader className="ion-no-border header-transparent">
         <IonToolbar>
-          <IonTitle className="app-brand">Sammāsati</IonTitle>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '16px' }}>
+            <IonTitle className="app-brand" style={{ flex: 'none' }}>Sammāsati</IonTitle>
+            <div
+              onClick={() => history.push('/settings')}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.6, fontSize: '0.7rem', fontWeight: '700' }}
+            >
+              <IonIcon icon={locationOutline} style={{ color: isLocationSet ? 'var(--color-text-secondary)' : 'var(--color-accent-primary)' }} />
+              <span style={{ color: isLocationSet ? 'var(--color-text-secondary)' : 'var(--color-accent-primary)' }}>
+                {locationName.split(',')[0]}
+              </span>
+            </div>
+          </div>
         </IonToolbar>
       </IonHeader>
 
@@ -95,7 +121,21 @@ const Home: React.FC = () => {
           <div className="home-hero">
             <h1 className="home-hero__title">Namo Buddhaya</h1>
             <p className="home-hero__subtitle">Your daily path to mindfulness.</p>
+
             <div className="home-hero__accent"></div>
+
+            <div className="home-location-container" onClick={() => history.push('/settings')}>
+              <div className={`home-location-row ${!isLocationSet ? 'is-unset' : ''}`}>
+                <IonIcon icon={locationOutline} className="location-pin-icon" />
+                <span className="location-text">{isLocationSet ? locationName : 'Set your location'}</span>
+                <IonIcon icon={chevronForwardOutline} className="location-chevron" />
+              </div>
+              <p className="location-note">
+                {isLocationSet
+                  ? "Observance dates are calculated for your selected region. Tap to update your location."
+                  : "Set your country to receive accurate Uposatha and festival dates for your region."}
+              </p>
+            </div>
           </div>
 
 
@@ -187,7 +227,7 @@ const Home: React.FC = () => {
 
         </div>
       </IonContent>
-    </IonPage>
+    </IonPage >
   );
 };
 
