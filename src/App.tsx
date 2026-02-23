@@ -151,6 +151,9 @@ const UpdateManager: React.FC = () => {
       }
     };
 
+    // Run immediately on cold launch
+    checkUpdate();
+
     const handleAppStateChange = CapApp.addListener('appStateChange', (state) => {
       if (state.isActive) {
         checkUpdate();
