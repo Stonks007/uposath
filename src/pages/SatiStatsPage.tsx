@@ -40,7 +40,12 @@ import UposathaStatsView from '../components/uposatha/UposathaStatsView';
 import './SatiStatsPage.css';
 
 
+import { useLocation } from 'react-router-dom';
+
 const SatiStatsPage: React.FC = () => {
+    const location = useLocation();
+
+    // ... all other states ...
     const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
     const [history, setHistory] = useState<UnifiedSession[]>([]);
 
@@ -60,8 +65,6 @@ const SatiStatsPage: React.FC = () => {
     const [showAnapanasatiDetails, setShowAnapanasatiDetails] = useState(false);
     const [showEmptinessDetails, setShowEmptinessDetails] = useState(false);
 
-
-    // ... (inside component)
     const [statsView, setStatsView] = useState<'practice' | 'observance'>('practice');
     const [editingSession, setEditingSession] = useState<{ id: string, category: PracticeCategory, count: number, seconds?: number, timestamp: string, notes?: string, focus?: string, technique?: string } | null>(null);
 
@@ -69,6 +72,15 @@ const SatiStatsPage: React.FC = () => {
     const [logFilter, setLogFilter] = useState<PracticeCategory | 'all'>('all');
     const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tab = queryParams.get('tab');
+        if (tab === 'history' || tab === 'observance') {
+            setStatsView('observance');
+        } else if (tab === 'practice') {
+            setStatsView('practice');
+        }
+    }, [location.search]);
 
     const loadData = async () => {
         try {

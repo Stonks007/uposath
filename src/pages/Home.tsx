@@ -14,7 +14,7 @@ import {
   IonLabel,
   useIonViewWillEnter
 } from '@ionic/react';
-import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline } from 'ionicons/icons';
+import { settingsOutline, statsChartOutline, leafOutline, calendarOutline, musicalNotesOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import NextUposathaWidget from '../components/uposatha/NextUposathaWidget';
 import DhammaAudioWidget from '../components/audio/DhammaAudioWidget';
@@ -98,6 +98,8 @@ const Home: React.FC = () => {
             <div className="home-hero__accent"></div>
           </div>
 
+
+
           {/* Primary Feature: Upcoming Uposatha */}
           <section>
             <div className="home-section-header">
@@ -109,7 +111,70 @@ const Home: React.FC = () => {
             <NextUposathaWidget />
           </section>
 
-          {/* New Audio Section */}
+          <section>
+            <div
+              className="home-section-header"
+              onClick={() => history.push('/sati/stats')}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
+                  <IonIcon icon={statsChartOutline} color="primary" />
+                </div>
+                <h3 className="home-section-title">Practice Summary</h3>
+              </div>
+              <IonIcon icon={chevronForwardOutline} style={{ fontSize: '1.2rem', color: 'var(--color-text-tertiary)' }} />
+            </div>
+
+            <div className="glass-card unified-stats-container">
+              {/* Daily Mindfulness Row */}
+              <div
+                className="stats-header-label"
+                onClick={() => history.push('/sati/stats?tab=practice')}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+              >
+                DAILY MINDFULNESS <IonIcon icon={chevronForwardOutline} style={{ fontSize: '0.8rem', opacity: 0.6 }} />
+              </div>
+              <div className="stats-section-row">
+                <div className="stats-column" onClick={() => history.push('/sati/stats?tab=practice')}>
+                  <div className="stat-value">{stats.totalBeads}</div>
+                  <div className="stat-label">Total Beads</div>
+                </div>
+                <div className="stats-divider-vertical"></div>
+                <div className="stats-column" onClick={() => history.push('/sati/stats?tab=practice')}>
+                  <div className="stat-value">{stats.currentStreak}</div>
+                  <div className="stat-label">Day Streak</div>
+                </div>
+              </div>
+
+              {/* Uposatha Journey Row (Only if tracking) */}
+              {observanceStats && observanceStats.totalTracked > 0 && (
+                <>
+                  <div className="stats-divider-horizontal"></div>
+                  <div
+                    className="stats-header-label"
+                    onClick={() => history.push('/sati/stats?tab=history')}
+                    style={{ color: 'var(--color-mahayana-accent)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                  >
+                    UPOSATHA JOURNEY <IonIcon icon={chevronForwardOutline} style={{ fontSize: '0.8rem', opacity: 0.6 }} />
+                  </div>
+                  <div className="stats-section-row">
+                    <div className="stats-column" onClick={() => history.push('/sati/stats?tab=history')}>
+                      <div className="stat-value" style={{ color: 'var(--color-mahayana-accent)' }}>{observanceStats.rate.toFixed(0)}%</div>
+                      <div className="stat-label">Observance Rate</div>
+                    </div>
+                    <div className="stats-divider-vertical"></div>
+                    <div className="stats-column" onClick={() => history.push('/sati/stats?tab=history')}>
+                      <div className="stat-value">{observanceStats.currentStreak}</div>
+                      <div className="stat-label">Uposatha Streak</div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Dhamma Inspiration (Audio) - Moved to Bottom */}
           <section>
             <div className="home-section-header">
               <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
@@ -118,68 +183,6 @@ const Home: React.FC = () => {
               <h3 className="home-section-title">Latest from {channelName}</h3>
             </div>
             <DhammaAudioWidget />
-          </section>
-
-          {/* Stats Section */}
-          <section>
-            <div className="home-section-header">
-              <div className="icon-wrapper icon-wrapper--small icon-wrapper--primary">
-                <IonIcon icon={statsChartOutline} color="primary" />
-              </div>
-              <h3 className="home-section-title">Practice Summary</h3>
-            </div>
-
-            <div className="stats-grid">
-              <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')}>
-                <div className="stat-value">{stats.totalBeads}</div>
-                <div className="stat-label">Total Beads</div>
-              </div>
-
-              <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')}>
-                <div className="stat-value">{stats.currentStreak}</div>
-                <div className="stat-label">Day Streak</div>
-              </div>
-            </div>
-
-            {observanceStats && (
-              <div className="stats-grid" style={{ marginTop: '12px' }}>
-                <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')} style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: '16px' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div className="stat-value" style={{ color: 'var(--color-mahayana-accent)' }}>{observanceStats.rate.toFixed(0)}%</div>
-                    <div className="stat-label">Observance Rate</div>
-                  </div>
-                  <div style={{ width: '1px', height: '40px', background: 'var(--glass-border)' }}></div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div className="stat-value">{observanceStats.currentStreak}</div>
-                    <div className="stat-label">Uposatha Streak</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Quick Actions */}
-          <section>
-            <div className="home-section-header">
-              <h3 className="home-section-title">Quick Actions</h3>
-            </div>
-            <div className="action-grid">
-              <div className="glass-card action-card-button" onClick={() => history.push('/sati')}>
-                <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
-                  <IonIcon icon={leafOutline} color="primary" />
-                </div>
-                <div className="action-label">Practice</div>
-                <div className="action-sublabel">Start Session</div>
-              </div>
-
-              <div className="glass-card action-card-button" onClick={() => history.push('/calendar')}>
-                <div className="icon-wrapper icon-wrapper--large icon-wrapper--primary">
-                  <IonIcon icon={calendarOutline} color="primary" />
-                </div>
-                <div className="action-label">Calendar</div>
-                <div className="action-sublabel">View Dates</div>
-              </div>
-            </div>
           </section>
 
         </div>
