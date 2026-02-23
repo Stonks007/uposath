@@ -311,7 +311,7 @@ const DayDetailPage: React.FC = () => {
                                 <h4 style={{ marginTop: 0, marginBottom: '16px', fontSize: '0.9rem', color: 'var(--color-accent-primary)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}> Calculations Reference</h4>
                                 <div style={{ display: 'grid', gap: '20px' }}>
                                     <div>
-                                        <h5 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>• Kshaya <span style={{ fontWeight: 'normal', opacity: 0.6 }}>(Skipped Tithi)</span></h5>
+                                        <h5 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>• Kshaya <span style={{ fontWeight: 'normal', opacity: 0.6 }}>(Optional Tithi)</span></h5>
                                         <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
                                             Occurs when a lunar day begins and ends between two consecutive sunrises. It's skipped in the standard count but remains an optional day for practice.
                                         </p>

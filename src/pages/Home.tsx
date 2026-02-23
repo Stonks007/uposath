@@ -22,6 +22,8 @@ import { SatiStatsService } from '../services/SatiStatsService';
 import { getSavedLocation, getObserver } from '../services/locationManager';
 import { getDefaultChannel } from '../services/channelManager';
 import { warmUpFestivalCache } from '../services/festivalCacheService';
+import { UposathaObservanceService } from '../services/UposathaObservanceService';
+import { UposathaStats } from '../types/ObservanceTypes';
 import './Home.css';
 
 const Home: React.FC = () => {
@@ -31,6 +33,7 @@ const Home: React.FC = () => {
     totalBeads: 0,
     currentStreak: 0
   });
+  const [observanceStats, setObservanceStats] = useState<UposathaStats | null>(null);
   const [channelName, setChannelName] = useState('Dhamma Inspiration');
 
   useIonViewWillEnter(() => {
@@ -64,12 +67,14 @@ const Home: React.FC = () => {
   const loadStats = async () => {
     try {
       const globalStats = await SatiStatsService.getGlobalStats();
+      const obsStats = await UposathaObservanceService.getStats();
 
       setStats({
         meditationMinutes: 0,
         totalBeads: globalStats.totalBeads,
         currentStreak: globalStats.currentStreak
       });
+      setObservanceStats(obsStats);
     } catch (err) {
       console.error('Failed to load practice stats:', err);
     }
@@ -135,6 +140,22 @@ const Home: React.FC = () => {
                 <div className="stat-label">Day Streak</div>
               </div>
             </div>
+
+            {observanceStats && (
+              <div className="stats-grid" style={{ marginTop: '12px' }}>
+                <div className="glass-card stat-card" onClick={() => history.push('/sati/stats')} style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: '16px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="stat-value" style={{ color: 'var(--color-mahayana-accent)' }}>{observanceStats.rate.toFixed(0)}%</div>
+                    <div className="stat-label">Observance Rate</div>
+                  </div>
+                  <div style={{ width: '1px', height: '40px', background: 'var(--glass-border)' }}></div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="stat-value">{observanceStats.currentStreak}</div>
+                    <div className="stat-label">Uposatha Streak</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Quick Actions */}

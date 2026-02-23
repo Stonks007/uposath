@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { IonCard, IonCardContent, IonButton, IonIcon, IonChip, useIonAlert } from '@ionic/react';
-import { checkmarkCircle, closeCircle, timeOutline, ribbonOutline } from 'ionicons/icons';
+import { checkmarkCircle, closeCircle, timeOutline, ribbonOutline, removeCircleOutline } from 'ionicons/icons';
 import { UposathaObservance } from '../../types/ObservanceTypes';
 import { UposathaObservanceService } from '../../services/UposathaObservanceService';
 import MarkObservedDialog from './MarkObservedDialog';
@@ -69,17 +69,17 @@ const ObservanceActionCard: React.FC<ObservanceActionCardProps> = ({ date, moonP
 
     if (observance) {
         return (
-            <IonCard style={{ background: observance.status === 'observed' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: observance.status === 'observed' ? '1px solid #10B981' : '1px solid #EF4444' }}>
+            <IonCard style={{ background: observance.status === 'observed' ? 'rgba(16, 185, 129, 0.1)' : observance.status === 'skipped' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(156, 163, 175, 0.1)', border: observance.status === 'observed' ? '1px solid #10B981' : observance.status === 'skipped' ? '1px solid #EF4444' : '1px solid #9CA3AF' }}>
                 <IonCardContent>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                 <IonIcon
-                                    icon={observance.status === 'observed' ? checkmarkCircle : closeCircle}
-                                    style={{ color: observance.status === 'observed' ? '#10B981' : '#EF4444', fontSize: '1.5rem' }}
+                                    icon={observance.status === 'observed' ? checkmarkCircle : observance.status === 'skipped' ? closeCircle : removeCircleOutline}
+                                    style={{ color: observance.status === 'observed' ? '#10B981' : observance.status === 'skipped' ? '#EF4444' : '#9CA3AF', fontSize: '1.5rem' }}
                                 />
                                 <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                                    {observance.status === 'observed' ? 'Observed' : 'Skipped'}
+                                    {observance.status === 'observed' ? 'Observed' : observance.status === 'skipped' ? 'Skipped' : 'Ignored'}
                                 </span>
                             </div>
 

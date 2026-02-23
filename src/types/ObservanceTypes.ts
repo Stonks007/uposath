@@ -4,7 +4,7 @@ export interface UposathaObservance {
     moonPhase: 'full' | 'new' | 'quarter' | 'chaturdashi';
     paksha?: 'Shukla' | 'Krishna';
     tithi?: string; // Formatted as 'Paksha: TithiName'
-    status: 'observed' | 'skipped';
+    status: 'observed' | 'skipped' | 'ignored';
     level?: 'full' | 'partial' | 'minimal';
     precepts?: string[]; // e.g., '8_precepts', 'monastery', 'study'
     practiceMinutes?: {
@@ -23,6 +23,7 @@ export interface UposathaStats {
     totalTracked: number;
     observed: number;
     skipped: number;
+    ignored: number;
     rate: number; // 0-100
     currentStreak: number;
     longestStreak: number;

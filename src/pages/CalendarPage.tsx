@@ -19,7 +19,8 @@ import {
     todayOutline,
     peopleOutline,
     checkmarkCircle,
-    closeCircle
+    closeCircle,
+    removeCircleOutline
 } from 'ionicons/icons';
 import { useHistory } from 'react-router';
 import { Preferences } from '@capacitor/preferences';
@@ -141,6 +142,7 @@ const CalendarPage: React.FC = () => {
     };
 
     const getMoonIcon = (status: UposathaStatus) => {
+        if (status.isKshaya) return '🌙';
         if (status.isUposatha) {
             if (status.isFullMoon) return '🌕';
             if (status.isNewMoon) return '🌑';
@@ -201,8 +203,8 @@ const CalendarPage: React.FC = () => {
                             {observance && (
                                 <div style={{ position: 'absolute', bottom: '2px', right: '2px', fontSize: '1rem', zIndex: 2 }}>
                                     <IonIcon
-                                        icon={observance.status === 'observed' ? checkmarkCircle : closeCircle}
-                                        color={observance.status === 'observed' ? 'success' : 'danger'}
+                                        icon={observance.status === 'observed' ? checkmarkCircle : observance.status === 'skipped' ? closeCircle : removeCircleOutline}
+                                        color={observance.status === 'observed' ? 'success' : observance.status === 'skipped' ? 'danger' : 'medium'}
                                     />
                                 </div>
                             )}
@@ -300,14 +302,14 @@ const CalendarPage: React.FC = () => {
                                     {todayData.u.isUposatha
                                         ? `✨ ${todayData.u.paliLabel || 'Uposatha'}`
                                         : todayData.u.isOptional
-                                            ? <><span className="moon-optional">○</span> {todayData.u.isKshaya ? 'Kshaya' : 'Vridhi'}</>
+                                            ? <><span className={todayData.u.isKshaya ? 'moon-indicator' : 'moon-optional'}>{getMoonIcon(todayData.u) || '○'}</span> {todayData.u.isKshaya ? 'Kshaya' : 'Vridhi'}</>
                                             : 'No Uposatha Day'}
                                 </span>
                             </div>
                             {todayData.u.isOptional && (
                                 <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '8px', lineHeight: '1.3' }}>
                                     {todayData.u.isKshaya
-                                        ? 'Note: Kshaya (Skipped) — This tithi started and ended between sunrises, missing the standard calendar count.'
+                                        ? 'Note: Kshaya (Optional) — This tithi started and ended between sunrises, missing the standard calendar count.'
                                         : 'Note: Vridhi (Extended) — This tithi spans across two sunrises, making today an additional observance day.'}
                                 </div>
                             )}
@@ -345,7 +347,8 @@ const CalendarPage: React.FC = () => {
                             <div className="legend-item"><span>🌑</span> Amavasya Uposatha</div>
                             <div className="legend-item"><span>🌗</span> Ashtami Uposatha</div>
                             <div className="legend-item"><span>🌖</span> Chaturdashi Uposatha</div>
-                            <div className="legend-item"><span className="moon-optional">○</span> Kshaya / Vridhi (Optional Uposatha)</div>
+                            <div className="legend-item"><span className="moon-indicator">🌙</span> Kshaya Uposatha</div>
+                            <div className="legend-item"><span className="moon-optional">○</span> Vridhi (Extended Uposatha)</div>
                         </div>
                     </div>
 
@@ -371,11 +374,11 @@ const CalendarPage: React.FC = () => {
                         <div className="legend-title">Liturgical Meanings</div>
                         <div className="liturgical-item">
                             <span className="bullet">•</span>
-                            <span><strong>Kshaya (Skipped):</strong> Occurs when a Tithi starts after one sunrise and ends before the next. "Skipped" in the count.</span>
+                            <span><strong>Kshaya:</strong> Occurs when a Tithi starts after one sunrise and ends before the next.</span>
                         </div>
                         <div className="liturgical-item">
                             <span className="bullet">•</span>
-                            <span><strong>Vridhi (Extended):</strong> Tithi spans two sunrises. Counted twice (primary + extended).</span>
+                            <span><strong>Vridhi (Extended):</strong> Tithi spans two sunrises. Counted twice (primary + extended). Skip, Do not Observe Uposatha</span>
                         </div>
                     </div>
                 </div>

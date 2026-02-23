@@ -21,7 +21,10 @@ export const UposathaObservanceService = {
     },
 
     async getObservance(date: Date): Promise<UposathaObservance | null> {
-        const dateStr = date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
         const history = await UposathaObservanceService.getHistory();
         return history.find(o => o.date === dateStr) || null;
     },
@@ -53,6 +56,20 @@ export const UposathaObservanceService = {
 
     async syncMissedObservances(observer: Observer): Promise<void> {
         let history = await UposathaObservanceService.getHistory();
+        let changed = false;
+
+        // Cleanup: Remove any 'ignored' or 'skipped' entries that are NO LONGER mathematically Uposatha days or Optional days.
+        const cleanedHistory = history.filter(o => {
+            if (o.status === 'observed') return true;
+            const checkDate = new Date(`${o.date}T12:00:00`);
+            const status = getUposathaStatus(checkDate, observer);
+            return status.isUposatha || status.isOptional;
+        });
+
+        if (cleanedHistory.length !== history.length) {
+            history = cleanedHistory;
+            changed = true;
+        }
 
         const now = new Date();
         now.setHours(0, 0, 0, 0); // Start boundary: strictly before today (00:00:00)
@@ -71,7 +88,10 @@ export const UposathaObservanceService = {
         scanDate.setDate(scanDate.getDate() - 1);
 
         while (scanDate >= earliestScanDate) {
-            const dateStr = scanDate.toISOString().split('T')[0];
+            const year = scanDate.getFullYear();
+            const month = String(scanDate.getMonth() + 1).padStart(2, '0');
+            const day = String(scanDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
 
             if (!recordedDates.has(dateStr)) {
                 // Determine if this past day was an Uposatha Day using local noon check
@@ -90,8 +110,7 @@ export const UposathaObservanceService = {
                         date: dateStr,
                         moonPhase,
                         paksha: status.paksha as 'Shukla' | 'Krishna',
-                        status: 'skipped',
-                        skipReason: 'forgot',
+                        status: status.isUposatha ? 'skipped' : 'ignored',
                         timestamp: new Date().toISOString()
                     });
                 }
@@ -99,7 +118,7 @@ export const UposathaObservanceService = {
             scanDate.setDate(scanDate.getDate() - 1);
         }
 
-        if (newEntries.length > 0) {
+        if (newEntries.length > 0 || changed) {
             history.push(...newEntries);
             // Re-sort descending just in case
             history = history.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -116,6 +135,7 @@ export const UposathaObservanceService = {
         const totalTracked = history.length;
         const observed = history.filter(o => o.status === 'observed').length;
         const skipped = history.filter(o => o.status === 'skipped').length;
+        const ignored = history.filter(o => o.status === 'ignored').length;
         const rate = totalTracked > 0 ? (observed / totalTracked) * 100 : 0;
 
         // Moon Phase Breakdown
@@ -194,6 +214,7 @@ export const UposathaObservanceService = {
             totalTracked,
             observed,
             skipped,
+            ignored,
             rate,
             currentStreak,
             longestStreak,
