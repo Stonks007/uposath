@@ -298,7 +298,7 @@ const CalendarPage: React.FC = () => {
                                     fontWeight: todayData.u.isUposatha ? '900' : 'bold'
                                 }}>
                                     {todayData.u.isUposatha
-                                        ? `✨ ${todayData.u.paliLabel || 'Uposatha'}`
+                                        ? <><span className="celestial-amber">✨</span> {todayData.u.paliLabel || 'Uposatha'}</>
                                         : todayData.u.isOptional
                                             ? <><span className={todayData.u.isKshaya ? 'moon-indicator' : 'moon-optional'}>{getMoonIcon(todayData.u) || '○'}</span> {todayData.u.isKshaya ? 'Kshaya' : 'Vridhi'}</>
                                             : 'No Uposatha Day'}

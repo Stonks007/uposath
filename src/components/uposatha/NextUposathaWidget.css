@@ -13,6 +13,7 @@
     position: relative;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
         box-shadow 0.2s ease;
+    animation: amberGlow 8s infinite ease-in-out;
 }
 
 .next-uposatha-card::before {
@@ -113,6 +114,7 @@
     font-size: 0.9rem;
     font-weight: 800;
     color: var(--color-accent-primary);
+    animation: amberGlow 2s infinite ease-in-out;
 }
 
 .next-uposatha-rate {

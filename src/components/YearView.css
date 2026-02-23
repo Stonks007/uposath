@@ -20,6 +20,21 @@
     animation: fadeIn var(--transition-base) ease-out;
 }
 
+.year-uposatha-item.today-item {
+    --background: rgba(255, 198, 112, 0.08);
+    border: 1px solid var(--color-accent-primary);
+    box-shadow: 0 0 15px rgba(255, 198, 112, 0.1);
+}
+
+.today-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--color-accent-primary);
+    margin-right: 8px;
+}
+
 .month-card-accent {
     position: absolute;
     left: 0;
@@ -80,7 +95,8 @@
     font-size: 1.15rem;
     font-weight: 800;
     color: var(--color-text-primary);
-    margin-bottom: 2px;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .year-uposatha-label {
@@ -89,19 +105,28 @@
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    opacity: 0.8;
+    opacity: 0.85;
+    margin-top: 4px;
+    line-height: 1.4;
+    display: block;
 }
 
 .year-festival-note {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 900;
     color: var(--color-theravada-primary) !important;
     background: rgba(255, 153, 51, 0.12);
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 153, 51, 0.25);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 153, 51, 0.2);
     text-transform: uppercase;
     letter-spacing: 0.02em;
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    text-align: right;
 }
 
 .year-moon-wrapper {
@@ -123,6 +148,7 @@
 .year-moon-icon.phase-full-moon {
     filter: drop-shadow(0 0 15px rgba(255, 198, 112, 0.4));
     transform: scale(1.1);
+    animation: amberGlow 4s infinite ease-in-out;
 }
 
 .year-moon-icon.phase-new-moon {
@@ -132,4 +158,5 @@
 .year-moon-icon.phase-chaturdashi,
 .year-moon-icon.phase-ashtami {
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+    animation: silverGlow 5s infinite ease-in-out;
 }

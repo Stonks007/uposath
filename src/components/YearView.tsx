@@ -66,11 +66,12 @@ const YearView: React.FC<YearViewProps> = ({ year, observer }) => {
                     </div>
                     {group.days.map((day, idx) => {
                         const festival = checkFestival(day.date, observer, day.status.panchangam);
+                        const isToday = new Date().toDateString() === day.date.toDateString();
                         return (
                             <IonItem
                                 key={idx}
                                 routerLink={`/day/${day.date.toISOString().split('T')[0]}`}
-                                className="year-uposatha-item"
+                                className={`year-uposatha-item ${isToday ? 'today-item' : ''}`}
                                 detail={false}
                             >
                                 <div slot="start" className="year-moon-wrapper">
@@ -87,6 +88,9 @@ const YearView: React.FC<YearViewProps> = ({ year, observer }) => {
                                     <h2 className="year-date-title">{formatSanskritDate(day.date)}</h2>
                                     <p className="year-uposatha-label">{day.status.label}</p>
                                 </IonLabel>
+                                {isToday && (
+                                    <div className="today-dot" slot="end" title="Today" />
+                                )}
                                 {festival && (
                                     <IonNote slot="end" className="year-festival-note">
                                         ☸️ {festival.name}
