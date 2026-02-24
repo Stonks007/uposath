@@ -63,7 +63,7 @@ export const UposathaObservanceService = {
             if (o.status === 'observed') return true;
             const checkDate = new Date(`${o.date}T12:00:00`);
             const status = getUposathaStatus(checkDate, observer);
-            return status.isUposatha || status.isOptional;
+            return status.isUposatha || (status.isOptional && !status.isVridhi);
         });
 
         if (cleanedHistory.length !== history.length) {
@@ -99,7 +99,7 @@ export const UposathaObservanceService = {
                 checkDate.setHours(12, 0, 0, 0);
                 const status = getUposathaStatus(checkDate, observer);
 
-                if (status.isUposatha || status.isOptional) {
+                if (status.isUposatha || (status.isOptional && !status.isVridhi)) {
                     const moonPhase = status.isFullMoon ? 'full'
                         : status.isNewMoon ? 'new'
                             : status.isChaturdashi ? 'chaturdashi'

@@ -260,7 +260,7 @@ const DayDetailPage: React.FC = () => {
                 </div>
 
                 {/* Observance Action Card */}
-                {(data.status.isUposatha || data.status.isOptional) && (
+                {(data.status.isUposatha || (data.status.isOptional && !data.status.isVridhi)) && (
                     <ObservanceActionCard
                         date={date}
                         moonPhase={

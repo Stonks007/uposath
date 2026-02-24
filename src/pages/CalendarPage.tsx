@@ -142,12 +142,12 @@ const CalendarPage: React.FC = () => {
     };
 
     const getMoonIcon = (status: UposathaStatus) => {
+        if (status.isOptional && status.isVridhi) return '○';
         if (status.isKshaya) return '🌙';
         if (status.isFullMoon) return '🌕';
         if (status.isNewMoon) return '🌑';
         if (status.isChaturdashi) return '🌖';
         if (status.isAshtami) return '🌗';
-        if (status.isOptional && status.isVridhi) return '○';
         return null;
     };
 
@@ -198,7 +198,7 @@ const CalendarPage: React.FC = () => {
                                     style={{ background: festivalColors?.primary }}
                                 />
                             )}
-                            {observance && (
+                            {observance && !day.uposatha.isVridhi && (
                                 <div style={{ position: 'absolute', bottom: '2px', right: '2px', fontSize: '1rem', zIndex: 2 }}>
                                     <IonIcon
                                         icon={observance.status === 'observed' ? checkmarkCircle : observance.status === 'skipped' ? closeCircle : removeCircleOutline}
