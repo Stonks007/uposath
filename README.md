@@ -279,6 +279,7 @@ uposath/
 |---|---|---|
 | [Node.js](https://nodejs.org/) | ≥ 18.0 | JavaScript runtime |
 | [Android Studio](https://developer.android.com/studio) | SDK 34+ | Native build & emulator |
+| **Android SDK** | `C:/Users/Admin/AppData/Local/Android/Sdk` | Path set in `android/local.properties` |
 | Git | Latest | Version control |
 
 ### 📲 Quick Install

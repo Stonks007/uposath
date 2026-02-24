@@ -33,7 +33,6 @@ google-services.json
 /android/.kotlin/
 /android/build/
 /android/app/build/
-/android/local.properties
 /android/build_log.txt
 /android/output.log
 /android/app/src/main/assets/public/
