@@ -7,6 +7,13 @@
 
 .settings-section {
     margin-bottom: 32px;
+    position: relative;
+    /* Create stacking context root */
+}
+
+/* Ensure current section is above others when interacting (e.g. city search dropdown) */
+.settings-section:focus-within {
+    z-index: 10;
 }
 
 .settings-item.clickable {
@@ -58,6 +65,8 @@ ion-select::part(icon) {
 .settings-card {
     padding: 8px 4px;
     /* Minimal padding since items will have their own or we'll manage strictly */
+    overflow: visible;
+    /* Allow absolute dropdowns to overflow */
 }
 
 .settings-item {
