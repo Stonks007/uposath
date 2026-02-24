@@ -37,8 +37,8 @@ export const ImageResizeHelper = {
 
                 ctx.drawImage(img, -offsetX, -offsetY, width, height);
 
-                // Export to high-quality low-filesize jpeg
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                // Export to high-quality low-filesize webp
+                const resizedBase64 = canvas.toDataURL('image/webp', 0.85);
                 resolve(resizedBase64);
             };
             img.onerror = () => reject(new Error('Failed to load image for resizing'));

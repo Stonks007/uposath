@@ -35,6 +35,7 @@ export interface BackupData {
     mantras: Mantra[];
     mantraSessions: MantraSession[];
     emptinessSessions: EmptinessSession[];
+    userImages?: Record<string, string>; // path -> base64
 }
 
 export interface BackupPayload {
@@ -108,8 +109,32 @@ export const BackupRestoreService = {
                 mantras,
                 mantraSessions,
                 emptinessSessions,
+                userImages: await this.collectUserImages(mantras),
             },
         };
+    },
+
+    /**
+     * Helper to read all user images from filesystem for backup embedding.
+     */
+    async collectUserImages(mantras: Mantra[]): Promise<Record<string, string>> {
+        const images: Record<string, string> = {};
+        const userImagePaths = mantras
+            .filter(m => m.basic.deityImageType === 'user' && m.basic.deityImagePath)
+            .map(m => m.basic.deityImagePath!);
+
+        for (const path of userImagePaths) {
+            try {
+                const file = await Filesystem.readFile({
+                    directory: Directory.Data,
+                    path: path
+                });
+                images[path] = typeof file.data === 'string' ? file.data : '';
+            } catch (e) {
+                console.error(`Backup: Failed to read image ${path}`, e);
+            }
+        }
+        return images;
     },
 
     /**
@@ -183,6 +208,7 @@ export const BackupRestoreService = {
                 mantras: Array.isArray(d.mantras) ? d.mantras : [],
                 mantraSessions: Array.isArray(d.mantraSessions) ? d.mantraSessions : [],
                 emptinessSessions: Array.isArray(d.emptinessSessions) ? d.emptinessSessions : [],
+                userImages: d.userImages && typeof d.userImages === 'object' ? d.userImages : {},
             },
         };
 
@@ -220,6 +246,7 @@ export const BackupRestoreService = {
             Preferences.set({ key: KEYS.mantras, value: JSON.stringify(d.mantras) }),
             Preferences.set({ key: KEYS.mantraSessions, value: JSON.stringify(d.mantraSessions) }),
             Preferences.set({ key: KEYS.emptinessSessions, value: JSON.stringify(d.emptinessSessions) }),
+            this.restoreUserImages(d.userImages || {}),
         ]);
 
         return this.summarize(payload);
@@ -265,4 +292,30 @@ export const BackupRestoreService = {
             input.click();
         });
     },
+
+    /**
+     * Helper to write restored images back to filesystem.
+     */
+    async restoreUserImages(images: Record<string, string>): Promise<void> {
+        // Ensure directory exists
+        try {
+            await Filesystem.mkdir({
+                directory: Directory.Data,
+                path: 'mantra-images',
+                recursive: true
+            });
+        } catch (e) { }
+
+        for (const [path, base64] of Object.entries(images)) {
+            try {
+                await Filesystem.writeFile({
+                    directory: Directory.Data,
+                    path: path,
+                    data: base64
+                });
+            } catch (e) {
+                console.error(`Restore: Failed to write image ${path}`, e);
+            }
+        }
+    }
 };

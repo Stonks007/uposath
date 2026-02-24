@@ -23,7 +23,7 @@ class DeityImageService {
                         directory: Directory.Data,
                         path: info.deityImagePath
                     });
-                    return `data:image/jpeg;base64,${file.data}`;
+                    return `data:image/webp;base64,${file.data}`;
                 } else {
                     // If it's a user image we must serve it via capacitor local web server
                     const stat = await Filesystem.getUri({
@@ -110,7 +110,7 @@ class DeityImageService {
 
                 for (const file of files) {
                     const fileName = typeof file === 'string' ? file : (file as any).name;
-                    if (!fileName.endsWith('.jpg')) continue;
+                    if (!fileName.endsWith('.webp') && !fileName.endsWith('.jpg')) continue;
 
                     const filePath = `mantra-images/${fileName}`;
                     if (!activeImagePaths.has(filePath)) {

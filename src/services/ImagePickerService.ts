@@ -45,12 +45,12 @@ class ImagePickerService {
                 }
             }
 
-            // Resize image to 256x256 jpeg
+            // Resize image to 256x256 webp
             const resizedBase64Url = await ImageResizeHelper.resizeImage(base64Data, 256, 256);
             // Extract pure base64 without mime prefix for Capacitor writing
             const pureBase64 = resizedBase64Url.split(',')[1];
 
-            const newFilename = `mantra-images/${mantraId}.jpg`;
+            const newFilename = `mantra-images/${mantraId}.webp`;
 
             // Delete old user image if exists
             if (oldPath) {
