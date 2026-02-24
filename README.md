@@ -11,18 +11,23 @@
 
   <br>
 
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+  <br>
+  
+  [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=for-the-badge&logo=gnu)](https://www.gnu.org/licenses/gpl-3.0)
   [![Framework: Ionic](https://img.shields.io/badge/Framework-Ionic-3880ff?style=for-the-badge&logo=ionic)](https://ionicframework.com/)
   [![UI: React](https://img.shields.io/badge/UI-React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
   [![Language: TypeScript](https://img.shields.io/badge/Lang-TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
   [![Platform: Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
   [![Backend: Kotlin](https://img.shields.io/badge/Native-Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+  [![Total Downloads](https://img.shields.io/github/downloads/Stonks007/uposath/total?style=for-the-badge&color=blueviolet&label=TOTAL%20DOWNLOADS)](https://github.com/Stonks007/uposath/releases)
 
-  <br>
+  <br><br>
 
-  [![Download APK](https://img.shields.io/badge/Download-APK_v1.0.3-success?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Stonks007/uposath/releases/download/v1.0.3/Uposatha-v1.0.3.apk)
+  <a href="https://github.com/Stonks007/uposath/releases/download/v1.0.3/Uposatha-v1.0.3.apk">
+    <img src="https://img.shields.io/badge/DOWNLOAD-APK-1a1b26?style=for-the-badge&logo=android&logoColor=white" height="42"><img src="https://img.shields.io/badge/v1.0.3-4CAF50?style=for-the-badge&logoColor=white" height="42"><img src="https://img.shields.io/github/downloads/Stonks007/uposath/v1.0.3/total?style=for-the-badge&label=&color=blueviolet" height="42">
+  </a>
 
-  <br>
+  <br><br>
 
   <sub>*"Appamādo amatapadaṃ" — Heedfulness is the path to the Deathless.*<br>— Dhammapada 21</sub>
 
@@ -286,7 +291,7 @@ uposath/
 
 If you just want to use the app on your Android device:
 
-**[Download Uposath v1.0.3 APK](https://github.com/Stonks007/uposath/releases/download/v1.0.3/Uposatha-v1.0.3.apk)**
+**[🚀 Download Uposath v1.0.3 APK](https://github.com/Stonks007/uposath/releases/download/v1.0.3/Uposatha-v1.0.3.apk)**
 
 ### 🏗️ Build from Source
 
@@ -394,7 +399,7 @@ Contributions are warmly welcomed! Whether it's fixing a bug, adding a new medit
 ## 🙏 Acknowledgments
 
 - **Dhammapada** texts sourced from [Project Gutenberg](https://www.gutenberg.org/) (public domain, Max Müller translation)
-- **Vedic Pañcāṅga calculations** via [`@ishubhamx/panchangam-js`](https://github.com/ishubhamx/panchangam-js) by Shubham
+- **Vedic Pañcāṅga calculations** via [`@ishubhamx/panchangam-js`](https://www.npmjs.com/package/@ishubhamx/panchangam-js) by Shubham
 - **Mahāyāna lunar phase tracking** via [`chinese-lunar-calendar`](https://www.npmjs.com/package/chinese-lunar-calendar) by linlifengx
 - **Offline global location lookups** via [`country-state-city`](https://www.npmjs.com/package/country-state-city) by Harpreet Singh
 - **Offline geospatial timezone mapping** via [`tz-lookup`](https://www.npmjs.com/package/tz-lookup) by The Dark Sky Company
@@ -405,7 +410,7 @@ Contributions are warmly welcomed! Whether it's fixing a bug, adding a new medit
 
 ## 📜 License
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for full details.
+Distributed under the **GNU General Public License v3.0**. See [`LICENSE`](LICENSE) for full details.
 
 This software is offered freely in the spirit of *Dāna* (generosity) — may it support your practice and benefit all beings.
 
